@@ -1,0 +1,20 @@
+Package: bsvarTVPs
+Type: Package
+Title: Bayesian estimation of heteroskedastic Structural Vector Autoregressions with Markov-switching structural matrix
+Version: 0.0.1.9000
+Date: 2022-10-17
+Authors@R: person("Tomasz", "Woźniak", , "wozniak.tom@pm.me", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-2212-2378"))
+Maintainer: Tomasz Woźniak <wozniak.tom@pm.me>
+Description: Efficient algorithms for Bayesian estimation of Structural Vector Autoregressions with Stochastic Volatility heteroskedasticity and Markov-switching structural matrix.
+License: GPL (>= 3)
+Imports: 
+    bsvars,
+    GIGrvg,
+    R6,
+    Rcpp (>= 1.0.9),
+    RcppProgress,
+    RcppTN
+LinkingTo: bsvars, Rcpp, RcppArmadillo, RcppProgress, RcppTN
+Encoding: UTF-8
+RoxygenNote: 7.2.1
