@@ -10,7 +10,14 @@ Markov-switching structural matrix.
 
 # Installation
 
-Just open your **R** and type:
+The current version of the package depends on the development version of
+the **bsvars** package.
+
+Install the **bsvars** package first:
+
+    devtools::install_git("https://github.com/donotdespair/bsvars.git")
+
+Now, just type in **R** to install the **bsvarTVPs** package:
 
     devtools::install_git("https://github.com/donotdespair/bsvarTVPs.git")
 
