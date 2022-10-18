@@ -23,3 +23,7 @@ Just open your **R** and type:
 ```
 devtools::install_git("https://github.com/donotdespair/bsvarTVPs.git")
 ```
+
+# Checks
+
+[![R-CMD-check](https://github.com/donotdespair/bsvarTVPs/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/donotdespair/bsvarTVPs/actions/workflows/R-CMD-check.yaml)
