@@ -1,7 +1,6 @@
 
 #include <RcppArmadillo.h>
 #include "progress.hpp"
-#include "Rcpp/Rmath.h"
 
 #include "sample_ABhyper.h"
 #include "sample_sv_ms.h"
@@ -14,7 +13,7 @@ using namespace arma;
 
 // [[Rcpp::interfaces(cpp, r)]]
 // [[Rcpp::export]]
-Rcpp::List bsvar_s4_sv_cpp (
+Rcpp::List bsvar_mss_s4_sv_cpp (
     const int&                    SS,         // No. of posterior draws
     const arma::mat&              Y,          // NxT dependent variables
     const arma::mat&              X,          // KxT explanatory variables
@@ -23,12 +22,13 @@ Rcpp::List bsvar_s4_sv_cpp (
     const Rcpp::List&             starting_values,
     const int                     thin = 100  // introduce thinning
 ) {
-  // Progress bar setup
+  // // Progress bar setup
   vec prog_rep_points = arma::round(arma::linspace(0, SS, 50));
-  // Rcout << "**************************************************|" << endl;
-  // Rcout << "bsvars: Bayesian Structural Vector Autoregressions|" << endl;
+  // // Rcout << "**************************************************|" << endl;
+  // // Rcout << "bsvars: Bayesian Structural Vector Autoregressions|" << endl;
   Rcout << "**************************************************|" << endl;
-  Rcout << " Gibbs sampler for the SVAR-SV model with         |" << endl;
+  Rcout << " Gibbs sampler for the SVAR-SV model              |" << endl;
+  Rcout << "    with Markov-switching and regime-specific     |" << endl;
   Rcout << "    Stochastic Search Specification Selection     |" << endl;
   Rcout << "    for the structural matrix                     |" << endl;
   Rcout << "**************************************************|" << endl;
@@ -42,89 +42,134 @@ Rcpp::List bsvar_s4_sv_cpp (
   const int   N     = Y.n_rows;
   const int   K     = X.n_rows;
   
-  mat   aux_B       = as<mat>(starting_values["B"]);
+  cube  aux_B       = as<cube>(starting_values["B"]);
   mat   aux_A       = as<mat>(starting_values["A"]);
   vec   aux_hyper   = as<vec>(starting_values["hyper"]);  // 5x1 (gamma_0, gamma_+, s_0, s_+, s_)
+  
+  mat   aux_PR_TR   = as<mat>(starting_values["PR_TR"]);
+  vec   aux_pi_0    = as<vec>(starting_values["pi_0"]);
+  mat   aux_xi      = as<mat>(starting_values["xi"]);
+  
+  const int M       = aux_PR_TR.n_cols;
+  vec      Tm      = sum(aux_xi, 1);
+  
   mat   aux_h       = as<mat>(starting_values["h"]);
   vec   aux_rho     = as<vec>(starting_values["rho"]);
-  vec   aux_omega   = as<vec>(starting_values["omega"]);
+  mat   aux_omega   = as<mat>(starting_values["omega"]);
   umat  aux_S       = as<umat>(starting_values["S"]);
   vec   aux_sigma2_omega = as<vec>(starting_values["sigma2_omega"]);
   vec   aux_s_      = as<vec>(starting_values["s_"]);
-  ivec  aux_SL      = as<ivec>(starting_values["S4_indicator"]) - 1;      // S4 indicator vector
+  imat  aux_SL      = as<imat>(starting_values["S4_indicator"]) - 1;      // NxM S4 indicator matrix
   mat   aux_sigma(N, T);
   
+  rowvec    omega_T_n(T);
   for (int n=0; n<N; n++) {
-    aux_sigma.row(n) = exp(0.5 * aux_omega(n) * aux_h.row(n));
+    for (int t=0; t<T; t++){
+      omega_T_n(t)    = aux_omega(n, aux_xi.col(t).index_max());
+    }
+    aux_sigma.row(n)  = exp(0.5 * (aux_h.row(n) % omega_T_n));
   }
   
   const int   S     = floor(SS / thin);
   
-  cube  posterior_B(N, N, S);
+  field<cube> posterior_B(S);
   cube  posterior_A(N, K, S);
   mat   posterior_hyper(5, S);
+  
+  cube  posterior_PR_TR(M, M, S);
+  mat   posterior_pi_0(M,S);
+  cube posterior_xi(M, T, S);
+  
   cube  posterior_h(N, T, S);
   mat   posterior_rho(N, S);
-  mat   posterior_omega(N, S);
+  cube  posterior_omega(N, M, S);
   ucube posterior_S(N, T, S);
   mat   posterior_sigma2_omega(N, S);
   mat   posterior_s_(N, S);
-  imat  posterior_SL(N, S);
+  icube posterior_SL(N, M, S);
   cube  posterior_sigma(N, T, S);
   
   int   s = 0;
   
   for (int ss=0; ss<SS; ss++) {
+    // Rcout << "Iteration: " << ss << endl;
     
     // Increment progress bar
     if (any(prog_rep_points == ss)) p.increment();
     // Check for user interrupts
     if (ss % 200 == 0) checkUserInterrupt();
     
+    // sample aux_xi
+    // Rcout << "   sample Markov process " << endl;
+    mat E = Y - aux_A * X;
+    sample_Markov_process_mss(aux_xi, E, aux_B, aux_sigma, aux_PR_TR, aux_pi_0);
+    
+    // sample aux_PR_TR
+    // Rcout << "   sample transition matrix" << endl;
+    bsvars::sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
+    
     // sample aux_hyper
-    sample_hyperparameters_s4( aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
+    // Rcout << "   sample hyper" << endl;
+    sample_hyperparameters_mss_s4( aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
     
     // sample aux_B
-    sample_B_heterosk1_s4(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, Y, X, prior, VB);
+    // Rcout << "   sample B " << endl;
+    sample_B_mss_s4(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, aux_xi, Y, X, prior, VB);
     
     // sample aux_A
-    bsvars::sample_A_heterosk1(aux_A, aux_B, aux_hyper, aux_sigma, Y, X, prior);
+    // Rcout << "   sample A" << endl;
+    sample_A_heterosk1_mss(aux_A, aux_B, aux_xi, aux_hyper, aux_sigma, Y, X, prior);
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
-    mat U = aux_B * (Y - aux_A * X);
+    // Rcout << "   sample SV" << endl;
+    mat U(N, T);
+    E = Y - aux_A * X;
+    for (int m=0; m<M; m++) {
+      for (int t=0; t<T; t++) {
+        if (aux_xi(m,t)==1) {
+          U.col(t)      = aux_B.slice(m) * (Y.col(t) - aux_A * X.col(t));
+        }
+      }
+    }
     
     for (int n=0; n<N; n++) {
       rowvec  h_tmp     = aux_h.row(n);
       double  rho_tmp   = aux_rho(n);
-      double  omega_tmp = aux_omega(n);
+      rowvec  omega_tmp = aux_omega.row(n);
       urowvec S_tmp     = aux_S.row(n);
       rowvec  U_tmp     = U.row(n);
       double  s2o_tmp   = aux_sigma2_omega(n);
       double  s_n       = aux_s_(n);
       
-      List sv_n         = bsvars::svar_nc1( h_tmp, rho_tmp, omega_tmp, s2o_tmp, s_n, S_tmp, U_tmp, prior, true );
+      List sv_n         = svar_nc1_mss( h_tmp, rho_tmp, omega_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior);
       
       aux_h.row(n)      = as<rowvec>(sv_n["aux_h_n"]);
       aux_rho(n)        = as<double>(sv_n["aux_rho_n"]);
-      aux_omega(n)      = as<double>(sv_n["aux_omega_n"]);
+      aux_omega.row(n)  = as<rowvec>(sv_n["aux_omega_n"]);
       aux_S.row(n)      = as<urowvec>(sv_n["aux_S_n"]);
       aux_sigma2_omega(n)         = as<double>(sv_n["aux_sigma2_omega_n"]);
       aux_s_(n)         = as<double>(sv_n["aux_s_n"]);
       
-      aux_sigma.row(n)  = exp(0.5 * aux_omega(n) * aux_h.row(n));
-    }
+      for (int t=0; t<T; t++){
+        omega_T_n(t)    = aux_omega(n, aux_xi.col(t).index_max());
+      }
+      aux_sigma.row(n)  = exp(0.5 * (aux_h.row(n) % omega_T_n));
+    } // END n loop
     
     if (ss % thin == 0) {
-      posterior_B.slice(s)          = aux_B;
+      posterior_B(s)                = aux_B;
       posterior_A.slice(s)          = aux_A;
       posterior_hyper.col(s)        = aux_hyper;
+      posterior_PR_TR.slice(s)      = aux_PR_TR;
+      posterior_pi_0.col(s)         = aux_pi_0;
+      posterior_xi.slice(s)         = aux_xi;
       posterior_h.slice(s)          = aux_h;
       posterior_rho.col(s)          = aux_rho;
-      posterior_omega.col(s)        = aux_omega;
+      posterior_omega.slice(s)      = aux_omega;
       posterior_S.slice(s)          = aux_S;
       posterior_sigma2_omega.col(s) = aux_sigma2_omega;
       posterior_s_.col(s)           = aux_s_;
-      posterior_SL.col(s)           = aux_SL;
+      posterior_SL.slice(s)         = aux_SL;
       posterior_sigma.slice(s)      = aux_sigma;
       s++;
     }
@@ -135,6 +180,9 @@ Rcpp::List bsvar_s4_sv_cpp (
       _["B"]        = aux_B,
       _["A"]        = aux_A,
       _["hyper"]    = aux_hyper,
+      _["PR_TR"]    = aux_PR_TR,
+      _["pi_0"]     = aux_pi_0,
+      _["xi"]       = aux_xi,
       _["h"]        = aux_h,
       _["rho"]      = aux_rho,
       _["omega"]    = aux_omega,
@@ -148,6 +196,9 @@ Rcpp::List bsvar_s4_sv_cpp (
       _["B"]        = posterior_B,
       _["A"]        = posterior_A,
       _["hyper"]    = posterior_hyper,
+      _["PR_TR"]    = posterior_PR_TR,
+      _["pi_0"]     = posterior_pi_0,
+      _["xi"]       = posterior_xi,
       _["h"]        = posterior_h,
       _["rho"]      = posterior_rho,
       _["omega"]    = posterior_omega,
@@ -158,4 +209,4 @@ Rcpp::List bsvar_s4_sv_cpp (
       _["sigma"]    = posterior_sigma
     )
   );
-} // END bsvar_s4_sv_cpp
+} // END bsvar_mss_s4_sv_cpp

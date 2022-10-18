@@ -1,3 +1,8 @@
+    bsvarTVPs: Bayesian Estimation of Heteroskedastic Structural Vector Autoregressions 
+    with Markov-Switching Structural Matrix
+    Copyright (C) 2022  Tomasz Woźniak <wozniak.tom@pm.me>
+
+
 GNU General Public License
 ==========================
 
