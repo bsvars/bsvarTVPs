@@ -11,7 +11,7 @@ using namespace Rcpp;
 using namespace arma;
 
 
-// [[Rcpp::interfaces(cpp, r)]]
+// [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
 Rcpp::List bsvar_mss_s4_sv_cpp (
     const int&                    SS,         // No. of posterior draws
