@@ -17,4 +17,4 @@ Imports:
     RcppTN
 LinkingTo: bsvars, Rcpp, RcppArmadillo, RcppProgress, RcppTN
 Encoding: UTF-8
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.2

@@ -71,7 +71,7 @@ Rcpp::List bsvar_mss_sv_cpp (
   
   field<cube> posterior_B(S);
   cube  posterior_A(N, K, S);
-  mat   posterior_hyper(5, S);
+  mat   posterior_hyper(2, S);
   
   cube  posterior_PR_TR(M, M, S);
   mat   posterior_pi_0(M,S);
@@ -237,6 +237,7 @@ Rcpp::List bsvar_mss_sv_cpp (
       _["sigma2_omega"] = posterior_sigma2_omega,
       _["s_"]        = posterior_s_,
       _["sigma"]    = posterior_sigma
-    )
+    ),
+    _["acceptance_rate"] = acceptance_count/SS
   );
 } // END bsvar_mss_sv_cpp

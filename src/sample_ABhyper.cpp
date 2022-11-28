@@ -425,6 +425,9 @@ arma::vec sample_hyperparameters_s4 (
   const int N = aux_B.n_rows;
   const int K = aux_A.n_cols;
   
+  double prior_hyper_nu     = as<double>(prior["hyper_nu"]);
+  double prior_hyper_s      = as<double>(prior["hyper_s"]);
+  
   int         Ltmp = VB.n_elem - 1;
   vec         Lm  = VB(Ltmp);
   vec         Lm_cs = cumsum(Lm);
@@ -437,15 +440,10 @@ arma::vec sample_hyperparameters_s4 (
     rn           += VB(ll).n_rows;
   }
   
-  // aux_hyper(4)    = ( as<double>(prior["hyper_S"]) + aux_hyper(2) + aux_hyper(3) ) / R::rchisq(as<double>(prior["hyper_V"]) + 4*as<double>(prior["hyper_a"]));
-  // aux_hyper(3)    = R::rgamma( as<double>(prior["hyper_a"]) + 0.5*as<double>(prior["hyper_nu"]) ,
-  //           1/((1/aux_hyper(4)) + (1/(2*aux_hyper(1)))));
-  // aux_hyper(2)    = R::rgamma( as<double>(prior["hyper_a"]) + 0.5*as<double>(prior["hyper_nu"]) ,
-  //           1/((1/aux_hyper(4)) + (1/(2*aux_hyper(0)))) );
-  aux_hyper(1)    = ( aux_hyper(3) + trace((aux_A - as<mat>(prior["A"])) * as<mat>(prior["A_V_inv"]) * trans(aux_A - as<mat>(prior["A"]))) ) /
-    R::rchisq( as<double>(prior["hyper_nu"]) + N * K );
-  aux_hyper(0)    = ( aux_hyper(2) + trace(aux_B * as<mat>(prior["B_V_inv"]) * trans(aux_B) )) /
-    R::rchisq( as<double>(prior["hyper_nu"]) + rn );
+  aux_hyper(1)    = ( prior_hyper_s + trace((aux_A - as<mat>(prior["A"])) * as<mat>(prior["A_V_inv"]) * trans(aux_A - as<mat>(prior["A"]))) ) /
+    R::rchisq( prior_hyper_nu + N * K );
+  aux_hyper(0)    = ( prior_hyper_s + trace(aux_B * as<mat>(prior["B_V_inv"]) * trans(aux_B) )) /
+    R::rchisq( prior_hyper_nu + rn );
   
   return aux_hyper;
 } // END sample_hyperparameters_s4
@@ -465,23 +463,23 @@ arma::vec sample_hyperparameters_mss (
   const int N = aux_B.n_rows;
   const int M = aux_B.n_slices;
   const int K = aux_A.n_cols;
+  
+  double prior_hyper_nu     = as<double>(prior["hyper_nu"]);
+  double prior_hyper_s      = as<double>(prior["hyper_s"]);
+  
   int rn=0;
   for (int n=0; n<N; n++) {
     rn       += VB(n).n_rows;
   }
-  // aux_hyper(4)    = ( as<double>(prior["hyper_S"]) + aux_hyper(2) + aux_hyper(3) ) / R::rchisq(as<double>(prior["hyper_V"]) + 4*as<double>(prior["hyper_a"]));
-  // aux_hyper(3)    = R::rgamma( as<double>(prior["hyper_a"]) + 0.5*as<double>(prior["hyper_nu"]) ,
-  //           1/((1/aux_hyper(4)) + (1/(2*aux_hyper(1)))));
-  // aux_hyper(2)    = R::rgamma( as<double>(prior["hyper_a"]) + 0.5*as<double>(prior["hyper_nu"]) ,
-  //           1/((1/aux_hyper(4)) + (1/(2*aux_hyper(0)))) );
-  aux_hyper(1)    = ( aux_hyper(3) + trace((aux_A - as<mat>(prior["A"])) * as<mat>(prior["A_V_inv"]) * trans(aux_A - as<mat>(prior["A"]))) ) /
-    R::rchisq( as<double>(prior["hyper_nu"]) + N * K );
+  
+  aux_hyper(1)    = ( prior_hyper_s + trace((aux_A - as<mat>(prior["A"])) * as<mat>(prior["A_V_inv"]) * trans(aux_A - as<mat>(prior["A"]))) ) /
+    R::rchisq( prior_hyper_nu + N * K );
   double BVB      = 0;
   for (int m=0; m<M; m++) {
     BVB          += trace(aux_B.slice(m) * as<mat>(prior["B_V_inv"]) * trans(aux_B.slice(m)) );
   }
-  aux_hyper(0)    = ( aux_hyper(2) + BVB) /
-    R::rchisq( as<double>(prior["hyper_nu"]) + M * rn );
+  aux_hyper(0)    = ( prior_hyper_s + BVB) /
+    R::rchisq( prior_hyper_nu + M * rn );
   
   return aux_hyper;
 } // END sample_hyperparameters_mss
@@ -504,6 +502,9 @@ arma::mat sample_hyperparameters_mss_s4 (
   const int M = aux_B.n_slices;
   const int K = aux_A.n_cols;
   
+  double prior_hyper_nu     = as<double>(prior["hyper_nu"]);
+  double prior_hyper_s      = as<double>(prior["hyper_s"]);
+  
   int         Ltmp  = VB.n_elem - 1;
   vec         Lm    = VB(Ltmp);
   vec         Lm_cs = cumsum(Lm);
@@ -518,19 +519,14 @@ arma::mat sample_hyperparameters_mss_s4 (
     }
   }
   
-  // aux_hyper(4)    = ( as<double>(prior["hyper_S"]) + aux_hyper(2) + aux_hyper(3) ) / R::rchisq(as<double>(prior["hyper_V"]) + 4*as<double>(prior["hyper_a"]));
-  // aux_hyper(3)    = R::rgamma( as<double>(prior["hyper_a"]) + 0.5*as<double>(prior["hyper_nu"]) ,
-  //           1/((1/aux_hyper(4)) + (1/(2*aux_hyper(1)))));
-  // aux_hyper(2)    = R::rgamma( as<double>(prior["hyper_a"]) + 0.5*as<double>(prior["hyper_nu"]) ,
-  //           1/((1/aux_hyper(4)) + (1/(2*aux_hyper(0)))) );
-  aux_hyper(1)    = ( aux_hyper(3) + trace((aux_A - as<mat>(prior["A"])) * as<mat>(prior["A_V_inv"]) * trans(aux_A - as<mat>(prior["A"]))) ) /
-    R::rchisq( as<double>(prior["hyper_nu"]) + N * K );
+  aux_hyper(1)    = ( prior_hyper_s + trace((aux_A - as<mat>(prior["A"])) * as<mat>(prior["A_V_inv"]) * trans(aux_A - as<mat>(prior["A"]))) ) /
+    R::rchisq( prior_hyper_nu + N * K );
   double BVB      = 0;
   for (int m=0; m<M; m++) {
     BVB          += trace(aux_B.slice(m) * as<mat>(prior["B_V_inv"]) * trans(aux_B.slice(m)) );
   }
-  aux_hyper(0)    = ( aux_hyper(2) + BVB) /
-    R::rchisq( as<double>(prior["hyper_nu"]) + rn );
+  aux_hyper(0)    = ( prior_hyper_s + BVB) /
+    R::rchisq( prior_hyper_nu + rn );
   
   return aux_hyper;
 } // END sample_hyperparameters_mss_s4

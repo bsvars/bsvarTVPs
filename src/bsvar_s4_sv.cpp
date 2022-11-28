@@ -61,7 +61,7 @@ Rcpp::List bsvar_s4_sv_cpp (
   
   cube  posterior_B(N, N, S);
   cube  posterior_A(N, K, S);
-  mat   posterior_hyper(5, S);
+  mat   posterior_hyper(2, S);
   cube  posterior_h(N, T, S);
   mat   posterior_rho(N, S);
   mat   posterior_omega(N, S);
@@ -199,6 +199,7 @@ Rcpp::List bsvar_s4_sv_cpp (
       _["s_"]        = posterior_s_,
       _["S4_indicator"] = posterior_SL + 1,
       _["sigma"]    = posterior_sigma
-    )
+    ),
+    _["acceptance_rate"] = acceptance_count/SS
   );
 } // END bsvar_s4_sv_cpp
