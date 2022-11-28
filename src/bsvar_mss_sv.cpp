@@ -238,6 +238,6 @@ Rcpp::List bsvar_mss_sv_cpp (
       _["s_"]        = posterior_s_,
       _["sigma"]    = posterior_sigma
     ),
-    _["acceptance_rate"] = acceptance_count/SS
+    _["acceptance_rate"] = 1- acceptance_count/SS
   );
 } // END bsvar_mss_sv_cpp
