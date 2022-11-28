@@ -1,7 +1,6 @@
 
 #include <RcppArmadillo.h>
 #include "progress.hpp"
-#include "Rcpp/Rmath.h"
 
 #include "sample_ABhyper.h"
 #include "sample_sv_ms.h"
@@ -72,6 +71,14 @@ Rcpp::List bsvar_s4_sv_cpp (
   imat  posterior_SL(N, S);
   cube  posterior_sigma(N, T, S);
   
+  vec   acceptance_count(3+N);
+  vec   aux_hyper_tmp       = aux_hyper;
+  mat   aux_B_tmp           = aux_B;
+  ivec  aux_SL_tmp          = aux_SL;
+  List  BSL_tmp;
+  mat   aux_A_tmp           = aux_A;
+  List  sv_n_tmp;
+  
   int   s = 0;
   
   for (int ss=0; ss<SS; ss++) {
@@ -82,13 +89,33 @@ Rcpp::List bsvar_s4_sv_cpp (
     if (ss % 200 == 0) checkUserInterrupt();
     
     // sample aux_hyper
-    sample_hyperparameters_s4( aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
+    aux_hyper_tmp       = aux_hyper;
+    try {
+      aux_hyper_tmp     = sample_hyperparameters_s4( aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
+    } catch (...) {
+      acceptance_count(0)++;
+    }
+    aux_hyper           = aux_hyper_tmp;
     
     // sample aux_B
-    sample_B_heterosk1_s4(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, Y, X, prior, VB);
+    aux_B_tmp           = aux_B;
+    aux_SL_tmp          = aux_SL;
+    try {
+      BSL_tmp           = sample_B_heterosk1_s4(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, Y, X, prior, VB);
+    } catch (...) {
+      acceptance_count(1)++;
+    }
+    aux_B               = as<mat>(BSL_tmp["aux_B"]);
+    aux_SL              = as<ivec>(BSL_tmp["aux_SL"]);
     
     // sample aux_A
-    bsvars::sample_A_heterosk1(aux_A, aux_B, aux_hyper, aux_sigma, Y, X, prior);
+    aux_A_tmp           = aux_A;
+    try {
+      aux_A_tmp         = sample_A_heterosk1(aux_A, aux_B, aux_hyper, aux_sigma, Y, X, prior);
+    } catch (...) {
+      acceptance_count(2)++;
+    }
+    aux_A               = aux_A_tmp;
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
     mat U = aux_B * (Y - aux_A * X);
@@ -97,13 +124,29 @@ Rcpp::List bsvar_s4_sv_cpp (
       rowvec  h_tmp     = aux_h.row(n);
       double  rho_tmp   = aux_rho(n);
       double  omega_tmp = aux_omega(n);
+      double  sigma2v_tmp = pow(aux_omega(n),2);
       urowvec S_tmp     = aux_S.row(n);
       rowvec  U_tmp     = U.row(n);
       double  s2o_tmp   = aux_sigma2_omega(n);
       double  s_n       = aux_s_(n);
       
-      List sv_n         = bsvars::svar_nc1( h_tmp, rho_tmp, omega_tmp, s2o_tmp, s_n, S_tmp, U_tmp, prior, true );
+      sv_n_tmp          = List::create(
+        _["aux_h_n"]              = h_tmp,
+        _["aux_rho_n"]            = rho_tmp,
+        _["aux_omega_n"]          = omega_tmp,
+        _["aux_sigma2v_n"]        = sigma2v_tmp,
+        _["aux_sigma2_omega_n"]   = s2o_tmp,
+        _["aux_s_n"]              = s_n,
+        _["aux_S_n"]              = S_tmp
+      );
       
+      try {
+        sv_n_tmp        = svar_nc1( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, U_tmp, prior, true );
+      } catch (...) {
+        acceptance_count(3 + n)++;
+      }
+      
+      List sv_n         = sv_n_tmp;
       aux_h.row(n)      = as<rowvec>(sv_n["aux_h_n"]);
       aux_rho(n)        = as<double>(sv_n["aux_rho_n"]);
       aux_omega(n)      = as<double>(sv_n["aux_omega_n"]);

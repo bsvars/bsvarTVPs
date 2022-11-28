@@ -5,6 +5,20 @@
 #include <RcppArmadillo.h>
 
 
+Rcpp::List svar_nc1 (
+    arma::rowvec    aux_h_n,                  // 1xT
+    double          aux_rho_n,
+    double          aux_omega_n,
+    double          aux_sigma2v_n,
+    double          aux_sigma2_omega_n,       // omega prior hyper-parameter 
+    double          aux_s_n,                  // scale of IG2 prior for aux_sigma2_omega_n
+    arma::urowvec   aux_S_n,                  // 1xT
+    const arma::rowvec&   u,                  // 1xT
+    const Rcpp::List&     prior,
+    bool            sample_s_ = true
+);
+  
+
 Rcpp::List svar_nc1_mss (
     arma::rowvec&         aux_h_n,            // 1xT
     double&               aux_rho_n,
@@ -32,8 +46,8 @@ arma::mat smoothing (
 );
 
 
-void sample_Markov_process_mss (
-    arma::mat&       aux_xi,             // MxT
+arma::mat sample_Markov_process_mss (
+    arma::mat         aux_xi,             // MxT
     const arma::mat&  E,                  // NxT
     const arma::cube& aux_B,              // NxNxM
     const arma::mat&  aux_sigma,          // NxM
