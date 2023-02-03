@@ -24,8 +24,10 @@ arma::field<arma::cube> bsvarTVPs_ir (
   field<cube>     irfs(S, M);
   
   for (int s=0; s<S; s++) {
+    Rcout << "Iteration: " << s << endl;
     for (int m=0; m<M; m++) {
-      aux_irfs            = bsvars::bsvars_ir1( posterior_B(s).slice(s), posterior_A.slice(s), horizon, p );
+      Rcout << "  Regime: " << m << endl;
+      aux_irfs            = bsvars::bsvars_ir1( posterior_B(s).slice(m), posterior_A.slice(s), horizon, p );
       irfs(s, m)          = aux_irfs;
     }
   } // END s loop
