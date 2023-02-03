@@ -40,4 +40,6 @@ bsvarTVPs_ir <- function(posterior, horizon) {
       ir_posterior[,,,m,s]  = irfs[s,m][[1]]
     }
   }
+  
+  return(ir_posterior)
 }
