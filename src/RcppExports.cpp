@@ -14,6 +14,43 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// bsvarTVPs_ir
+arma::field<arma::cube> bsvarTVPs_ir(arma::field<arma::cube>& posterior_B, arma::cube& posterior_A, const int horizon, const int p);
+static SEXP _bsvarTVPs_bsvarTVPs_ir_try(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP horizonSEXP, SEXP pSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< arma::field<arma::cube>& >::type posterior_B(posterior_BSEXP);
+    Rcpp::traits::input_parameter< arma::cube& >::type posterior_A(posterior_ASEXP);
+    Rcpp::traits::input_parameter< const int >::type horizon(horizonSEXP);
+    Rcpp::traits::input_parameter< const int >::type p(pSEXP);
+    rcpp_result_gen = Rcpp::wrap(bsvarTVPs_ir(posterior_B, posterior_A, horizon, p));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _bsvarTVPs_bsvarTVPs_ir(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP horizonSEXP, SEXP pSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvarTVPs_ir_try(posterior_BSEXP, posterior_ASEXP, horizonSEXP, pSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 // bsvar_mss_s4_sv_cpp
 Rcpp::List bsvar_mss_s4_sv_cpp(const int& SS, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB, const Rcpp::List& starting_values, const int thin);
 static SEXP _bsvarTVPs_bsvar_mss_s4_sv_cpp_try(SEXP SSSEXP, SEXP YSEXP, SEXP XSEXP, SEXP priorSEXP, SEXP VBSEXP, SEXP starting_valuesSEXP, SEXP thinSEXP) {
@@ -701,6 +738,7 @@ RcppExport SEXP _bsvarTVPs_sample_Markov_process_mss(SEXP aux_xiSEXP, SEXP ESEXP
 static int _bsvarTVPs_RcppExport_validate(const char* sig) { 
     static std::set<std::string> signatures;
     if (signatures.empty()) {
+        signatures.insert("arma::field<arma::cube>(*bsvarTVPs_ir)(arma::field<arma::cube>&,arma::cube&,const int,const int)");
         signatures.insert("Rcpp::List(*bsvar_mss_s4_sv_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int)");
         signatures.insert("Rcpp::List(*bsvar_mss_sv_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int)");
         signatures.insert("Rcpp::List(*bsvar_s4_sv_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int)");
@@ -724,6 +762,7 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
 
 // registerCCallable (register entry points for exported C++ functions)
 RcppExport SEXP _bsvarTVPs_RcppExport_registerCCallable() { 
+    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_ir", (DL_FUNC)_bsvarTVPs_bsvarTVPs_ir_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvar_mss_s4_sv_cpp", (DL_FUNC)_bsvarTVPs_bsvar_mss_s4_sv_cpp_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvar_mss_sv_cpp", (DL_FUNC)_bsvarTVPs_bsvar_mss_sv_cpp_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvar_s4_sv_cpp", (DL_FUNC)_bsvarTVPs_bsvar_s4_sv_cpp_try);
@@ -746,6 +785,7 @@ RcppExport SEXP _bsvarTVPs_RcppExport_registerCCallable() {
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_bsvarTVPs_bsvarTVPs_ir", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_ir, 4},
     {"_bsvarTVPs_bsvar_mss_s4_sv_cpp", (DL_FUNC) &_bsvarTVPs_bsvar_mss_s4_sv_cpp, 7},
     {"_bsvarTVPs_bsvar_mss_sv_cpp", (DL_FUNC) &_bsvarTVPs_bsvar_mss_sv_cpp, 7},
     {"_bsvarTVPs_bsvar_s4_sv_cpp", (DL_FUNC) &_bsvarTVPs_bsvar_s4_sv_cpp, 7},
