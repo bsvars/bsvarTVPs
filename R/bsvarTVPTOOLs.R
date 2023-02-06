@@ -111,7 +111,7 @@ compute_impulse_responses_by_components <- function(ir_posterior, S5_posterior, 
       for (component in 1:comp[eq]) {
         draws_count                     = S5_posterior[S5_ind[eq], m, ] == component
         output[[m]][[eq]][[component]]  = ir_posterior[,,,m,draws_count]
-        S5_density[[m]][[eq]]           = mean(draws_count)
+        S5_density[[m]][[eq]][component]= mean(draws_count)
       } # END component loop
     } # END eq loop
   } # END m loop
