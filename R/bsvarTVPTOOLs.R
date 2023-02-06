@@ -5,8 +5,9 @@
 #' to the structural shocks for SVAR models with Markov-switching structural matrix with \code{M} regimes
 #' 
 #' 
-#' @param posterior a list with random draws from the posterior distribution of 
-#' the Structural model with Markov-switching structural matrix
+#' @param posterior_output an object of classof class PosteriorBSVARSV-MSS5, 
+#' PosteriorBSVARSV-MS, or PosteriorBSVARSV-S5 with random draws from the posterior 
+#' distribution of the Structural model with Markov-switching structural matrix
 #' @param horizon a positive integer specifying the forecasting horizon for the impulse responses
 #' 
 #' @return An \code{N x N x horizon x M x S} array containing the posterior draws 
@@ -19,15 +20,15 @@
 #' Monetary Policy Shock Identification?
 #' 
 #' @export
-compute_impulse_responses <- function(posterior, horizon) {
+compute_impulse_responses <- function(posterior_output, horizon) {
   
-  stopifnot("Argument posterior must be of class PosteriorBSVARSV-MSS5, PosteriorBSVARSV-MS, or PosteriorBSVARSV-S5." = substr(class(posterior), 1, 17) == "PosteriorBSVARSV-")
+  stopifnot("Argument posterior must be of class PosteriorBSVARSV-MSS5, PosteriorBSVARSV-MS, or PosteriorBSVARSV-S5." = substr(class(posterior_output), 1, 17) == "PosteriorBSVARSV-")
   stopifnot("Argument horizon must be a positive integer number." = horizon >= 1 & horizon %% 1 == 0)
   
-  is_MS       = substr(class(posterior), 1, 19) == "PosteriorBSVARSV-MS"
+  is_MS       = substr(class(posterior_output), 1, 19) == "PosteriorBSVARSV-MS"
   
-  posterior_B = posterior$B
-  posterior_A = posterior$A
+  posterior_B = posterior_output$posterior$B
+  posterior_A = posterior_output$posterior$A
   N           = nrow(posterior_A[,,1])
   p           = (ncol(posterior_A[,,1]) - 1) / N
   S           = dim(posterior_A)[3]
