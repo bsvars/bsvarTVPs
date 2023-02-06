@@ -50,7 +50,7 @@ compute_impulse_responses <- function(posterior_output, horizon) {
       ir_posterior[,,,m,s]  = irfs[s,m][[1]]
     }
   }
-  class(irfs)     = "PosteriorIR"
+  class(ir_posterior) = "PosteriorIR"
   
   return(ir_posterior)
 }
