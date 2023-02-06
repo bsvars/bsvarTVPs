@@ -32,7 +32,9 @@
 #' 
 #' @export
 bsvar_mss_s4_sv_cpp <- function(SS, Y, X, prior, VB, starting_values, thin = 100L) {
-  .Call(`_bsvarTVPs_bsvar_mss_s4_sv_cpp`, SS, Y, X, prior, VB, starting_values, thin)
+  output          = .Call(`_bsvarTVPs_bsvar_mss_s4_sv_cpp`, SS, Y, X, prior, VB, starting_values, thin)
+  class(output)   = "PosteriorBSVARSV-MSS5"
+  return(output)
 }
 
 
@@ -70,7 +72,9 @@ bsvar_mss_s4_sv_cpp <- function(SS, Y, X, prior, VB, starting_values, thin = 100
 #' 
 #' @export
 bsvar_mss_sv_cpp <- function(SS, Y, X, prior, VB, starting_values, thin = 100L) {
-  .Call(`_bsvarTVPs_bsvar_mss_sv_cpp`, SS, Y, X, prior, VB, starting_values, thin)
+  output          = .Call(`_bsvarTVPs_bsvar_mss_sv_cpp`, SS, Y, X, prior, VB, starting_values, thin)
+  class(output)   = "PosteriorBSVARSV-MS"
+  return(output)
 }
 
 
@@ -108,5 +112,7 @@ bsvar_mss_sv_cpp <- function(SS, Y, X, prior, VB, starting_values, thin = 100L) 
 #' 
 #' @export
 bsvar_s4_sv_cpp <- function(SS, Y, X, prior, VB, starting_values, thin = 100L) {
-  .Call(`_bsvarTVPs_bsvar_s4_sv_cpp`, SS, Y, X, prior, VB, starting_values, thin)
+  output          = .Call(`_bsvarTVPs_bsvar_s4_sv_cpp`, SS, Y, X, prior, VB, starting_values, thin)
+  class(output)   = "PosteriorBSVARSV-S5"
+  return(output)
 }
