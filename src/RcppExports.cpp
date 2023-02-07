@@ -88,6 +88,44 @@ RcppExport SEXP _bsvarTVPs_bsvarTVPs_ir(SEXP posterior_BSEXP, SEXP posterior_ASE
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// bsvarTVPs_filter_forecast_smooth
+arma::cube bsvarTVPs_filter_forecast_smooth(Rcpp::List& posterior, const arma::mat& Y, const arma::mat& X, const bool forecasted, const bool smoothed);
+static SEXP _bsvarTVPs_bsvarTVPs_filter_forecast_smooth_try(SEXP posteriorSEXP, SEXP YSEXP, SEXP XSEXP, SEXP forecastedSEXP, SEXP smoothedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::List& >::type posterior(posteriorSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const bool >::type forecasted(forecastedSEXP);
+    Rcpp::traits::input_parameter< const bool >::type smoothed(smoothedSEXP);
+    rcpp_result_gen = Rcpp::wrap(bsvarTVPs_filter_forecast_smooth(posterior, Y, X, forecasted, smoothed));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _bsvarTVPs_bsvarTVPs_filter_forecast_smooth(SEXP posteriorSEXP, SEXP YSEXP, SEXP XSEXP, SEXP forecastedSEXP, SEXP smoothedSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvarTVPs_filter_forecast_smooth_try(posteriorSEXP, YSEXP, XSEXP, forecastedSEXP, smoothedSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 // bsvar_mss_s4_sv_cpp
 Rcpp::List bsvar_mss_s4_sv_cpp(const int& SS, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB, const Rcpp::List& starting_values, const int thin);
 static SEXP _bsvarTVPs_bsvar_mss_s4_sv_cpp_try(SEXP SSSEXP, SEXP YSEXP, SEXP XSEXP, SEXP priorSEXP, SEXP VBSEXP, SEXP starting_valuesSEXP, SEXP thinSEXP) {
@@ -777,6 +815,7 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
     if (signatures.empty()) {
         signatures.insert("arma::field<arma::cube>(*bsvarTVPs_ir_ms)(arma::field<arma::cube>&,arma::cube&,const int,const int)");
         signatures.insert("arma::field<arma::cube>(*bsvarTVPs_ir)(arma::cube&,arma::cube&,const int,const int)");
+        signatures.insert("arma::cube(*bsvarTVPs_filter_forecast_smooth)(Rcpp::List&,const arma::mat&,const arma::mat&,const bool,const bool)");
         signatures.insert("Rcpp::List(*bsvar_mss_s4_sv_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int)");
         signatures.insert("Rcpp::List(*bsvar_mss_sv_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int)");
         signatures.insert("Rcpp::List(*bsvar_s4_sv_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int)");
@@ -802,6 +841,7 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
 RcppExport SEXP _bsvarTVPs_RcppExport_registerCCallable() { 
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_ir_ms", (DL_FUNC)_bsvarTVPs_bsvarTVPs_ir_ms_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_ir", (DL_FUNC)_bsvarTVPs_bsvarTVPs_ir_try);
+    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_filter_forecast_smooth", (DL_FUNC)_bsvarTVPs_bsvarTVPs_filter_forecast_smooth_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvar_mss_s4_sv_cpp", (DL_FUNC)_bsvarTVPs_bsvar_mss_s4_sv_cpp_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvar_mss_sv_cpp", (DL_FUNC)_bsvarTVPs_bsvar_mss_sv_cpp_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvar_s4_sv_cpp", (DL_FUNC)_bsvarTVPs_bsvar_s4_sv_cpp_try);
@@ -826,6 +866,7 @@ RcppExport SEXP _bsvarTVPs_RcppExport_registerCCallable() {
 static const R_CallMethodDef CallEntries[] = {
     {"_bsvarTVPs_bsvarTVPs_ir_ms", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_ir_ms, 4},
     {"_bsvarTVPs_bsvarTVPs_ir", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_ir, 4},
+    {"_bsvarTVPs_bsvarTVPs_filter_forecast_smooth", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_filter_forecast_smooth, 5},
     {"_bsvarTVPs_bsvar_mss_s4_sv_cpp", (DL_FUNC) &_bsvarTVPs_bsvar_mss_s4_sv_cpp, 7},
     {"_bsvarTVPs_bsvar_mss_sv_cpp", (DL_FUNC) &_bsvarTVPs_bsvar_mss_sv_cpp, 7},
     {"_bsvarTVPs_bsvar_s4_sv_cpp", (DL_FUNC) &_bsvarTVPs_bsvar_s4_sv_cpp, 7},

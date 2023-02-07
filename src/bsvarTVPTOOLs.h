@@ -21,4 +21,13 @@ arma::field<arma::cube> bsvarTVPs_ir (
 );
 
 
+arma::cube bsvarTVPs_filter_forecast_smooth (
+    Rcpp::List&       posterior,
+    const arma::mat&  Y,
+    const arma::mat&  X,
+    const bool        forecasted,
+    const bool        smoothed
+);
+
+
 #endif  // _BSVARTVPTOOLS_H_
