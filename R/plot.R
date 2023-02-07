@@ -50,13 +50,13 @@ ribbon_plot = function(
     N               = dim(draws)[3]
   }
   # compute characteristics of draws
-  draws_median    = apply(draws, c(1,3), median) # K x N
+  draws_median    = apply(draws, c(1,3), stats::median) # K x N
   draws_hdi       = apply(draws, c(1,3), HDInterval::hdi, credMass = probability) # 2 x K x N
   draws_range     = range(draws_hdi)
   
   # create col_ribbon
-  col_ribbon_rgb  = col2rgb(col)
-  col_ribbon      = rgb(col_ribbon_rgb[1], col_ribbon_rgb[2], col_ribbon_rgb[3], 100, maxColorValue = 255)
+  col_ribbon_rgb  = grDevices::col2rgb(col)
+  col_ribbon      = grDevices::rgb(col_ribbon_rgb[1], col_ribbon_rgb[2], col_ribbon_rgb[3], 100, maxColorValue = 255)
   
   # manage the arguments
   if ( missing(ylim) ) ylim = draws_range
@@ -75,13 +75,13 @@ ribbon_plot = function(
     )
   }
   for (n in 1:N) {
-    polygon(
+    graphics::polygon(
       x      = c(start_at:(K - 1 + start_at), (K - 1 + start_at):start_at),
       y      = c(draws_hdi[1, 1:K, n], draws_hdi[2, K:1, n]),
       col    = col_ribbon,
       border = col_ribbon
     )
-    lines(
+    graphics::lines(
       x      = start_at:(K - 1 + start_at), 
       y      = draws_median[,n],
       type   = "l",
