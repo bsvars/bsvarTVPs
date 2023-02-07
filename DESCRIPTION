@@ -11,6 +11,7 @@ License: GPL (>= 3)
 Imports: 
     bsvars,
     GIGrvg,
+    HDInterval,
     R6,
     Rcpp (>= 1.0.9),
     RcppProgress,
