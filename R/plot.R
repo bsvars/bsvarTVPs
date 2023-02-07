@@ -32,7 +32,7 @@ ribbon_plot = function(
     ...
 ) {
   
-  stopifnot("Argument draws must be a matrix or an array." = class(draws) == "matrix" || class(draws) == "array")
+  stopifnot("Argument draws must be a matrix or an array." = any(class(draws) == "matrix") || any(class(draws) == "array"))
   stopifnot("Argument probability must be a number from interval (0,1)." = is.numeric(probability) & length(probability) == 1 & probability > 0 & probability < 1)
   stopifnot("Argument start_at must be a matrix or an integer number." = start_at %% 1 == 0)
   stopifnot("Argument add must be a logical value." = is.logical(add) & length(add) == 1)
