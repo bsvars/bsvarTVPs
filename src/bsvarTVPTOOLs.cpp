@@ -111,3 +111,76 @@ arma::cube bsvarTVPs_filter_forecast_smooth (
 } // END bsvarTVPs_filter_forecast_smooth
 
 
+
+
+// [[Rcpp::interfaces(cpp,r)]]
+// [[Rcpp::export]]
+arma::cube bsvarTVPs_fitted_values (
+    arma::cube&     posterior_A,        // NxKxS
+    arma::mat&      X                   // KxT
+) {
+  
+  const int   N = posterior_A.n_rows;
+  const int   S = posterior_A.n_slices;
+  const int   T = X.n_cols;
+  
+  cube    fitted_values(N, T, S);
+  
+  for (int s=0; s<S; s++) {
+    fitted_values.slice(s) = posterior_A.slice(s) * X;
+  } // END s loop
+  
+  return fitted_values;
+} // END bsvarTVPs_fitted_values
+
+
+
+// [[Rcpp::interfaces(cpp,r)]]
+// [[Rcpp::export]]
+arma::cube bsvarTVPs_structural_shocks (
+    const arma::field<arma::cube>&  posterior_B,    // (S)(N, N, M)
+    const arma::cube&         posterior_A,    // (N, K, S)
+    const arma::cube&         posterior_xi,   // (M, T, S)
+    const arma::mat&          Y,              // NxT dependent variables
+    const arma::mat&          X               // KxT dependent variables
+) {
+  
+  const int       N = Y.n_rows;
+  const int       M = posterior_xi.n_rows;
+  const int       T = Y.n_cols;
+  const int       S = posterior_B.n_slices;
+  
+  cube            structural_shocks(N, T, S);
+  
+  for (int s=0; s<S; s++) {
+    for (int t=0; t<T; t++) {
+      int m  = index_max(posterior_xi.slice(s).col(t));
+      structural_shocks.slice(s).col(t)    = posterior_B(s).slice(m) * (Y.col(t) - posterior_A.slice(s) * X.col(t));
+    } // END t loop
+  } // END s loop
+  
+  return structural_shocks;
+} // END bsvarTVPs_structural_shocks
+
+
+// [[Rcpp::interfaces(cpp,r)]]
+// [[Rcpp::export]]
+arma::cube bsvars_structural_shocks (
+    const arma::cube&     posterior_B,    // (N, N, S)
+    const arma::cube&     posterior_A,    // (N, K, S)
+    const arma::mat&      Y,              // NxT dependent variables
+    const arma::mat&      X               // KxT dependent variables
+) {
+  
+  const int       N = Y.n_rows;
+  const int       T = Y.n_cols;
+  const int       S = posterior_B.n_slices;
+  
+  cube            structural_shocks(N, T, S);
+  
+  for (int s=0; s<S; s++) {
+    structural_shocks.slice(s)    = posterior_B.slice(s) * (Y - posterior_A.slice(s) * X);
+  } // END s loop
+  
+  return structural_shocks;
+} // END bsvars_structural_shocks

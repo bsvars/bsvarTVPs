@@ -30,4 +30,27 @@ arma::cube bsvarTVPs_filter_forecast_smooth (
 );
 
 
+arma::cube bsvarTVPs_fitted_values (
+    arma::cube&     posterior_A,        // NxKxS
+    arma::mat&      X                   // KxT
+);
+
+
+arma::cube bsvars_structural_shocks (
+    const arma::field<arma::cube>&  posterior_B,    // (S)(N, N, M)
+    const arma::cube&         posterior_A,    // (N, K, S)
+    const arma::cube&         posterior_xi,   // (M, T, S)
+    const arma::mat&          Y,              // NxT dependent variables
+    const arma::mat&          X               // KxT dependent variables
+);
+
+
+arma::cube bsvars_structural_shocks (
+    const arma::cube&     posterior_B,    // (N, N, S)
+    const arma::cube&     posterior_A,    // (N, K, S)
+    const arma::mat&      Y,              // NxT dependent variables
+    const arma::mat&      X               // KxT dependent variables
+);
+
+
 #endif  // _BSVARTVPTOOLS_H_
