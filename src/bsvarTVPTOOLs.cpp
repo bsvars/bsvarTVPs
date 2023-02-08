@@ -146,9 +146,8 @@ arma::cube bsvarTVPs_structural_shocks (
 ) {
   
   const int       N = Y.n_rows;
-  const int       M = posterior_xi.n_rows;
   const int       T = Y.n_cols;
-  const int       S = posterior_B.n_slices;
+  const int       S = posterior_A.n_slices;
   
   cube            structural_shocks(N, T, S);
   
@@ -174,7 +173,7 @@ arma::cube bsvars_structural_shocks (
   
   const int       N = Y.n_rows;
   const int       T = Y.n_cols;
-  const int       S = posterior_B.n_elem;
+  const int       S = posterior_A.n_slices;
   
   cube            structural_shocks(N, T, S);
   
