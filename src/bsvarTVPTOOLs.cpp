@@ -210,13 +210,14 @@ arma::cube bsvars_normalisation_wz2003 (
   }
   
   // normalisation
+  cube out(N, N, S);
   for (int s=0; s<S; s++) {
     rowvec sss            = bsvars::normalisation_wz2003_s(posterior_B.slice(s), B_hat_inv, Sigma_inv, diag_signs);
     mat B_norm            = diagmat(sss) * posterior_B.slice(s);
-    posterior_B.slice(s)  = B_norm;
+    out.slice(s)  = B_norm;
   }
   
-  return posterior_B;
+  return out;
 } // END bsvars_normalisation_wz2003
 
 
@@ -243,9 +244,10 @@ arma::mat bsvars_normalisation_wz20031 (
   }
   
   // normalisation
+  mat out(N, N);
   rowvec sss            = bsvars::normalisation_wz2003_s(aux_B, B_hat_inv, Sigma_inv, diag_signs);
   mat B_norm            = diagmat(sss) * aux_B;
-  aux_B                 = B_norm;
+  out                   = B_norm;
 
-  return aux_B;
+  return out;
 } // END bsvars_normalisation_wz20031

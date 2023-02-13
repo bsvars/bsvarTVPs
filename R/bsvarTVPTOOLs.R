@@ -190,7 +190,11 @@ compute_impulse_responses_by_components <- function(ir_posterior, S5_posterior, 
       names(S5_density[[m]][[eq]])      = 1:comp[eq]
       
       for (component in 1:comp[eq]) {
-        draws_count                     = S5_posterior[S5_ind[eq], m, ] == component
+        if ( M == 1 ) {
+          draws_count                   = S5_posterior[S5_ind[eq], ] == component
+        } else {
+          draws_count                   = S5_posterior[S5_ind[eq], m, ] == component
+        }
         output[[m]][[eq]][[component]]  = ir_posterior[,,,m,draws_count]
         S5_density[[m]][[eq]][component] = mean(draws_count)
       } # END component loop
@@ -585,3 +589,74 @@ compute_structural_shocks.PosteriorBSVARSVS5 <- function(posterior, Y, X) {
   return(ss)
 }
 
+
+
+
+#' @title Extracts the posterior draws of the structural matrix \eqn{B} and returns the as an \code{array}
+#'
+#' @description Extracts the posterior draws of the structural matrix \eqn{B} and returns the as an \code{array}
+#' 
+#' @param posterior Posterior draws of from a Markov-switching model
+#' 
+#' @return An array containing the posterior draws of the structural matrix \eqn{B}
+#'
+#' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
+#' 
+#' @references
+#' Camehl, A. & Woźniak, T. (2022) What do Data Say About Time-Variation in 
+#' Monetary Policy Shock Identification?
+#' 
+#' @export
+structural_to_array <- function(posterior) {
+  
+  # call method
+  UseMethod("structural_to_array", posterior)
+}
+
+
+#' @inherit structural_to_array
+#' @method structural_to_array PosteriorBSVARSVMSS5
+#' @inheritParams structural_to_array
+#' 
+#' @return An \code{N x N x M x S} array containing the posterior draws 
+#' of the structural matrix \eqn{B}
+#' 
+#' @export
+structural_to_array.PosteriorBSVARSVMSS5 <- function(posterior) {
+  
+  B_posterior = posterior$posterior$B
+  S       = dim(B_posterior)[1]
+  N       = dim(B_posterior[1,1][[1]])[1]
+  M       = dim(B_posterior[1,1][[1]])[3]
+  
+  B_out   = array(NA, c(N, N, M, S))
+  for (s in 1:S) {
+    B_out[,,,s]  = B_posterior[1,1][[1]]
+  }
+  
+  return(B_out)
+}
+
+
+#' @inherit structural_to_array
+#' @method structural_to_array PosteriorBSVARSVMS
+#' @inheritParams structural_to_array
+#' 
+#' @return An \code{N x N x M x S} array containing the posterior draws 
+#' of the structural matrix \eqn{B}
+#' 
+#' @export
+structural_to_array.PosteriorBSVARSVMS <- function(posterior) {
+  
+  B_posterior = posterior$posterior$B
+  S       = dim(B_posterior)[1]
+  N       = dim(B_posterior[1,1][[1]])[1]
+  M       = dim(B_posterior[1,1][[1]])[3]
+  
+  B_out   = array(NA, c(N, N, M, S))
+  for (s in 1:S) {
+    B_out[,,,s]  = B_posterior[1,1][[1]]
+  }
+  
+  return(B_out)
+}
