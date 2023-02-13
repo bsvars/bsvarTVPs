@@ -53,8 +53,14 @@ arma::cube bsvars_structural_shocks (
 );
 
 
-void bsvars_normalisation_wz2003 (
-    arma::cube&       posterior_B,        // NxNxS
+arma::cube  bsvars_normalisation_wz2003 (
+    arma::cube        posterior_B,        // NxNxS
+    const arma::mat&  B_hat               // NxN
+);
+
+
+arma::mat bsvars_normalisation_wz20031 (
+    arma::mat         aux_B,              // NxNxS
     const arma::mat&  B_hat               // NxN
 );
 

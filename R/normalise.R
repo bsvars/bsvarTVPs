@@ -107,13 +107,13 @@ normalise.PosteriorBSVARSVS5 <- function(posterior, B_hat, VB) {
     }
     B_to_normalise            = posterior$posterior$B[,,S5_indices]
     
-    invisible(.Call(`_bsvarTVPs_bsvars_normalisation_wz2003`, B_to_normalise, B_hat[,,component]))
+    B_to_normalise            = .Call(`_bsvarTVPs_bsvars_normalisation_wz2003`, B_to_normalise, B_hat[,,component])
     
     posterior$posterior$B[,,S5_indices] = B_to_normalise
     
     # last_draw
     if ( component == posterior$last_draw$S4_indicator[S5_equation,] ) {
-      invisible(.Call(`_bsvarTVPs_bsvars_normalisation_wz2003`, posterior$last_draw$B, B_hat[,,component]))
+      posterior$last_draw$B   = .Call(`_bsvarTVPs_bsvars_normalisation_wz20031`, posterior$last_draw$B, B_hat[,,component])
     }
   } # END component loop
   
@@ -175,17 +175,17 @@ normalise.PosteriorBSVARSVMS <- function(posterior, B_hat, VB) {
     }
     B_to_normalise        = array(NA, c(N, N, S))
     for (i in 1:S) {
-      B_to_normalise[,,i]   = posterior$posterior$B[i,1][[1]][,,m]
+      B_to_normalise[,,i] = posterior$posterior$B[i,1][[1]][,,m]
     }
     
-    invisible(.Call(`_bsvarTVPs_bsvars_normalisation_wz2003`, B_to_normalise, B_hat[,,m]))
+    B_to_normalise        = .Call(`_bsvarTVPs_bsvars_normalisation_wz2003`, B_to_normalise, B_hat[,,m])
     
     for (i in 1:S) {
       posterior$posterior$B[i,1][[1]][,,m] = B_to_normalise[,,i]
     }
     
     # last_draw
-    invisible(.Call(`_bsvarTVPs_bsvars_normalisation_wz2003`, posterior$last_draw$B, B_hat[,,m]))
+    posterior$last_draw$B[,,m]  = .Call(`_bsvarTVPs_bsvars_normalisation_wz2003`, posterior$last_draw$B[,,m], B_hat[,,m])
     
   } # END m loop
   
@@ -257,7 +257,7 @@ normalise.PosteriorBSVARSVMSS5 <- function(posterior, B_hat, VB) {
         B_to_normalise[,,i]   = posterior$posterior$B[S5_indices[i],1][[1]][,,m] # this is ridiculus!
       }
       
-      invisible(.Call(`_bsvarTVPs_bsvars_normalisation_wz2003`, B_to_normalise, B_hat[,,m,component]))
+      B_to_normalise          = .Call(`_bsvarTVPs_bsvars_normalisation_wz2003`, B_to_normalise, B_hat[,,m,component])
       
       for (i in 1:length(S5_indices)) {
         posterior$posterior$B[S5_indices[i],1][[1]][,,m] = B_to_normalise[,,i]
@@ -265,7 +265,7 @@ normalise.PosteriorBSVARSVMSS5 <- function(posterior, B_hat, VB) {
       
       # last_draw
       if ( component == posterior$last_draw$S4_indicator[S5_equation,m] ) {
-        invisible(.Call(`_bsvarTVPs_bsvars_normalisation_wz2003`, posterior$last_draw$B, B_hat[,,m,component]))
+        posterior$last_draw$B[,,m]    = .Call(`_bsvarTVPs_bsvars_normalisation_wz20031`, posterior$last_draw$B[,,m], B_hat[,,m,component])
       }
       
     } # END component loop
