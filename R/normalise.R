@@ -36,11 +36,8 @@
 #' @export
 normalise <- function(posterior, B_hat, VB) {
   
-  N = dim(B_hat)[1]
-  
   # check the args
   stopifnot("Argument posterior must contain estimation output from the estimate function." = any(class(posterior)[1] == c("PosteriorBSVARSVMSS5", "PosteriorBSVARSVMS", "PosteriorBSVARSVS5")))
-  # stopifnot("Argument B_hat must be a numeric array." = is.numeric(B_hat) & is.array(B_hat))
   stopifnot("Argument VB must be a list." = is.list(VB))
   
   # call method
