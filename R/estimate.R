@@ -16,7 +16,7 @@
 #' @param starting_values a list providing starting values to the estimated parameters
 #' @param thin a positive integer determining MCMC thinning
 #' 
-#' @return A list containing the Bayesian estimation output in two elements:
+#' @return An object of class \code{PosteriorBSVARSVMSS5} - a list containing the Bayesian estimation output in two elements:
 #' 
 #' \code{posterior} a list with a collection of \code{S} draws from the posterior distribution 
 #' generated via Gibbs sampler containing many arrays and vectors whose selection depends on 
@@ -33,7 +33,7 @@
 #' @export
 bsvar_mss_s4_sv_cpp <- function(SS, Y, X, prior, VB, starting_values, thin = 100L) {
   output          = .Call(`_bsvarTVPs_bsvar_mss_s4_sv_cpp`, SS, Y, X, prior, VB, starting_values, thin)
-  class(output)   = "PosteriorBSVARSV-MSS5"
+  class(output)   = "PosteriorBSVARSVMSS5"
   return(output)
 }
 
@@ -56,7 +56,7 @@ bsvar_mss_s4_sv_cpp <- function(SS, Y, X, prior, VB, starting_values, thin = 100
 #' @param starting_values a list providing starting values to the estimated parameters
 #' @param thin a positive integer determining MCMC thinning
 #' 
-#' @return A list containing the Bayesian estimation output in two elements:
+#' @return  An object of class \code{PosteriorBSVARSVMS} - a list containing the Bayesian estimation output in two elements:
 #' 
 #' \code{posterior} a list with a collection of \code{S} draws from the posterior distribution 
 #' generated via Gibbs sampler containing many arrays and vectors whose selection depends on 
@@ -73,7 +73,7 @@ bsvar_mss_s4_sv_cpp <- function(SS, Y, X, prior, VB, starting_values, thin = 100
 #' @export
 bsvar_mss_sv_cpp <- function(SS, Y, X, prior, VB, starting_values, thin = 100L) {
   output          = .Call(`_bsvarTVPs_bsvar_mss_sv_cpp`, SS, Y, X, prior, VB, starting_values, thin)
-  class(output)   = "PosteriorBSVARSV-MS"
+  class(output)   = "PosteriorBSVARSVMS"
   return(output)
 }
 
@@ -96,7 +96,7 @@ bsvar_mss_sv_cpp <- function(SS, Y, X, prior, VB, starting_values, thin = 100L) 
 #' @param starting_values a list providing starting values to the estimated parameters
 #' @param thin a positive integer determining MCMC thinning
 #' 
-#' @return A list containing the Bayesian estimation output in two elements:
+#' @return  An object of class \code{PosteriorBSVARSVS5} - a list containing the Bayesian estimation output in two elements:
 #' 
 #' \code{posterior} a list with a collection of \code{S} draws from the posterior distribution 
 #' generated via Gibbs sampler containing many arrays and vectors whose selection depends on 
@@ -113,6 +113,6 @@ bsvar_mss_sv_cpp <- function(SS, Y, X, prior, VB, starting_values, thin = 100L) 
 #' @export
 bsvar_s4_sv_cpp <- function(SS, Y, X, prior, VB, starting_values, thin = 100L) {
   output          = .Call(`_bsvarTVPs_bsvar_s4_sv_cpp`, SS, Y, X, prior, VB, starting_values, thin)
-  class(output)   = "PosteriorBSVARSV-S5"
+  class(output)   = "PosteriorBSVARSVS5"
   return(output)
 }

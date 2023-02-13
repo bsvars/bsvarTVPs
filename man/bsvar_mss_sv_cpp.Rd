@@ -23,7 +23,7 @@ bsvar_mss_sv_cpp(SS, Y, X, prior, VB, starting_values, thin = 100L)
 \item{thin}{a positive integer determining MCMC thinning}
 }
 \value{
-A list containing the Bayesian estimation output in two elements:
+An object of class \code{PosteriorBSVARSVMS} - a list containing the Bayesian estimation output in two elements:
 
 \code{posterior} a list with a collection of \code{S} draws from the posterior distribution 
 generated via Gibbs sampler containing many arrays and vectors whose selection depends on 

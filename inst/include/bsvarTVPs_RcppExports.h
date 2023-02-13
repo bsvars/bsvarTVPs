@@ -151,6 +151,26 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::cube >(rcpp_result_gen);
     }
 
+    inline void bsvars_normalisation_wz2003(arma::cube& posterior_B, const arma::mat& B_hat) {
+        typedef SEXP(*Ptr_bsvars_normalisation_wz2003)(SEXP,SEXP);
+        static Ptr_bsvars_normalisation_wz2003 p_bsvars_normalisation_wz2003 = NULL;
+        if (p_bsvars_normalisation_wz2003 == NULL) {
+            validateSignature("void(*bsvars_normalisation_wz2003)(arma::cube&,const arma::mat&)");
+            p_bsvars_normalisation_wz2003 = (Ptr_bsvars_normalisation_wz2003)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_bsvars_normalisation_wz2003");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_bsvars_normalisation_wz2003(Shield<SEXP>(Rcpp::wrap(posterior_B)), Shield<SEXP>(Rcpp::wrap(B_hat)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+    }
+
     inline Rcpp::List bsvar_mss_s4_sv_cpp(const int& SS, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB, const Rcpp::List& starting_values, const int thin = 100) {
         typedef SEXP(*Ptr_bsvar_mss_s4_sv_cpp)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_bsvar_mss_s4_sv_cpp p_bsvar_mss_s4_sv_cpp = NULL;
