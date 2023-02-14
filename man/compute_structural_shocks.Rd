@@ -5,8 +5,6 @@
 \title{Computes posterior draws of structural shocks}
 \usage{
 compute_structural_shocks(posterior, Y, X)
-
-compute_structural_shocks(posterior, Y, X)
 }
 \arguments{
 \item{posterior}{posterior estimation outcome - an object of either of the classes: 
@@ -19,14 +17,8 @@ PosteriorBSVARSVMSS5, PosteriorBSVARSVMS, or PosteriorBSVARSVS5.}
 \value{
 An object of class PosteriorShocks, that is, an \code{NxTxS} array with attribute PosteriorShocks 
 containing \code{S} draws of the structural shocks.
-
-An object of class PosteriorShocks, that is, an \code{NxTxS} array with attribute PosteriorShocks 
-containing \code{S} draws of the structural shocks.
 }
 \description{
-Each of the draws from the posterior estimation of a model is transformed into
-a draw from the posterior distribution of the structural shocks.
-
 Each of the draws from the posterior estimation of a model is transformed into
 a draw from the posterior distribution of the structural shocks.
 }

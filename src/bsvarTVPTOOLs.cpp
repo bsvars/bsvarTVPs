@@ -251,3 +251,34 @@ arma::mat bsvars_normalisation_wz20031 (
 
   return out;
 } // END bsvars_normalisation_wz20031
+
+
+
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+arma::vec bsvars_normalisation_wz20031_diag (
+    arma::mat         aux_B,        // NxNxS
+    const arma::mat&  B_hat               // NxN
+) {
+  // changes posterior_B by reference filling it with normalised values
+  const int   N       = aux_B.n_rows;
+  const int   K       = pow(2, N);
+  
+  mat B_hat_inv       = inv(B_hat);
+  mat Sigma_inv       = B_hat.t() * B_hat;
+  
+  // create matrix diag_signs whose rows contain all sign combinations
+  mat diag_signs(K, N);
+  vec omo             = as<vec>(NumericVector::create(-1,1));
+  for (int n=0; n<N; n++) {
+    vec os(pow(2, n), fill::ones);
+    vec oos(pow(2, N-1-n), fill::ones);
+    diag_signs.col(n) = kron(os, kron(omo, oos));
+  }
+  
+  // normalisation
+  rowvec sss            = bsvars::normalisation_wz2003_s(aux_B, B_hat_inv, Sigma_inv, diag_signs);
+  vec out               = sss.t();
+  
+  return out;
+} // END bsvars_normalisation_wz20031

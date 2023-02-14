@@ -4,20 +4,14 @@
 \alias{normalise.PosteriorBSVARSVS5}
 \title{Waggoner & Zha (2003) row signs normalisation of the posterior draws for matrix \eqn{B}}
 \usage{
-\method{normalise}{PosteriorBSVARSVS5}(posterior, B_hat, VB)
+\method{normalise}{PosteriorBSVARSVS5}(posterior, VB)
 }
 \arguments{
-\item{posterior}{posterior estimation outcome - an object of class "PosteriorBSVARSVS5"
+\item{posterior}{posterior estimation outcome - an object of either of classes: 
+"PosteriorBSVARSVMSS5", "PosteriorBSVARSVMS", or "PosteriorBSVARSVS5"
 containing, amongst other draws, the \code{S} draws from the posterior 
 distribution of the \code{NxN} matrix of contemporaneous relationships \eqn{B}. 
 These draws are to be normalised with respect to:}
-
-\item{B_hat}{an \code{NxNxS5} array with \code{S5} \code{NxN} benchmark 
-matrices specified by the user to be used to normalise the \eqn{B} matrices in the posterior output.
-\code{S5} denotes the number of alternative S5 components.
-If this argument is not provided the function creates its own proposal based on the 
-last available component specific draws of \eqn{B} normalised to have 
-positive elements on the main diagonal.}
 
 \item{VB}{the list with matrices determining identification, including S5 identification}
 }
@@ -26,7 +20,8 @@ An object of class corresponding to the class of the first argument \code{poster
 with normalised draws of matrix \eqn{B}.
 }
 \description{
-Normalises the sign of rows of matrix \eqn{B} MCMC draws S5 component-by-component, 
+Normalises the sign of rows of matrix \eqn{B} MCMC draws 
+Markov state-by-state and S5 component-by-component, 
  provided as the first argument \code{posterior_B}, relative to the matrices in
  \code{B_hat}, provided as the second argument of the function. If the second argument 
  is not provided, the function creates its own benchmark matrix. The implemented

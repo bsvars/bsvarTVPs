@@ -193,6 +193,27 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::mat >(rcpp_result_gen);
     }
 
+    inline arma::vec bsvars_normalisation_wz20031_diag(arma::mat aux_B, const arma::mat& B_hat) {
+        typedef SEXP(*Ptr_bsvars_normalisation_wz20031_diag)(SEXP,SEXP);
+        static Ptr_bsvars_normalisation_wz20031_diag p_bsvars_normalisation_wz20031_diag = NULL;
+        if (p_bsvars_normalisation_wz20031_diag == NULL) {
+            validateSignature("arma::vec(*bsvars_normalisation_wz20031_diag)(arma::mat,const arma::mat&)");
+            p_bsvars_normalisation_wz20031_diag = (Ptr_bsvars_normalisation_wz20031_diag)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_bsvars_normalisation_wz20031_diag");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_bsvars_normalisation_wz20031_diag(Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(B_hat)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<arma::vec >(rcpp_result_gen);
+    }
+
     inline Rcpp::List bsvar_mss_s4_sv_cpp(const int& SS, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB, const Rcpp::List& starting_values, const int thin = 100) {
         typedef SEXP(*Ptr_bsvar_mss_s4_sv_cpp)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_bsvar_mss_s4_sv_cpp p_bsvar_mss_s4_sv_cpp = NULL;

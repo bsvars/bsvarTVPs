@@ -5,10 +5,10 @@
 \title{Computes regime-specific impulse response functions of the dependent variables 
 to the structural shocks}
 \usage{
-compute_impulse_responses(posterior_output, horizon)
+compute_impulse_responses(posterior, horizon)
 }
 \arguments{
-\item{posterior_output}{an object of class of class PosteriorBSVARSVMSS5, 
+\item{posterior}{an object of class of class PosteriorBSVARSVMSS5, 
 PosteriorBSVARSVMS, or PosteriorBSVARSVS5 with random draws from the posterior 
 distribution of the Structural model with Markov-switching structural matrix}
 

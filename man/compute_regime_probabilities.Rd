@@ -10,13 +10,6 @@ compute_regime_probabilities(
   X,
   type = c("realized", "filtered", "forecasted", "smoothed")
 )
-
-compute_regime_probabilities(
-  posterior,
-  Y,
-  X,
-  type = c("realized", "filtered", "forecasted", "smoothed")
-)
 }
 \arguments{
 \item{posterior}{posterior estimation outcome of regime-dependent heteroskedastic models 
@@ -32,9 +25,6 @@ denoting the type of probabilities to be computed.}
 \value{
 An object of class PosteriorRegimePr, that is, an \code{MxTxS} array with attribute PosteriorRegimePr 
 containing \code{S} draws of the regime probabilities.
-
-An object of class PosteriorRegimePr, that is, an \code{MxTxS} array with attribute PosteriorRegimePr 
-containing \code{S} draws of the regime probabilities.
 }
 \description{
 Each of the draws from the posterior estimation of a model is transformed into
@@ -42,16 +32,8 @@ a draw from the posterior distribution of the regime probabilities. These repres
 the realisations of the regime indicators, when \code{type = "realized"}, filtered probabilities,
 when \code{type = "filtered"}, forecasted regime probabilities, when \code{type = "forecasted"},
 or the smoothed probabilities, when \code{type = "smoothed"}, .
-
-Each of the draws from the posterior estimation of a model is transformed into
-a draw from the posterior distribution of the regime probabilities. These represent either
-the realisations of the regime indicators, when \code{type = "realized"}, filtered probabilities,
-when \code{type = "filtered"}, forecasted regime probabilities, when \code{type = "forecasted"},
-or the smoothed probabilities, when \code{type = "smoothed"}, .
 }
 \references{
-Song, Y., and Woźniak, T., (2021) Markov Switching. \emph{Oxford Research Encyclopedia of Economics and Finance}, Oxford University Press, \doi{https://doi.org/10.1093/acrefore/9780190625979.013.174}.
-
 Song, Y., and Woźniak, T., (2021) Markov Switching. \emph{Oxford Research Encyclopedia of Economics and Finance}, Oxford University Press, \doi{https://doi.org/10.1093/acrefore/9780190625979.013.174}.
 }
 \author{

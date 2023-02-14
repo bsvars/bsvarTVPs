@@ -5,8 +5,6 @@
 \title{Computes posterior draws of dependent variables' fitted values}
 \usage{
 compute_fitted_values(posterior, X)
-
-compute_fitted_values(posterior, X)
 }
 \arguments{
 \item{posterior}{posterior estimation outcome - an object of either of the classes: 
@@ -17,14 +15,8 @@ PosteriorBSVARSVMSS5, PosteriorBSVARSVMS, or PosteriorBSVARSVS5.}
 \value{
 An object of class PosteriorFitted, that is, an \code{NxTxS} array with attribute PosteriorFitted 
 containing \code{S} draws of the fitted values.
-
-An object of class PosteriorFitted, that is, an \code{NxTxS} array with attribute PosteriorFitted 
-containing \code{S} draws of the fitted values.
 }
 \description{
-Each of the draws from the posterior estimation of a model is transformed into
-a draw from the posterior distribution of the fitted values.
-
 Each of the draws from the posterior estimation of a model is transformed into
 a draw from the posterior distribution of the fitted values.
 }
