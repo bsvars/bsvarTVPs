@@ -90,3 +90,73 @@ ribbon_plot = function(
     )
   }
 }
+
+
+
+
+
+#' @title Plots the (state-specific) S5 components posterior density
+#'
+#' @description Plots the posterior densities of (Markov state-specific) S5 components
+#' based on the posterior draws of the S5 indicators
+#' 
+#' @param S5_density an object of class S5density - an outcome of applying function \code{compute_S5_component_density}
+#' @param ylim limits for the y axis. If missing, set to interval \eqn{(0,1)}
+#' @param ylab a label for the y axis. If missing, set to \code{"component probability"}
+#' @param main main title of the plots. If missing, set to equation names.
+#' @param col a vector of colors for the bars or bar components. If missing, an original proposal is used.
+#' @param border the color to be used for the border of the bars. Is missing, no border is plotted.
+#' @param ... other graphical parameters to be passed to \code{base:barplot}
+#' 
+#' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
+#' 
+#' @export
+plot_S5density = function(
+    S5_density,
+    ylim, 
+    ylab, 
+    main,
+    col,
+    border,
+    ...
+) {
+  
+  stopifnot("Argument S5_density has to be of class S5density" = any(class(S5_density) == "S5density"))
+  
+  # read the parameters
+  eqs_n     = length(S5_density)
+  eqs_names = names(S5_density)
+  M         = nrow(S5_density[[1]])
+    
+  # create a color palette
+  fc        = grDevices::colorRampPalette(c("darkorchid1", "darkorchid4"))
+  cols      = fc(M)
+  
+  # manage the arguments
+  if (missing(ylim)) ylim = c(0,1)
+  if (missing(ylab)) ylab = "component probability"
+  if (missing(main)) main = eqs_names
+  if (missing(col))  col = cols
+  if (missing(border)) border = NA
+  
+  # barplot with legend
+  graphics::par(mfrow = c(eqs_n,1))
+  for (i in 1:eqs_n) {
+    graphics::barplot(
+      S5_density[[i]], beside = TRUE, 
+      ylim = ylim, 
+      ylab = ylab, 
+      main = main[i],
+      col = col, 
+      border = border,
+      ...
+    )
+    if ( M > 1 ) {
+      graphics::legend(
+        "top", legend = rownames(S5_density[[i]]), 
+        fill = cols, 
+        bty = "n", border = border, horiz = TRUE
+      )
+    }
+  } # END i loop
+}
