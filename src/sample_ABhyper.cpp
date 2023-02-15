@@ -440,8 +440,8 @@ arma::vec sample_hyperparameters_s4 (
     rn           += VB(ll).n_rows;
   }
   
-  aux_hyper(1)    = ( prior_hyper_s + trace((aux_A - as<mat>(prior["A"])) * as<mat>(prior["A_V_inv"]) * trans(aux_A - as<mat>(prior["A"]))) ) /
-    R::rchisq( prior_hyper_nu + N * K );
+  // aux_hyper(1)    = ( prior_hyper_s + trace((aux_A - as<mat>(prior["A"])) * as<mat>(prior["A_V_inv"]) * trans(aux_A - as<mat>(prior["A"]))) ) /
+  //   R::rchisq( prior_hyper_nu + N * K );
   aux_hyper(0)    = ( prior_hyper_s + trace(aux_B * as<mat>(prior["B_V_inv"]) * trans(aux_B) )) /
     R::rchisq( prior_hyper_nu + rn );
   
@@ -472,8 +472,8 @@ arma::vec sample_hyperparameters_mss (
     rn       += VB(n).n_rows;
   }
   
-  aux_hyper(1)    = ( prior_hyper_s + trace((aux_A - as<mat>(prior["A"])) * as<mat>(prior["A_V_inv"]) * trans(aux_A - as<mat>(prior["A"]))) ) /
-    R::rchisq( prior_hyper_nu + N * K );
+  // aux_hyper(1)    = ( prior_hyper_s + trace((aux_A - as<mat>(prior["A"])) * as<mat>(prior["A_V_inv"]) * trans(aux_A - as<mat>(prior["A"]))) ) /
+  //   R::rchisq( prior_hyper_nu + N * K );
   double BVB      = 0;
   for (int m=0; m<M; m++) {
     BVB          += trace(aux_B.slice(m) * as<mat>(prior["B_V_inv"]) * trans(aux_B.slice(m)) );
@@ -519,8 +519,8 @@ arma::mat sample_hyperparameters_mss_s4 (
     }
   }
   
-  aux_hyper(1)    = ( prior_hyper_s + trace((aux_A - as<mat>(prior["A"])) * as<mat>(prior["A_V_inv"]) * trans(aux_A - as<mat>(prior["A"]))) ) /
-    R::rchisq( prior_hyper_nu + N * K );
+  // aux_hyper(1)    = ( prior_hyper_s + trace((aux_A - as<mat>(prior["A"])) * as<mat>(prior["A_V_inv"]) * trans(aux_A - as<mat>(prior["A"]))) ) /
+  //   R::rchisq( prior_hyper_nu + N * K );
   double BVB      = 0;
   for (int m=0; m<M; m++) {
     BVB          += trace(aux_B.slice(m) * as<mat>(prior["B_V_inv"]) * trans(aux_B.slice(m)) );
