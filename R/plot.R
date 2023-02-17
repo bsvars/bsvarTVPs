@@ -154,7 +154,7 @@ plot_S5density = function(
     if ( M > 1 ) {
       graphics::legend(
         "top", legend = rownames(S5_density[[i]]), 
-        fill = cols, 
+        fill = col, 
         bty = "n", border = border, horiz = TRUE
       )
     }
