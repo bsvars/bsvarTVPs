@@ -15,23 +15,24 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // bsvarTVPs_ir_ms
-arma::field<arma::cube> bsvarTVPs_ir_ms(arma::field<arma::cube>& posterior_B, arma::cube& posterior_A, const int horizon, const int p);
-static SEXP _bsvarTVPs_bsvarTVPs_ir_ms_try(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP horizonSEXP, SEXP pSEXP) {
+arma::field<arma::cube> bsvarTVPs_ir_ms(arma::field<arma::cube>& posterior_B, arma::cube& posterior_A, const int horizon, const int p, const bool standardise);
+static SEXP _bsvarTVPs_bsvarTVPs_ir_ms_try(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP horizonSEXP, SEXP pSEXP, SEXP standardiseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< arma::field<arma::cube>& >::type posterior_B(posterior_BSEXP);
     Rcpp::traits::input_parameter< arma::cube& >::type posterior_A(posterior_ASEXP);
     Rcpp::traits::input_parameter< const int >::type horizon(horizonSEXP);
     Rcpp::traits::input_parameter< const int >::type p(pSEXP);
-    rcpp_result_gen = Rcpp::wrap(bsvarTVPs_ir_ms(posterior_B, posterior_A, horizon, p));
+    Rcpp::traits::input_parameter< const bool >::type standardise(standardiseSEXP);
+    rcpp_result_gen = Rcpp::wrap(bsvarTVPs_ir_ms(posterior_B, posterior_A, horizon, p, standardise));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _bsvarTVPs_bsvarTVPs_ir_ms(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP horizonSEXP, SEXP pSEXP) {
+RcppExport SEXP _bsvarTVPs_bsvarTVPs_ir_ms(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP horizonSEXP, SEXP pSEXP, SEXP standardiseSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvarTVPs_ir_ms_try(posterior_BSEXP, posterior_ASEXP, horizonSEXP, pSEXP));
+        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvarTVPs_ir_ms_try(posterior_BSEXP, posterior_ASEXP, horizonSEXP, pSEXP, standardiseSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -52,23 +53,24 @@ RcppExport SEXP _bsvarTVPs_bsvarTVPs_ir_ms(SEXP posterior_BSEXP, SEXP posterior_
     return rcpp_result_gen;
 }
 // bsvarTVPs_ir
-arma::field<arma::cube> bsvarTVPs_ir(arma::cube& posterior_B, arma::cube& posterior_A, const int horizon, const int p);
-static SEXP _bsvarTVPs_bsvarTVPs_ir_try(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP horizonSEXP, SEXP pSEXP) {
+arma::field<arma::cube> bsvarTVPs_ir(arma::cube& posterior_B, arma::cube& posterior_A, const int horizon, const int p, const bool standardise);
+static SEXP _bsvarTVPs_bsvarTVPs_ir_try(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP horizonSEXP, SEXP pSEXP, SEXP standardiseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< arma::cube& >::type posterior_B(posterior_BSEXP);
     Rcpp::traits::input_parameter< arma::cube& >::type posterior_A(posterior_ASEXP);
     Rcpp::traits::input_parameter< const int >::type horizon(horizonSEXP);
     Rcpp::traits::input_parameter< const int >::type p(pSEXP);
-    rcpp_result_gen = Rcpp::wrap(bsvarTVPs_ir(posterior_B, posterior_A, horizon, p));
+    Rcpp::traits::input_parameter< const bool >::type standardise(standardiseSEXP);
+    rcpp_result_gen = Rcpp::wrap(bsvarTVPs_ir(posterior_B, posterior_A, horizon, p, standardise));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _bsvarTVPs_bsvarTVPs_ir(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP horizonSEXP, SEXP pSEXP) {
+RcppExport SEXP _bsvarTVPs_bsvarTVPs_ir(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP horizonSEXP, SEXP pSEXP, SEXP standardiseSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvarTVPs_ir_try(posterior_BSEXP, posterior_ASEXP, horizonSEXP, pSEXP));
+        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvarTVPs_ir_try(posterior_BSEXP, posterior_ASEXP, horizonSEXP, pSEXP, standardiseSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -1028,8 +1030,8 @@ RcppExport SEXP _bsvarTVPs_sample_Markov_process_mss(SEXP aux_xiSEXP, SEXP ESEXP
 static int _bsvarTVPs_RcppExport_validate(const char* sig) { 
     static std::set<std::string> signatures;
     if (signatures.empty()) {
-        signatures.insert("arma::field<arma::cube>(*bsvarTVPs_ir_ms)(arma::field<arma::cube>&,arma::cube&,const int,const int)");
-        signatures.insert("arma::field<arma::cube>(*bsvarTVPs_ir)(arma::cube&,arma::cube&,const int,const int)");
+        signatures.insert("arma::field<arma::cube>(*bsvarTVPs_ir_ms)(arma::field<arma::cube>&,arma::cube&,const int,const int,const bool)");
+        signatures.insert("arma::field<arma::cube>(*bsvarTVPs_ir)(arma::cube&,arma::cube&,const int,const int,const bool)");
         signatures.insert("arma::cube(*bsvarTVPs_filter_forecast_smooth)(Rcpp::List&,const arma::mat&,const arma::mat&,const bool,const bool)");
         signatures.insert("arma::cube(*bsvarTVPs_fitted_values)(arma::cube&,arma::mat&)");
         signatures.insert("arma::cube(*bsvarTVPs_structural_shocks)(const arma::field<arma::cube>&,const arma::cube&,const arma::cube&,const arma::mat&,const arma::mat&)");
@@ -1091,8 +1093,8 @@ RcppExport SEXP _bsvarTVPs_RcppExport_registerCCallable() {
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_bsvarTVPs_bsvarTVPs_ir_ms", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_ir_ms, 4},
-    {"_bsvarTVPs_bsvarTVPs_ir", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_ir, 4},
+    {"_bsvarTVPs_bsvarTVPs_ir_ms", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_ir_ms, 5},
+    {"_bsvarTVPs_bsvarTVPs_ir", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_ir, 5},
     {"_bsvarTVPs_bsvarTVPs_filter_forecast_smooth", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_filter_forecast_smooth, 5},
     {"_bsvarTVPs_bsvarTVPs_fitted_values", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_fitted_values, 2},
     {"_bsvarTVPs_bsvarTVPs_structural_shocks", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_structural_shocks, 5},

@@ -11,6 +11,9 @@
 #' PosteriorBSVARSVMS, or PosteriorBSVARSVS5 with random draws from the posterior 
 #' distribution of the Structural model with Markov-switching structural matrix
 #' @param horizon a positive integer specifying the forecasting horizon for the impulse responses
+#' @param standardise a logical value. If \code{TRUE}, the impulse responses are standardised 
+#' so that the variables' own shocks at horizon 0 are equal to 1. Otherwise, the parameter estimates 
+#' determine this magnitude.
 #' 
 #' @return An \code{N x N x horizon x M x S} array containing the posterior draws 
 #' of the impulse responses 
@@ -22,7 +25,7 @@
 #' Monetary Policy Shock Identification?
 #' 
 #' @export
-compute_impulse_responses <- function(posterior, horizon) {
+compute_impulse_responses <- function(posterior, horizon, standardise = FALSE) {
   
   # check arguments
   stopifnot("Argument posterior must be of class PosteriorBSVARSVMSS5, PosteriorBSVARSVMS, or PosteriorBSVARSVS5." = substr(class(posterior), 1, 16) == "PosteriorBSVARSV")
@@ -38,7 +41,7 @@ compute_impulse_responses <- function(posterior, horizon) {
 #' @inheritParams compute_impulse_responses
 #' 
 #' @export
-compute_impulse_responses.PosteriorBSVARSVMSS5 <- function(posterior, horizon) {
+compute_impulse_responses.PosteriorBSVARSVMSS5 <- function(posterior, horizon, standardise = FALSE) {
   
   posterior_B = posterior$posterior$B
   posterior_A = posterior$posterior$A
@@ -48,7 +51,7 @@ compute_impulse_responses.PosteriorBSVARSVMSS5 <- function(posterior, horizon) {
   M           = dim(posterior_B[1,1][[1]])[3]
   
   # compute IRFs
-  irfs          = .Call(`_bsvarTVPs_bsvarTVPs_ir_ms`, posterior_B, posterior_A, horizon, p)
+  irfs          = .Call(`_bsvarTVPs_bsvarTVPs_ir_ms`, posterior_B, posterior_A, horizon, p, standardise)
   
   # transform the output to an array and return
   ir_posterior    = array(NA, c(N, N, horizon + 1, M, S))
@@ -68,7 +71,7 @@ compute_impulse_responses.PosteriorBSVARSVMSS5 <- function(posterior, horizon) {
 #' @inheritParams compute_impulse_responses
 #' 
 #' @export
-compute_impulse_responses.PosteriorBSVARSVMS <- function(posterior, horizon) {
+compute_impulse_responses.PosteriorBSVARSVMS <- function(posterior, horizon, standardise = FALSE) {
   
   posterior_B = posterior$posterior$B
   posterior_A = posterior$posterior$A
@@ -78,7 +81,7 @@ compute_impulse_responses.PosteriorBSVARSVMS <- function(posterior, horizon) {
   M           = dim(posterior_B[1,1][[1]])[3]
   
   # compute IRFs
-  irfs          = .Call(`_bsvarTVPs_bsvarTVPs_ir_ms`, posterior_B, posterior_A, horizon, p)
+  irfs          = .Call(`_bsvarTVPs_bsvarTVPs_ir_ms`, posterior_B, posterior_A, horizon, p, standardise)
   
   # transform the output to an array and return
   ir_posterior    = array(NA, c(N, N, horizon + 1, M, S))
@@ -98,7 +101,7 @@ compute_impulse_responses.PosteriorBSVARSVMS <- function(posterior, horizon) {
 #' @inheritParams compute_impulse_responses
 #' 
 #' @export
-compute_impulse_responses.PosteriorBSVARSVS5 <- function(posterior, horizon) {
+compute_impulse_responses.PosteriorBSVARSVS5 <- function(posterior, horizon, standardise = FALSE) {
   
   posterior_B = posterior$posterior$B
   posterior_A = posterior$posterior$A
@@ -108,7 +111,7 @@ compute_impulse_responses.PosteriorBSVARSVS5 <- function(posterior, horizon) {
   M           = 1
   
   # compute IRFs
-  irfs        = .Call(`_bsvarTVPs_bsvarTVPs_ir`, posterior_B, posterior_A, horizon, p)
+  irfs        = .Call(`_bsvarTVPs_bsvarTVPs_ir`, posterior_B, posterior_A, horizon, p, standardise)
   
   # transform the output to an array and return
   ir_posterior    = array(NA, c(N, N, horizon + 1, M, S))

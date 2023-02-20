@@ -5,7 +5,7 @@
 \title{Computes regime-specific impulse response functions of the dependent variables 
 to the structural shocks}
 \usage{
-\method{compute_impulse_responses}{PosteriorBSVARSVS5}(posterior, horizon)
+\method{compute_impulse_responses}{PosteriorBSVARSVS5}(posterior, horizon, standardise = FALSE)
 }
 \arguments{
 \item{posterior}{an object of class of class PosteriorBSVARSVMSS5, 
@@ -13,6 +13,10 @@ PosteriorBSVARSVMS, or PosteriorBSVARSVS5 with random draws from the posterior
 distribution of the Structural model with Markov-switching structural matrix}
 
 \item{horizon}{a positive integer specifying the forecasting horizon for the impulse responses}
+
+\item{standardise}{a logical value. If \code{TRUE}, the impulse responses are standardised 
+so that the variables' own shocks at horizon 0 are equal to 1. Otherwise, the parameter estimates 
+determine this magnitude.}
 }
 \value{
 An \code{N x N x horizon x M x S} array containing the posterior draws 

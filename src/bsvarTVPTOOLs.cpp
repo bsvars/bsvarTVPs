@@ -13,7 +13,8 @@ arma::field<arma::cube> bsvarTVPs_ir_ms (
     arma::field<arma::cube>&  posterior_B,        // (S)(N, N, M)
     arma::cube&               posterior_A,        // (N, K, S)
     const int                 horizon,
-    const int                 p
+    const int                 p,
+    const bool                standardise = false
 ) {
   
   const int       N = posterior_B(0).n_rows;
@@ -25,7 +26,7 @@ arma::field<arma::cube> bsvarTVPs_ir_ms (
   
   for (int s=0; s<S; s++) {
     for (int m=0; m<M; m++) {
-      aux_irfs            = bsvars::bsvars_ir1( posterior_B(s).slice(m), posterior_A.slice(s), horizon, p );
+      aux_irfs            = bsvars::bsvars_ir1( posterior_B(s).slice(m), posterior_A.slice(s), horizon, p , standardise);
       irfs(s, m)          = aux_irfs;
     } // END m loop
   } // END s loop
@@ -40,7 +41,8 @@ arma::field<arma::cube> bsvarTVPs_ir (
     arma::cube&               posterior_B,        // (N, N, S)
     arma::cube&               posterior_A,        // (N, K, S)
     const int                 horizon,
-    const int                 p
+    const int                 p,
+    const bool                standardise = false
 ) {
   
   const int       N = posterior_B.n_rows;
@@ -51,7 +53,7 @@ arma::field<arma::cube> bsvarTVPs_ir (
   field<cube>     irfs(S, M);
   
   for (int s=0; s<S; s++) {
-    aux_irfs            = bsvars::bsvars_ir1( posterior_B.slice(s), posterior_A.slice(s), horizon, p );
+    aux_irfs            = bsvars::bsvars_ir1( posterior_B.slice(s), posterior_A.slice(s), horizon, p, standardise);
     irfs(s, 0)          = aux_irfs;
   } // END s loop
   

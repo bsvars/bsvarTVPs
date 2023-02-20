@@ -25,17 +25,17 @@ namespace bsvarTVPs {
         }
     }
 
-    inline arma::field<arma::cube> bsvarTVPs_ir_ms(arma::field<arma::cube>& posterior_B, arma::cube& posterior_A, const int horizon, const int p) {
-        typedef SEXP(*Ptr_bsvarTVPs_ir_ms)(SEXP,SEXP,SEXP,SEXP);
+    inline arma::field<arma::cube> bsvarTVPs_ir_ms(arma::field<arma::cube>& posterior_B, arma::cube& posterior_A, const int horizon, const int p, const bool standardise = false) {
+        typedef SEXP(*Ptr_bsvarTVPs_ir_ms)(SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_bsvarTVPs_ir_ms p_bsvarTVPs_ir_ms = NULL;
         if (p_bsvarTVPs_ir_ms == NULL) {
-            validateSignature("arma::field<arma::cube>(*bsvarTVPs_ir_ms)(arma::field<arma::cube>&,arma::cube&,const int,const int)");
+            validateSignature("arma::field<arma::cube>(*bsvarTVPs_ir_ms)(arma::field<arma::cube>&,arma::cube&,const int,const int,const bool)");
             p_bsvarTVPs_ir_ms = (Ptr_bsvarTVPs_ir_ms)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_ir_ms");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_bsvarTVPs_ir_ms(Shield<SEXP>(Rcpp::wrap(posterior_B)), Shield<SEXP>(Rcpp::wrap(posterior_A)), Shield<SEXP>(Rcpp::wrap(horizon)), Shield<SEXP>(Rcpp::wrap(p)));
+            rcpp_result_gen = p_bsvarTVPs_ir_ms(Shield<SEXP>(Rcpp::wrap(posterior_B)), Shield<SEXP>(Rcpp::wrap(posterior_A)), Shield<SEXP>(Rcpp::wrap(horizon)), Shield<SEXP>(Rcpp::wrap(p)), Shield<SEXP>(Rcpp::wrap(standardise)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -46,17 +46,17 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::field<arma::cube> >(rcpp_result_gen);
     }
 
-    inline arma::field<arma::cube> bsvarTVPs_ir(arma::cube& posterior_B, arma::cube& posterior_A, const int horizon, const int p) {
-        typedef SEXP(*Ptr_bsvarTVPs_ir)(SEXP,SEXP,SEXP,SEXP);
+    inline arma::field<arma::cube> bsvarTVPs_ir(arma::cube& posterior_B, arma::cube& posterior_A, const int horizon, const int p, const bool standardise = false) {
+        typedef SEXP(*Ptr_bsvarTVPs_ir)(SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_bsvarTVPs_ir p_bsvarTVPs_ir = NULL;
         if (p_bsvarTVPs_ir == NULL) {
-            validateSignature("arma::field<arma::cube>(*bsvarTVPs_ir)(arma::cube&,arma::cube&,const int,const int)");
+            validateSignature("arma::field<arma::cube>(*bsvarTVPs_ir)(arma::cube&,arma::cube&,const int,const int,const bool)");
             p_bsvarTVPs_ir = (Ptr_bsvarTVPs_ir)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_ir");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_bsvarTVPs_ir(Shield<SEXP>(Rcpp::wrap(posterior_B)), Shield<SEXP>(Rcpp::wrap(posterior_A)), Shield<SEXP>(Rcpp::wrap(horizon)), Shield<SEXP>(Rcpp::wrap(p)));
+            rcpp_result_gen = p_bsvarTVPs_ir(Shield<SEXP>(Rcpp::wrap(posterior_B)), Shield<SEXP>(Rcpp::wrap(posterior_A)), Shield<SEXP>(Rcpp::wrap(horizon)), Shield<SEXP>(Rcpp::wrap(p)), Shield<SEXP>(Rcpp::wrap(standardise)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
