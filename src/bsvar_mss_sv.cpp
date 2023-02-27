@@ -71,7 +71,7 @@ Rcpp::List bsvar_mss_sv_cpp (
   
   field<cube> posterior_B(S);
   cube  posterior_A(N, K, S);
-  mat   posterior_hyper(2, S);
+  mat   posterior_hyper(5, S);
   
   cube  posterior_PR_TR(M, M, S);
   mat   posterior_pi_0(M,S);
