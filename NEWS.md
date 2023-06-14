@@ -1,3 +1,7 @@
+# bsvarTVPs 0.0.4.9000
+
+1. Estimation of models with a three-level global-local hierarchical prior shrinkage for the structural and autoregressive matrices
+
 # bsvarTVPs 0.0.3.9000
 
 1. Documentation for the estimation functions

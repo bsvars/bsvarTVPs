@@ -1,7 +1,7 @@
 Package: bsvarTVPs
 Type: Package
 Title: Bayesian Estimation of Heteroskedastic Structural Vector Autoregressions with Markov-Switching Structural Matrix
-Version: 0.0.3.9000
+Version: 0.0.4.9000
 Date: 2022-10-17
 Authors@R: person("Tomasz", "Woźniak", , "wozniak.tom@pm.me", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-2212-2378"))
