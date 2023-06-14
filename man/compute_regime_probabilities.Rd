@@ -13,7 +13,7 @@ compute_regime_probabilities(
 }
 \arguments{
 \item{posterior}{posterior estimation outcome of regime-dependent heteroskedastic models 
-- an object of either of the classes: PosteriorBSVARSVMSS5, or PosteriorBSVARSVMS.}
+- an object of either of the classes: PosteriorBSVARSVMSTVI, or PosteriorBSVARSVMS.}
 
 \item{Y}{a \code{N x T} matrix of dependent variables}
 

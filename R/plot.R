@@ -95,12 +95,12 @@ ribbon_plot = function(
 
 
 
-#' @title Plots the (state-specific) S5 components posterior density
+#' @title Plots the (state-specific) TVI components posterior density
 #'
-#' @description Plots the posterior densities of (Markov state-specific) S5 components
-#' based on the posterior draws of the S5 indicators
+#' @description Plots the posterior densities of (Markov state-specific) TVI components
+#' based on the posterior draws of the TVI indicators
 #' 
-#' @param S5_density an object of class S5density - an outcome of applying function \code{compute_S5_component_density}
+#' @param TVI_density an object of class TVIdensity - an outcome of applying function \code{compute_TVI_component_density}
 #' @param ylim limits for the y axis. If missing, set to interval \eqn{(0,1)}
 #' @param ylab a label for the y axis. If missing, set to \code{"component probability"}
 #' @param main main title of the plots. If missing, set to equation names.
@@ -111,8 +111,8 @@ ribbon_plot = function(
 #' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
 #' 
 #' @export
-plot_S5density = function(
-    S5_density,
+plot_TVIdensity = function(
+    TVI_density,
     ylim, 
     ylab, 
     main,
@@ -121,12 +121,12 @@ plot_S5density = function(
     ...
 ) {
   
-  stopifnot("Argument S5_density has to be of class S5density" = any(class(S5_density) == "S5density"))
+  stopifnot("Argument TVI_density has to be of class TVIdensity" = any(class(TVI_density) == "TVIdensity"))
   
   # read the parameters
-  eqs_n     = length(S5_density)
-  eqs_names = names(S5_density)
-  M         = nrow(S5_density[[1]])
+  eqs_n     = length(TVI_density)
+  eqs_names = names(TVI_density)
+  M         = nrow(TVI_density[[1]])
     
   # create a color palette
   fc        = grDevices::colorRampPalette(c("darkorchid1", "darkorchid4"))
@@ -143,7 +143,7 @@ plot_S5density = function(
   graphics::par(mfrow = c(eqs_n,1))
   for (i in 1:eqs_n) {
     graphics::barplot(
-      S5_density[[i]], beside = TRUE, 
+      TVI_density[[i]], beside = TRUE, 
       ylim = ylim, 
       ylab = ylab, 
       main = main[i],
@@ -153,7 +153,7 @@ plot_S5density = function(
     )
     if ( M > 1 ) {
       graphics::legend(
-        "top", legend = rownames(S5_density[[i]]), 
+        "top", legend = rownames(TVI_density[[i]]), 
         fill = col, 
         bty = "n", border = border, horiz = TRUE
       )

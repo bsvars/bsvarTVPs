@@ -2,27 +2,27 @@
 % Please edit documentation in R/bsvarTVPTOOLs.R
 \name{compute_impulse_responses_by_components}
 \alias{compute_impulse_responses_by_components}
-\title{Computes regime and S5 component-specific impulse response functions of the dependent variables 
+\title{Computes regime and TVI component-specific impulse response functions of the dependent variables 
 to the structural shocks}
 \usage{
-compute_impulse_responses_by_components(ir_posterior, S5_posterior, VB)
+compute_impulse_responses_by_components(ir_posterior, TVI_posterior, VB)
 }
 \arguments{
 \item{ir_posterior}{an object of class \code{PosteriorIR} list with random draws from the posterior distribution of 
 the impulse responses obtained applying function \code{compute_impulse_responses}}
 
-\item{S5_posterior}{a \code{N x M x S}}
+\item{TVI_posterior}{a \code{N x M x S}}
 
-\item{VB}{a list containing matrices determining the S5 component specifications}
+\item{VB}{a list containing matrices determining the TVI component specifications}
 }
 \value{
 An \code{N x N x horizon x M x S} array containing the posterior draws 
 of the impulse responses
 }
 \description{
-Computes regime and S5 component-specific impulse response functions of the dependent variables 
+Computes regime and TVI component-specific impulse response functions of the dependent variables 
 to the structural shocks for SVAR models with Markov-switching structural matrix with \code{M} regimes 
-and the S5 structure provided on \code{VB}.
+and the TVI structure provided on \code{VB}.
 }
 \references{
 Camehl, A. & Woźniak, T. (2022) What do Data Say About Time-Variation in 

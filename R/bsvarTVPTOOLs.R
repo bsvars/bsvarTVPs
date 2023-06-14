@@ -7,8 +7,8 @@
 #' to the structural shocks for SVAR models with Markov-switching structural matrix with \code{M} regimes
 #' 
 #' 
-#' @param posterior an object of class of class PosteriorBSVARSVMSS5, 
-#' PosteriorBSVARSVMS, or PosteriorBSVARSVS5 with random draws from the posterior 
+#' @param posterior an object of class of class PosteriorBSVARSVMSTVI, 
+#' PosteriorBSVARSVMS, or PosteriorBSVARSVTVI with random draws from the posterior 
 #' distribution of the Structural model with Markov-switching structural matrix
 #' @param horizon a positive integer specifying the forecasting horizon for the impulse responses
 #' @param standardise a logical value. If \code{TRUE}, the impulse responses are standardised 
@@ -28,7 +28,7 @@
 compute_impulse_responses <- function(posterior, horizon, standardise = FALSE) {
   
   # check arguments
-  stopifnot("Argument posterior must be of class PosteriorBSVARSVMSS5, PosteriorBSVARSVMS, or PosteriorBSVARSVS5." = substr(class(posterior), 1, 16) == "PosteriorBSVARSV")
+  stopifnot("Argument posterior must be of class PosteriorBSVARSVMSTVI, PosteriorBSVARSVMS, or PosteriorBSVARSVTVI." = substr(class(posterior), 1, 16) == "PosteriorBSVARSV")
   stopifnot("Argument horizon must be a positive integer number." = horizon >= 1 & horizon %% 1 == 0)
   
   # call method
@@ -37,11 +37,11 @@ compute_impulse_responses <- function(posterior, horizon, standardise = FALSE) {
 
 
 #' @inherit compute_impulse_responses
-#' @method compute_impulse_responses PosteriorBSVARSVMSS5
+#' @method compute_impulse_responses PosteriorBSVARSVMSTVI
 #' @inheritParams compute_impulse_responses
 #' 
 #' @export
-compute_impulse_responses.PosteriorBSVARSVMSS5 <- function(posterior, horizon, standardise = FALSE) {
+compute_impulse_responses.PosteriorBSVARSVMSTVI <- function(posterior, horizon, standardise = FALSE) {
   
   posterior_B = posterior$posterior$B
   posterior_A = posterior$posterior$A
@@ -97,11 +97,11 @@ compute_impulse_responses.PosteriorBSVARSVMS <- function(posterior, horizon, sta
 
 
 #' @inherit compute_impulse_responses
-#' @method compute_impulse_responses PosteriorBSVARSVS5
+#' @method compute_impulse_responses PosteriorBSVARSVTVI
 #' @inheritParams compute_impulse_responses
 #' 
 #' @export
-compute_impulse_responses.PosteriorBSVARSVS5 <- function(posterior, horizon, standardise = FALSE) {
+compute_impulse_responses.PosteriorBSVARSVTVI <- function(posterior, horizon, standardise = FALSE) {
   
   posterior_B = posterior$posterior$B
   posterior_A = posterior$posterior$A
@@ -126,18 +126,18 @@ compute_impulse_responses.PosteriorBSVARSVS5 <- function(posterior, horizon, sta
 
 
 
-#' @title Computes regime and S5 component-specific impulse response functions of the dependent variables 
+#' @title Computes regime and TVI component-specific impulse response functions of the dependent variables 
 #' to the structural shocks
 #'
-#' @description Computes regime and S5 component-specific impulse response functions of the dependent variables 
+#' @description Computes regime and TVI component-specific impulse response functions of the dependent variables 
 #' to the structural shocks for SVAR models with Markov-switching structural matrix with \code{M} regimes 
-#' and the S5 structure provided on \code{VB}.
+#' and the TVI structure provided on \code{VB}.
 #' 
 #' 
 #' @param ir_posterior an object of class \code{PosteriorIR} list with random draws from the posterior distribution of 
 #' the impulse responses obtained applying function \code{compute_impulse_responses}
-#' @param S5_posterior a \code{N x M x S}
-#' @param VB a list containing matrices determining the S5 component specifications
+#' @param TVI_posterior a \code{N x M x S}
+#' @param VB a list containing matrices determining the TVI component specifications
 #' 
 #' @return An \code{N x N x horizon x M x S} array containing the posterior draws 
 #' of the impulse responses 
@@ -149,7 +149,7 @@ compute_impulse_responses.PosteriorBSVARSVS5 <- function(posterior, horizon, sta
 #' Monetary Policy Shock Identification?
 #' 
 #' @export
-compute_impulse_responses_by_components <- function(ir_posterior, S5_posterior, VB) {
+compute_impulse_responses_by_components <- function(ir_posterior, TVI_posterior, VB) {
   
   stopifnot("Argument ir_posterior must be an object of class PosteriorIR." = class(ir_posterior) == "PosteriorIR")
   
@@ -157,33 +157,33 @@ compute_impulse_responses_by_components <- function(ir_posterior, S5_posterior, 
   S           = dim(ir_posterior)[5]
   N           = dim(ir_posterior)[1]
   comp        = VB[length(VB)][[1]]
-  S5_ind      = which(comp > 1)
-  comp        = comp[S5_ind]
-  S5_length   = length(S5_ind)
+  TVI_ind      = which(comp > 1)
+  comp        = comp[TVI_ind]
+  TVI_length   = length(TVI_ind)
   
   output      = vector("list", M)
   names(output)   = paste0(rep("regime", M), 1:M)
   
   for (m in 1:M) {
-    output[[m]]         = vector("list", S5_length)
-    names(output[[m]])  = paste0(rep("equation", S5_length), S5_ind)
+    output[[m]]         = vector("list", TVI_length)
+    names(output[[m]])  = paste0(rep("equation", TVI_length), TVI_ind)
     
-    for (eq in 1:S5_length) {
+    for (eq in 1:TVI_length) {
       output[[m]][[eq]]         = vector("list", comp[eq])
-      names(output[[m]][[eq]])  = paste0(rep("S5component", comp[eq]), 1:comp[eq])
+      names(output[[m]][[eq]])  = paste0(rep("TVIcomponent", comp[eq]), 1:comp[eq])
       
       for (component in 1:comp[eq]) {
         if ( M == 1 ) {
-          draws_count                   = S5_posterior[S5_ind[eq], ] == component
+          draws_count                   = TVI_posterior[TVI_ind[eq], ] == component
         } else {
-          draws_count                   = S5_posterior[S5_ind[eq], m, ] == component
+          draws_count                   = TVI_posterior[TVI_ind[eq], m, ] == component
         }
         output[[m]][[eq]][[component]]  = ir_posterior[,,,m,draws_count]
       } # END component loop
     } # END eq loop
   } # END m loop
   
-  class(output)     = "PosteriorIRS5"
+  class(output)     = "PosteriorIRTVI"
   return(output)
 }
 
@@ -197,7 +197,7 @@ compute_impulse_responses_by_components <- function(ir_posterior, S5_posterior, 
 #' or the smoothed probabilities, when \code{type = "smoothed"}, .
 #' 
 #' @param posterior posterior estimation outcome of regime-dependent heteroskedastic models 
-#' - an object of either of the classes: PosteriorBSVARSVMSS5, or PosteriorBSVARSVMS.
+#' - an object of either of the classes: PosteriorBSVARSVMSTVI, or PosteriorBSVARSVMS.
 #' @param Y a \code{N x T} matrix of dependent variables
 #' @param X a \code{K x T} matrix of lagged variables
 #' @param type one of the values \code{"realized"}, \code{"filtered"}, \code{"forecasted"}, or \code{"smoothed"}
@@ -214,7 +214,7 @@ compute_impulse_responses_by_components <- function(ir_posterior, S5_posterior, 
 #' @export
 compute_regime_probabilities <- function(posterior, Y, X, type = c("realized", "filtered", "forecasted", "smoothed")) {
   
-  stopifnot("Argument posterior must be of class PosteriorBSVARSVMSS5 or PosteriorBSVARSVMS." = substr(class(posterior), 1, 18) == "PosteriorBSVARSVMS")
+  stopifnot("Argument posterior must be of class PosteriorBSVARSVMSTVI or PosteriorBSVARSVMS." = substr(class(posterior), 1, 18) == "PosteriorBSVARSVMS")
   
   type          = match.arg(type)
   
@@ -251,7 +251,7 @@ compute_regime_probabilities <- function(posterior, Y, X, type = c("realized", "
 #' a draw from the posterior distribution of the fitted values. 
 #' 
 #' @param posterior posterior estimation outcome - an object of either of the classes: 
-#' PosteriorBSVARSVMSS5, PosteriorBSVARSVMS, or PosteriorBSVARSVS5.
+#' PosteriorBSVARSVMSTVI, PosteriorBSVARSVMS, or PosteriorBSVARSVTVI.
 #' @param X a \code{K x T} matrix of vector autoregressive regressors.
 #' 
 #' @return An object of class PosteriorFitted, that is, an \code{NxTxS} array with attribute PosteriorFitted 
@@ -262,7 +262,7 @@ compute_regime_probabilities <- function(posterior, Y, X, type = c("realized", "
 #' @export
 compute_fitted_values <- function(posterior, X) {
   
-  stopifnot("Argument posterior must contain estimation output." = any(class(posterior)[1] == c("PosteriorBSVARSVMSS5", "PosteriorBSVARSVMS", "PosteriorBSVARSVS5")))
+  stopifnot("Argument posterior must contain estimation output." = any(class(posterior)[1] == c("PosteriorBSVARSVMSTVI", "PosteriorBSVARSVMS", "PosteriorBSVARSVTVI")))
   
   posterior_A     = posterior$posterior$A
   # X               = posterior$last_draw$data_matrices$X
@@ -283,7 +283,7 @@ compute_fitted_values <- function(posterior, X) {
 #' a draw from the posterior distribution of the structural shocks. 
 #' 
 #' @param posterior posterior estimation outcome - an object of either of the classes: 
-#' PosteriorBSVARSVMSS5, PosteriorBSVARSVMS, or PosteriorBSVARSVS5.
+#' PosteriorBSVARSVMSTVI, PosteriorBSVARSVMS, or PosteriorBSVARSVTVI.
 #' @param Y a \code{N x T} matrix od dependent variables
 #' @param X a \code{K x T} matrix of vector autoregressive regressors.
 #' 
@@ -295,7 +295,7 @@ compute_fitted_values <- function(posterior, X) {
 #' @export
 compute_structural_shocks <- function(posterior, Y, X) {
   
-  stopifnot("Argument posterior must contain estimation output." = any(class(posterior)[1] == c("PosteriorBSVARSVMSS5", "PosteriorBSVARSVMS", "PosteriorBSVARSVS5")))
+  stopifnot("Argument posterior must contain estimation output." = any(class(posterior)[1] == c("PosteriorBSVARSVMSTVI", "PosteriorBSVARSVMS", "PosteriorBSVARSVTVI")))
   
   # call method
   UseMethod("compute_structural_shocks", posterior)
@@ -305,11 +305,11 @@ compute_structural_shocks <- function(posterior, Y, X) {
 
 
 #' @inherit compute_structural_shocks
-#' @method compute_structural_shocks PosteriorBSVARSVMSS5
+#' @method compute_structural_shocks PosteriorBSVARSVMSTVI
 #' @inheritParams compute_structural_shocks
 #' 
 #' @export
-compute_structural_shocks.PosteriorBSVARSVMSS5 <- function(posterior, Y, X) {
+compute_structural_shocks.PosteriorBSVARSVMSTVI <- function(posterior, Y, X) {
   
   posterior_B     = posterior$posterior$B
   posterior_A     = posterior$posterior$A
@@ -341,11 +341,11 @@ compute_structural_shocks.PosteriorBSVARSVMS <- function(posterior, Y, X) {
 
 
 #' @inherit compute_structural_shocks
-#' @method compute_structural_shocks PosteriorBSVARSVS5
+#' @method compute_structural_shocks PosteriorBSVARSVTVI
 #' @inheritParams compute_structural_shocks
 #' 
 #' @export
-compute_structural_shocks.PosteriorBSVARSVS5 <- function(posterior, Y, X) {
+compute_structural_shocks.PosteriorBSVARSVTVI <- function(posterior, Y, X) {
   
   posterior_B     = posterior$posterior$B
   posterior_A     = posterior$posterior$A
@@ -357,16 +357,16 @@ compute_structural_shocks.PosteriorBSVARSVS5 <- function(posterior, Y, X) {
 
 
 
-#' @title Computes S5 components density
+#' @title Computes TVI components density
 #'
-#' @description Computes posterior density of (Markov state-specific) S5 components
-#' based on the posterior draws of the S5 indicators
+#' @description Computes posterior density of (Markov state-specific) TVI components
+#' based on the posterior draws of the TVI indicators
 #' 
 #' 
-#' @param posterior estimation output of class PosteriorBSVARSVMSS5 or PosteriorBSVARSVS5
-#' @param VB a list containing matrices determining the S5 component specifications
+#' @param posterior estimation output of class PosteriorBSVARSVMSTVI or PosteriorBSVARSVTVI
+#' @param VB a list containing matrices determining the TVI component specifications
 #' 
-#' @return A list containing S5 components density
+#' @return A list containing TVI components density
 #'
 #' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
 #' 
@@ -375,86 +375,86 @@ compute_structural_shocks.PosteriorBSVARSVS5 <- function(posterior, Y, X) {
 #' Monetary Policy Shock Identification?
 #' 
 #' @export
-compute_S5_component_density <- function(posterior, VB) {
+compute_TVI_component_density <- function(posterior, VB) {
   
-  stopifnot("Argument posterior must contain estimation output of class PosteriorBSVARSVMSS5 or PosteriorBSVARSVS5." = any(class(posterior)[1] == c("PosteriorBSVARSVMSS5","PosteriorBSVARSVS5")))
+  stopifnot("Argument posterior must contain estimation output of class PosteriorBSVARSVMSTVI or PosteriorBSVARSVTVI." = any(class(posterior)[1] == c("PosteriorBSVARSVMSTVI","PosteriorBSVARSVTVI")))
   
-  UseMethod("compute_S5_component_density", posterior)
+  UseMethod("compute_TVI_component_density", posterior)
 }
 
 
 
-#' @inherit compute_S5_component_density
-#' @method compute_S5_component_density PosteriorBSVARSVMSS5
-#' @inheritParams compute_S5_component_density
+#' @inherit compute_TVI_component_density
+#' @method compute_TVI_component_density PosteriorBSVARSVMSTVI
+#' @inheritParams compute_TVI_component_density
 #' 
 #' @export
-compute_S5_component_density.PosteriorBSVARSVMSS5 <- function(posterior, VB) {
+compute_TVI_component_density.PosteriorBSVARSVMSTVI <- function(posterior, VB) {
   
-  S5_posterior  = posterior$posterior$S4_indicator
+  TVI_posterior  = posterior$posterior$S4_indicator
   
-  M           = dim(S5_posterior)[2]
-  S           = dim(S5_posterior)[3]
-  N           = dim(S5_posterior)[1]
+  M           = dim(TVI_posterior)[2]
+  S           = dim(TVI_posterior)[3]
+  N           = dim(TVI_posterior)[1]
   comp        = VB[length(VB)][[1]]
-  S5_ind      = which(comp > 1)
-  comp        = comp[S5_ind]
-  S5_length   = length(S5_ind)
+  TVI_ind      = which(comp > 1)
+  comp        = comp[TVI_ind]
+  TVI_length   = length(TVI_ind)
   
-  S5_density        = vector("list", S5_length)
-  names(S5_density) = paste0(rep("equation", S5_length), S5_ind)
+  TVI_density        = vector("list", TVI_length)
+  names(TVI_density) = paste0(rep("equation", TVI_length), TVI_ind)
   
-  for (eq in 1:S5_length) {
-    S5_density[[eq]]            = matrix(NA, M, comp[eq])
-    rownames(S5_density[[eq]])  = paste0(rep("regime", M), 1:M)
-    colnames(S5_density[[eq]])  = paste0(rep("component", comp[eq]), 1:comp[eq])
+  for (eq in 1:TVI_length) {
+    TVI_density[[eq]]            = matrix(NA, M, comp[eq])
+    rownames(TVI_density[[eq]])  = paste0(rep("regime", M), 1:M)
+    colnames(TVI_density[[eq]])  = paste0(rep("component", comp[eq]), 1:comp[eq])
     
     for (m in 1:M) {
       for (component in 1:comp[eq]) {
-        draws_count                   = S5_posterior[S5_ind[eq], m, ] == component
-        S5_density[[eq]][m,component] = mean(draws_count)
+        draws_count                   = TVI_posterior[TVI_ind[eq], m, ] == component
+        TVI_density[[eq]][m,component] = mean(draws_count)
       } # END component loop
     } # END m loop
   } # END eq loop
   
-  class(S5_density)     = "S5density"
+  class(TVI_density)     = "TVIdensity"
   
-  return(S5_density)
+  return(TVI_density)
 }
 
 
-#' @inherit compute_S5_component_density
-#' @method compute_S5_component_density PosteriorBSVARSVS5
-#' @inheritParams compute_S5_component_density
+#' @inherit compute_TVI_component_density
+#' @method compute_TVI_component_density PosteriorBSVARSVTVI
+#' @inheritParams compute_TVI_component_density
 #' 
 #' @export
-compute_S5_component_density.PosteriorBSVARSVS5 <- function(posterior, VB) {
+compute_TVI_component_density.PosteriorBSVARSVTVI <- function(posterior, VB) {
   
-  S5_posterior  = posterior$posterior$S4_indicator
+  TVI_posterior  = posterior$posterior$S4_indicator
   
-  S           = dim(S5_posterior)[2]
-  N           = dim(S5_posterior)[1]
+  S           = dim(TVI_posterior)[2]
+  N           = dim(TVI_posterior)[1]
   comp        = VB[length(VB)][[1]]
-  S5_ind      = which(comp > 1)
-  comp        = comp[S5_ind]
-  S5_length   = length(S5_ind)
+  TVI_ind      = which(comp > 1)
+  comp        = comp[TVI_ind]
+  TVI_length   = length(TVI_ind)
   
-  S5_density        = vector("list", S5_length)
-  names(S5_density) = paste0(rep("equation", S5_length), S5_ind)
+  TVI_density        = vector("list", TVI_length)
+  names(TVI_density) = paste0(rep("equation", TVI_length), TVI_ind)
   
-  for (eq in 1:S5_length) {
-    S5_density[[eq]]            = matrix(NA, 1, comp[eq])
-    colnames(S5_density[[eq]])  = paste0(rep("component", comp[eq]), 1:comp[eq])
+  for (eq in 1:TVI_length) {
+    TVI_density[[eq]]            = matrix(NA, 1, comp[eq])
+    colnames(TVI_density[[eq]])  = paste0(rep("component", comp[eq]), 1:comp[eq])
     
       for (component in 1:comp[eq]) {
-        draws_count                   = S5_posterior[S5_ind[eq], ] == component
-        S5_density[[eq]][1,component] = mean(draws_count)
+        draws_count                   = TVI_posterior[TVI_ind[eq], ] == component
+        TVI_density[[eq]][1,component] = mean(draws_count)
       } # END component loop
   } # END eq loop
   
-  class(S5_density)     = "S5density"
+  class(TVI_density)     = "TVIdensity"
   
-  return(S5_density)
+  return(TVI_density)
 }
 
 
@@ -489,14 +489,14 @@ structural_to_array <- function(posterior) {
 
 
 #' @inherit structural_to_array
-#' @method structural_to_array PosteriorBSVARSVMSS5
+#' @method structural_to_array PosteriorBSVARSVMSTVI
 #' @inheritParams structural_to_array
 #' 
 #' @return An \code{N x N x M x S} array containing the posterior draws 
 #' of the structural matrix \eqn{B}
 #' 
 #' @export
-structural_to_array.PosteriorBSVARSVMSS5 <- function(posterior) {
+structural_to_array.PosteriorBSVARSVMSTVI <- function(posterior) {
   
   B_posterior = posterior$posterior$B
   S       = dim(B_posterior)[1]
@@ -537,14 +537,14 @@ structural_to_array.PosteriorBSVARSVMS <- function(posterior) {
 
 
 #' @inherit structural_to_array
-#' @method structural_to_array PosteriorBSVARSVS5
+#' @method structural_to_array PosteriorBSVARSVTVI
 #' @inheritParams structural_to_array
 #' 
 #' @return An \code{N x N x S} array containing the posterior draws 
 #' of the structural matrix \eqn{B}
 #' 
 #' @export
-structural_to_array.PosteriorBSVARSVS5 <- function(posterior) {
+structural_to_array.PosteriorBSVARSVTVI <- function(posterior) {
   
   return(posterior$posterior$B)
 }

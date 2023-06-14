@@ -8,8 +8,8 @@ and returns draws on the remaining parameters}
 drop_sv(posterior)
 }
 \arguments{
-\item{posterior}{an object of class of class PosteriorBSVARSVMSS5, 
-PosteriorBSVARSVMS, or PosteriorBSVARSVS5 with random draws from the posterior 
+\item{posterior}{an object of class of class PosteriorBSVARSVMSTVI, 
+PosteriorBSVARSVMS, or PosteriorBSVARSVTVI with random draws from the posterior 
 distribution of the Structural model with Markov-switching structural matrix}
 }
 \value{

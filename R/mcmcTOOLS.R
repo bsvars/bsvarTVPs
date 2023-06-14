@@ -8,8 +8,8 @@
 #' the memory used to save the posterior output.
 #' 
 #' 
-#' @param posterior an object of class of class PosteriorBSVARSVMSS5, 
-#' PosteriorBSVARSVMS, or PosteriorBSVARSVS5 with random draws from the posterior 
+#' @param posterior an object of class of class PosteriorBSVARSVMSTVI, 
+#' PosteriorBSVARSVMS, or PosteriorBSVARSVTVI with random draws from the posterior 
 #' distribution of the Structural model with Markov-switching structural matrix
 #' 
 #' @return An object of the same class as the input object class but with an extra 
@@ -24,7 +24,7 @@
 drop_sv <- function(posterior) {
   
   # check arguments
-  stopifnot("Argument posterior must be of class PosteriorBSVARSVMSS5, PosteriorBSVARSVMS, or PosteriorBSVARSVS5." = substr(class(posterior), 1, 16) == "PosteriorBSVARSV")
+  stopifnot("Argument posterior must be of class PosteriorBSVARSVMSTVI, PosteriorBSVARSVMS, or PosteriorBSVARSVTVI." = substr(class(posterior), 1, 16) == "PosteriorBSVARSV")
   
   out = posterior$posterior
   out = within(out, rm("sigma", "h"))
@@ -41,8 +41,8 @@ drop_sv <- function(posterior) {
 #' @description Returns a list with two elements, \code{h} and \code{sigma}, from the posterior 
 #' output. To be used for managing the memory used to save the posterior output.
 #' 
-#' @param posterior an object of class of class PosteriorBSVARSVMSS5, 
-#' PosteriorBSVARSVMS, or PosteriorBSVARSVS5 with random draws from the posterior 
+#' @param posterior an object of class of class PosteriorBSVARSVMSTVI, 
+#' PosteriorBSVARSVMS, or PosteriorBSVARSVTVI with random draws from the posterior 
 #' distribution of the Structural model with Markov-switching structural matrix
 #' 
 #' @return An object of the same class as the input object class but with an extra 
@@ -57,7 +57,7 @@ drop_sv <- function(posterior) {
 drag_sv <- function(posterior) {
   
   # check arguments
-  stopifnot("Argument posterior must be of class PosteriorBSVARSVMSS5, PosteriorBSVARSVMS, or PosteriorBSVARSVS5." = substr(class(posterior), 1, 16) == "PosteriorBSVARSV")
+  stopifnot("Argument posterior must be of class PosteriorBSVARSVMSTVI, PosteriorBSVARSVMS, or PosteriorBSVARSVTVI." = substr(class(posterior), 1, 16) == "PosteriorBSVARSV")
   
   out           = list(
     posterior   = list(

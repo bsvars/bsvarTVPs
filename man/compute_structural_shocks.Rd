@@ -8,7 +8,7 @@ compute_structural_shocks(posterior, Y, X)
 }
 \arguments{
 \item{posterior}{posterior estimation outcome - an object of either of the classes: 
-PosteriorBSVARSVMSS5, PosteriorBSVARSVMS, or PosteriorBSVARSVS5.}
+PosteriorBSVARSVMSTVI, PosteriorBSVARSVMS, or PosteriorBSVARSVTVI.}
 
 \item{Y}{a \code{N x T} matrix od dependent variables}
 

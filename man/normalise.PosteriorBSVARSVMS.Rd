@@ -8,12 +8,12 @@
 }
 \arguments{
 \item{posterior}{posterior estimation outcome - an object of either of classes: 
-"PosteriorBSVARSVMSS5", "PosteriorBSVARSVMS", or "PosteriorBSVARSVS5"
+"PosteriorBSVARSVMSTVI", "PosteriorBSVARSVMS", or "PosteriorBSVARSVTVI"
 containing, amongst other draws, the \code{S} draws from the posterior 
 distribution of the \code{NxN} matrix of contemporaneous relationships \eqn{B}. 
 These draws are to be normalised with respect to:}
 
-\item{VB}{the list with matrices determining identification, including S5 identification}
+\item{VB}{the list with matrices determining identification, including TVI identification}
 }
 \value{
 An object of class corresponding to the class of the first argument \code{posterior} 
@@ -21,7 +21,7 @@ with normalised draws of matrix \eqn{B}.
 }
 \description{
 Normalises the sign of rows of matrix \eqn{B} MCMC draws 
-Markov state-by-state and S5 component-by-component, 
+Markov state-by-state and TVI component-by-component, 
  provided as the first argument \code{posterior_B}, relative to the matrices in
  \code{B_hat}, provided as the second argument of the function. If the second argument 
  is not provided, the function creates its own benchmark matrix. The implemented
