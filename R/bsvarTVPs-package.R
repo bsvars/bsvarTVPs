@@ -1,8 +1,9 @@
 #  #####################################################################################
 #  R package bsvarTVPs by Tomasz Woźniak Copyright (C) 2022
 #
-#  This file is part of the R package bsvarTVPs: Bayesian estimation of 
-#  heteroskedastic Structural Vector Autoregressions with Markov-switching structural matrix
+#  This file is part of the R package bsvarTVPs: Bayesian Estimation of 
+#  Heteroskedastic Structural Vector Autoregressions with Markov-Switching and 
+#  Time-Varying Identification of the Structural Matrix
 #
 #  The R package bsvarTVPs is free software: you can redistribute it
 #  and/or modify it under the terms of the GNU General Public License
@@ -19,12 +20,16 @@
 #  refer to <http://www.gnu.org/licenses/>.
 #  #####################################################################################
 #
-#' @title Bayesian estimation of heteroskedastic Structural Vector Autoregressions with 
-#' Markov-switching structural matrix
+#' @title Bayesian Estimation of Heteroskedastic Structural Vector Autoregressions 
+#' with Markov-Switching and Time-Varying Identification of the Structural Matrix
 #'
-#' @description Efficient algorithms for Bayesian estimation of Structural Vector Autoregressions 
-#' with Stochastic Volatility heteroskedasticity and Markov-switching structural matrix. The models
-#' were developed for a paper Camehl, Annika & Woźniak, Tomasz (2022) What do Data Say About 
+#' @description Efficient algorithms for Bayesian estimation of Structural 
+#' Vector Autoregressions with Stochastic Volatility heteroskedasticity, 
+#' Markov-switching and Time-Varying Identification of the Structural Matrix, 
+#' and a three-level global-local hierarchical prior shrinkage for the structural 
+#' and autoregressive matrices.
+#' The models were developed for a paper 
+#' Camehl, Annika & Woźniak, Tomasz (2022) What do Data Say About 
 #' Time-Variation in Monetary Policy Shock Identification?
 #' 
 #' @details 
@@ -52,6 +57,7 @@
 #' @docType package
 #' @useDynLib bsvarTVPs, .registration = TRUE
 #' @importFrom bsvars specify_bsvar_sv
+#' @importFrom HDInterval hdi
 #' @importFrom GIGrvg rgig
 #' @importFrom R6 R6Class
 #' @importFrom Rcpp sourceCpp
