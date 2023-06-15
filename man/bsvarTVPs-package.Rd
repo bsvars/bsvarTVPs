@@ -4,12 +4,16 @@
 \name{bsvarTVPs-package}
 \alias{bsvarTVPs-package}
 \alias{bsvarTVPs}
-\title{Bayesian estimation of heteroskedastic Structural Vector Autoregressions with 
-Markov-switching structural matrix}
+\title{Bayesian Estimation of Heteroskedastic Structural Vector Autoregressions 
+with Markov-Switching and Time-Varying Identification of the Structural Matrix}
 \description{
-Efficient algorithms for Bayesian estimation of Structural Vector Autoregressions 
-with Stochastic Volatility heteroskedasticity and Markov-switching structural matrix. The models
-were developed for a paper Camehl, Annika & Woźniak, Tomasz (2022) What do Data Say About 
+Efficient algorithms for Bayesian estimation of Structural 
+Vector Autoregressions with Stochastic Volatility heteroskedasticity, 
+Markov-switching and Time-Varying Identification of the Structural Matrix, 
+and a three-level global-local hierarchical prior shrinkage for the structural 
+and autoregressive matrices.
+The models were developed for a paper 
+Camehl, Annika & Woźniak, Tomasz (2022) What do Data Say About 
 Time-Variation in Monetary Policy Shock Identification?
 }
 \details{

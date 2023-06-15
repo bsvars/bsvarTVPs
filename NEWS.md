@@ -3,6 +3,7 @@
 1. Estimation of models with a three-level global-local hierarchical prior shrinkage for the structural and autoregressive matrices
 2. Info regarding the time-varying identification and the hierarchical prior included in the package description
 3. Package description in the progress bar
+4. Estimation of models with homoskedastic structural shocks
 
 # bsvarTVPs 0.0.3.9000
 

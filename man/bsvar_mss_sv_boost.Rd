@@ -29,7 +29,7 @@ An object of class \code{PosteriorBSVARSVMS} - a list containing the Bayesian es
 generated via Gibbs sampler containing many arrays and vectors whose selection depends on 
 the model specification.
 \code{last_draw} a list with the last draw of the current MCMC run as the starting value 
-to be passed to the continuation of the MCMC estimation using \code{bsvar_tvi_sv()}.
+to be passed to the continuation of the MCMC estimation.
 }
 \description{
 Estimates a Structural Vector Autoregressions with Stochastic Volatility
