@@ -31,7 +31,7 @@ Rcpp::List bsvar_mss_s4_sv_boost_cpp (
   Rcout << "**************************************************|" << endl;
   Rcout << " Gibbs sampler for the SVAR-SV model              |" << endl;
   Rcout << "    with Markov-switching and regime-specific     |" << endl;
-  Rcout << "    Stochastic Search Specification Selection     |" << endl;
+  Rcout << "    time-varying identification                   |" << endl;
   Rcout << "    for the structural matrix                     |" << endl;
   Rcout << "**************************************************|" << endl;
   Rcout << " Progress of the MCMC simulation for " << SS << " draws" << endl;
