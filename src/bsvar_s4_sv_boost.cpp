@@ -24,8 +24,10 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
 ) {
   // Progress bar setup
   vec prog_rep_points = arma::round(arma::linspace(0, SS, 50));
-  // Rcout << "**************************************************|" << endl;
-  // Rcout << "bsvars: Bayesian Structural Vector Autoregressions|" << endl;
+  Rcout << "**************************************************|" << endl;
+  Rcout << "bsvarTVPs: Bayesian Structural VARs with          |" << endl;
+  Rcout << "  Markov-Switching and Time-Varying Identification|" << endl;
+  Rcout << "  and Stochastic Volatility                       |" << endl;
   Rcout << "**************************************************|" << endl;
   Rcout << " Gibbs sampler for the SVAR-SV model with         |" << endl;
   Rcout << "    Stochastic Search Specification Selection     |" << endl;
