@@ -2,6 +2,7 @@
 #include <RcppArmadillo.h>
 #include "RcppTN.h"
 #include "bsvars.h"
+#include "sample_ABhyper.h"
 
 using namespace Rcpp;
 using namespace arma;
