@@ -1,5 +1,4 @@
 
-#include <RcppArmadilloExtensions/sample.h>
 #include <RcppArmadillo.h>
 #include "Rcpp/Rmath.h"
 
@@ -216,7 +215,7 @@ Rcpp::List sample_B_heterosk1_s4 (
       
       // Sample S4 indicator
       NumericVector seq_1S    = wrap(seq_len(Lm(n)) - 1);
-      NumericVector indi_tmp  = Rcpp::RcppArmadillo::sample(seq_1S, 1, false, wrap(pr_s4));
+      NumericVector indi_tmp  = bsvars::csample_num1(seq_1S, wrap(pr_s4));
       index_s4                = indi_tmp(0);
     }
     aux_SL(n)                 = index_s4;
@@ -491,7 +490,7 @@ Rcpp::List sample_B_heterosk1_s4_boost (
       
       // Sample S4 indicator
       NumericVector seq_1S    = wrap(seq_len(Lm(n)) - 1);
-      NumericVector indi_tmp  = Rcpp::RcppArmadillo::sample(seq_1S, 1, false, wrap(pr_s4));
+      NumericVector indi_tmp  = bsvars::csample_num1(seq_1S, wrap(pr_s4));
       index_s4                = indi_tmp(0);
     }
     aux_SL(n)                 = index_s4;
