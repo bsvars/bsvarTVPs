@@ -44,7 +44,7 @@ Rcpp::List bsvar_mss_sv_cpp (
   
   cube  aux_B       = as<cube>(starting_values["B"]);
   mat   aux_A       = as<mat>(starting_values["A"]);
-  vec   aux_hyper   = as<vec>(starting_values["hyper"]);  // 5x1 (gamma_0, gamma_+, s_0, s_+, s_)
+  vec   aux_hyper   = as<vec>(starting_values["hyper"]);  // 2x1 (gamma_0, gamma_+)
   
   mat   aux_PR_TR   = as<mat>(starting_values["PR_TR"]);
   vec   aux_pi_0    = as<vec>(starting_values["pi_0"]);
@@ -73,7 +73,7 @@ Rcpp::List bsvar_mss_sv_cpp (
   
   field<cube> posterior_B(S);
   cube  posterior_A(N, K, S);
-  mat   posterior_hyper(5, S);
+  mat   posterior_hyper(2, S);
   
   cube  posterior_PR_TR(M, M, S);
   mat   posterior_pi_0(M,S);

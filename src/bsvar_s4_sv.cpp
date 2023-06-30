@@ -45,7 +45,7 @@ Rcpp::List bsvar_s4_sv_cpp (
   
   mat   aux_B       = as<mat>(starting_values["B"]);
   mat   aux_A       = as<mat>(starting_values["A"]);
-  vec   aux_hyper   = as<vec>(starting_values["hyper"]);  // 5x1 (gamma_0, gamma_+, s_0, s_+, s_)
+  vec   aux_hyper   = as<vec>(starting_values["hyper"]);  // 2x1 (gamma_0, gamma_+)
   mat   aux_h       = as<mat>(starting_values["h"]);
   vec   aux_rho     = as<vec>(starting_values["rho"]);
   vec   aux_omega   = as<vec>(starting_values["omega"]);
@@ -63,7 +63,7 @@ Rcpp::List bsvar_s4_sv_cpp (
   
   cube  posterior_B(N, N, S);
   cube  posterior_A(N, K, S);
-  mat   posterior_hyper(5, S);
+  mat   posterior_hyper(2, S);
   cube  posterior_h(N, T, S);
   mat   posterior_rho(N, S);
   mat   posterior_omega(N, S);
