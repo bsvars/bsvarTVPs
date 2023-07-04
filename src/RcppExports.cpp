@@ -201,6 +201,214 @@ RcppExport SEXP _bsvarTVPs_bsvarTVPs_structural_shocks(SEXP posterior_BSEXP, SEX
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// bsvarTVPs_covariances_rf_mssv
+arma::field<arma::mat> bsvarTVPs_covariances_rf_mssv(const arma::field<arma::cube>& posterior_B, const arma::cube& posterior_xi, const arma::cube& posterior_sigma);
+static SEXP _bsvarTVPs_bsvarTVPs_covariances_rf_mssv_try(SEXP posterior_BSEXP, SEXP posterior_xiSEXP, SEXP posterior_sigmaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const arma::field<arma::cube>& >::type posterior_B(posterior_BSEXP);
+    Rcpp::traits::input_parameter< const arma::cube& >::type posterior_xi(posterior_xiSEXP);
+    Rcpp::traits::input_parameter< const arma::cube& >::type posterior_sigma(posterior_sigmaSEXP);
+    rcpp_result_gen = Rcpp::wrap(bsvarTVPs_covariances_rf_mssv(posterior_B, posterior_xi, posterior_sigma));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _bsvarTVPs_bsvarTVPs_covariances_rf_mssv(SEXP posterior_BSEXP, SEXP posterior_xiSEXP, SEXP posterior_sigmaSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvarTVPs_covariances_rf_mssv_try(posterior_BSEXP, posterior_xiSEXP, posterior_sigmaSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// bsvarTVPs_covariances_rf_sv
+arma::field<arma::mat> bsvarTVPs_covariances_rf_sv(const arma::cube& posterior_B, const arma::cube& posterior_sigma);
+static SEXP _bsvarTVPs_bsvarTVPs_covariances_rf_sv_try(SEXP posterior_BSEXP, SEXP posterior_sigmaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const arma::cube& >::type posterior_B(posterior_BSEXP);
+    Rcpp::traits::input_parameter< const arma::cube& >::type posterior_sigma(posterior_sigmaSEXP);
+    rcpp_result_gen = Rcpp::wrap(bsvarTVPs_covariances_rf_sv(posterior_B, posterior_sigma));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _bsvarTVPs_bsvarTVPs_covariances_rf_sv(SEXP posterior_BSEXP, SEXP posterior_sigmaSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvarTVPs_covariances_rf_sv_try(posterior_BSEXP, posterior_sigmaSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// bsvarTVPs_covariances_rf_ms
+arma::field<arma::mat> bsvarTVPs_covariances_rf_ms(const arma::field<arma::cube>& posterior_B, const arma::cube& posterior_xi);
+static SEXP _bsvarTVPs_bsvarTVPs_covariances_rf_ms_try(SEXP posterior_BSEXP, SEXP posterior_xiSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const arma::field<arma::cube>& >::type posterior_B(posterior_BSEXP);
+    Rcpp::traits::input_parameter< const arma::cube& >::type posterior_xi(posterior_xiSEXP);
+    rcpp_result_gen = Rcpp::wrap(bsvarTVPs_covariances_rf_ms(posterior_B, posterior_xi));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _bsvarTVPs_bsvarTVPs_covariances_rf_ms(SEXP posterior_BSEXP, SEXP posterior_xiSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvarTVPs_covariances_rf_ms_try(posterior_BSEXP, posterior_xiSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// bsvarTVPs_covariances_rf
+arma::cube bsvarTVPs_covariances_rf(const arma::cube& posterior_B);
+static SEXP _bsvarTVPs_bsvarTVPs_covariances_rf_try(SEXP posterior_BSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const arma::cube& >::type posterior_B(posterior_BSEXP);
+    rcpp_result_gen = Rcpp::wrap(bsvarTVPs_covariances_rf(posterior_B));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _bsvarTVPs_bsvarTVPs_covariances_rf(SEXP posterior_BSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvarTVPs_covariances_rf_try(posterior_BSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// bsvarTVPs_cov2cor
+arma::field<arma::mat> bsvarTVPs_cov2cor(const arma::field<arma::mat>& posterior_cov);
+static SEXP _bsvarTVPs_bsvarTVPs_cov2cor_try(SEXP posterior_covSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const arma::field<arma::mat>& >::type posterior_cov(posterior_covSEXP);
+    rcpp_result_gen = Rcpp::wrap(bsvarTVPs_cov2cor(posterior_cov));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _bsvarTVPs_bsvarTVPs_cov2cor(SEXP posterior_covSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvarTVPs_cov2cor_try(posterior_covSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// bsvarTVPs_sd
+arma::cube bsvarTVPs_sd(const arma::field<arma::mat>& posterior_cov);
+static SEXP _bsvarTVPs_bsvarTVPs_sd_try(SEXP posterior_covSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const arma::field<arma::mat>& >::type posterior_cov(posterior_covSEXP);
+    rcpp_result_gen = Rcpp::wrap(bsvarTVPs_sd(posterior_cov));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _bsvarTVPs_bsvarTVPs_sd(SEXP posterior_covSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvarTVPs_sd_try(posterior_covSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 // bsvars_structural_shocks
 arma::cube bsvars_structural_shocks(const arma::cube& posterior_B, const arma::cube& posterior_A, const arma::mat& Y, const arma::mat& X);
 static SEXP _bsvarTVPs_bsvars_structural_shocks_try(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP YSEXP, SEXP XSEXP) {
@@ -1640,6 +1848,12 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
         signatures.insert("arma::cube(*bsvarTVPs_filter_forecast_smooth)(Rcpp::List&,const arma::mat&,const arma::mat&,const bool,const bool)");
         signatures.insert("arma::cube(*bsvarTVPs_fitted_values)(arma::cube&,arma::mat&)");
         signatures.insert("arma::cube(*bsvarTVPs_structural_shocks)(const arma::field<arma::cube>&,const arma::cube&,const arma::cube&,const arma::mat&,const arma::mat&)");
+        signatures.insert("arma::field<arma::mat>(*bsvarTVPs_covariances_rf_mssv)(const arma::field<arma::cube>&,const arma::cube&,const arma::cube&)");
+        signatures.insert("arma::field<arma::mat>(*bsvarTVPs_covariances_rf_sv)(const arma::cube&,const arma::cube&)");
+        signatures.insert("arma::field<arma::mat>(*bsvarTVPs_covariances_rf_ms)(const arma::field<arma::cube>&,const arma::cube&)");
+        signatures.insert("arma::cube(*bsvarTVPs_covariances_rf)(const arma::cube&)");
+        signatures.insert("arma::field<arma::mat>(*bsvarTVPs_cov2cor)(const arma::field<arma::mat>&)");
+        signatures.insert("arma::cube(*bsvarTVPs_sd)(const arma::field<arma::mat>&)");
         signatures.insert("arma::cube(*bsvars_structural_shocks)(const arma::cube&,const arma::cube&,const arma::mat&,const arma::mat&)");
         signatures.insert("arma::cube(*bsvars_normalisation_wz2003)(arma::cube,const arma::mat&)");
         signatures.insert("arma::mat(*bsvars_normalisation_wz20031)(arma::mat,const arma::mat&)");
@@ -1687,6 +1901,12 @@ RcppExport SEXP _bsvarTVPs_RcppExport_registerCCallable() {
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_filter_forecast_smooth", (DL_FUNC)_bsvarTVPs_bsvarTVPs_filter_forecast_smooth_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_fitted_values", (DL_FUNC)_bsvarTVPs_bsvarTVPs_fitted_values_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_structural_shocks", (DL_FUNC)_bsvarTVPs_bsvarTVPs_structural_shocks_try);
+    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_covariances_rf_mssv", (DL_FUNC)_bsvarTVPs_bsvarTVPs_covariances_rf_mssv_try);
+    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_covariances_rf_sv", (DL_FUNC)_bsvarTVPs_bsvarTVPs_covariances_rf_sv_try);
+    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_covariances_rf_ms", (DL_FUNC)_bsvarTVPs_bsvarTVPs_covariances_rf_ms_try);
+    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_covariances_rf", (DL_FUNC)_bsvarTVPs_bsvarTVPs_covariances_rf_try);
+    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_cov2cor", (DL_FUNC)_bsvarTVPs_bsvarTVPs_cov2cor_try);
+    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_sd", (DL_FUNC)_bsvarTVPs_bsvarTVPs_sd_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvars_structural_shocks", (DL_FUNC)_bsvarTVPs_bsvars_structural_shocks_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvars_normalisation_wz2003", (DL_FUNC)_bsvarTVPs_bsvars_normalisation_wz2003_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvars_normalisation_wz20031", (DL_FUNC)_bsvarTVPs_bsvars_normalisation_wz20031_try);
@@ -1733,6 +1953,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bsvarTVPs_bsvarTVPs_filter_forecast_smooth", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_filter_forecast_smooth, 5},
     {"_bsvarTVPs_bsvarTVPs_fitted_values", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_fitted_values, 2},
     {"_bsvarTVPs_bsvarTVPs_structural_shocks", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_structural_shocks, 5},
+    {"_bsvarTVPs_bsvarTVPs_covariances_rf_mssv", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_covariances_rf_mssv, 3},
+    {"_bsvarTVPs_bsvarTVPs_covariances_rf_sv", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_covariances_rf_sv, 2},
+    {"_bsvarTVPs_bsvarTVPs_covariances_rf_ms", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_covariances_rf_ms, 2},
+    {"_bsvarTVPs_bsvarTVPs_covariances_rf", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_covariances_rf, 1},
+    {"_bsvarTVPs_bsvarTVPs_cov2cor", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_cov2cor, 1},
+    {"_bsvarTVPs_bsvarTVPs_sd", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_sd, 1},
     {"_bsvarTVPs_bsvars_structural_shocks", (DL_FUNC) &_bsvarTVPs_bsvars_structural_shocks, 4},
     {"_bsvarTVPs_bsvars_normalisation_wz2003", (DL_FUNC) &_bsvarTVPs_bsvars_normalisation_wz2003, 2},
     {"_bsvarTVPs_bsvars_normalisation_wz20031", (DL_FUNC) &_bsvarTVPs_bsvars_normalisation_wz20031, 2},

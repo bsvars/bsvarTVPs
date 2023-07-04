@@ -130,6 +130,132 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::cube >(rcpp_result_gen);
     }
 
+    inline arma::field<arma::mat> bsvarTVPs_covariances_rf_mssv(const arma::field<arma::cube>& posterior_B, const arma::cube& posterior_xi, const arma::cube& posterior_sigma) {
+        typedef SEXP(*Ptr_bsvarTVPs_covariances_rf_mssv)(SEXP,SEXP,SEXP);
+        static Ptr_bsvarTVPs_covariances_rf_mssv p_bsvarTVPs_covariances_rf_mssv = NULL;
+        if (p_bsvarTVPs_covariances_rf_mssv == NULL) {
+            validateSignature("arma::field<arma::mat>(*bsvarTVPs_covariances_rf_mssv)(const arma::field<arma::cube>&,const arma::cube&,const arma::cube&)");
+            p_bsvarTVPs_covariances_rf_mssv = (Ptr_bsvarTVPs_covariances_rf_mssv)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_covariances_rf_mssv");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_bsvarTVPs_covariances_rf_mssv(Shield<SEXP>(Rcpp::wrap(posterior_B)), Shield<SEXP>(Rcpp::wrap(posterior_xi)), Shield<SEXP>(Rcpp::wrap(posterior_sigma)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<arma::field<arma::mat> >(rcpp_result_gen);
+    }
+
+    inline arma::field<arma::mat> bsvarTVPs_covariances_rf_sv(const arma::cube& posterior_B, const arma::cube& posterior_sigma) {
+        typedef SEXP(*Ptr_bsvarTVPs_covariances_rf_sv)(SEXP,SEXP);
+        static Ptr_bsvarTVPs_covariances_rf_sv p_bsvarTVPs_covariances_rf_sv = NULL;
+        if (p_bsvarTVPs_covariances_rf_sv == NULL) {
+            validateSignature("arma::field<arma::mat>(*bsvarTVPs_covariances_rf_sv)(const arma::cube&,const arma::cube&)");
+            p_bsvarTVPs_covariances_rf_sv = (Ptr_bsvarTVPs_covariances_rf_sv)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_covariances_rf_sv");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_bsvarTVPs_covariances_rf_sv(Shield<SEXP>(Rcpp::wrap(posterior_B)), Shield<SEXP>(Rcpp::wrap(posterior_sigma)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<arma::field<arma::mat> >(rcpp_result_gen);
+    }
+
+    inline arma::field<arma::mat> bsvarTVPs_covariances_rf_ms(const arma::field<arma::cube>& posterior_B, const arma::cube& posterior_xi) {
+        typedef SEXP(*Ptr_bsvarTVPs_covariances_rf_ms)(SEXP,SEXP);
+        static Ptr_bsvarTVPs_covariances_rf_ms p_bsvarTVPs_covariances_rf_ms = NULL;
+        if (p_bsvarTVPs_covariances_rf_ms == NULL) {
+            validateSignature("arma::field<arma::mat>(*bsvarTVPs_covariances_rf_ms)(const arma::field<arma::cube>&,const arma::cube&)");
+            p_bsvarTVPs_covariances_rf_ms = (Ptr_bsvarTVPs_covariances_rf_ms)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_covariances_rf_ms");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_bsvarTVPs_covariances_rf_ms(Shield<SEXP>(Rcpp::wrap(posterior_B)), Shield<SEXP>(Rcpp::wrap(posterior_xi)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<arma::field<arma::mat> >(rcpp_result_gen);
+    }
+
+    inline arma::cube bsvarTVPs_covariances_rf(const arma::cube& posterior_B) {
+        typedef SEXP(*Ptr_bsvarTVPs_covariances_rf)(SEXP);
+        static Ptr_bsvarTVPs_covariances_rf p_bsvarTVPs_covariances_rf = NULL;
+        if (p_bsvarTVPs_covariances_rf == NULL) {
+            validateSignature("arma::cube(*bsvarTVPs_covariances_rf)(const arma::cube&)");
+            p_bsvarTVPs_covariances_rf = (Ptr_bsvarTVPs_covariances_rf)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_covariances_rf");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_bsvarTVPs_covariances_rf(Shield<SEXP>(Rcpp::wrap(posterior_B)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<arma::cube >(rcpp_result_gen);
+    }
+
+    inline arma::field<arma::mat> bsvarTVPs_cov2cor(const arma::field<arma::mat>& posterior_cov) {
+        typedef SEXP(*Ptr_bsvarTVPs_cov2cor)(SEXP);
+        static Ptr_bsvarTVPs_cov2cor p_bsvarTVPs_cov2cor = NULL;
+        if (p_bsvarTVPs_cov2cor == NULL) {
+            validateSignature("arma::field<arma::mat>(*bsvarTVPs_cov2cor)(const arma::field<arma::mat>&)");
+            p_bsvarTVPs_cov2cor = (Ptr_bsvarTVPs_cov2cor)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_cov2cor");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_bsvarTVPs_cov2cor(Shield<SEXP>(Rcpp::wrap(posterior_cov)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<arma::field<arma::mat> >(rcpp_result_gen);
+    }
+
+    inline arma::cube bsvarTVPs_sd(const arma::field<arma::mat>& posterior_cov) {
+        typedef SEXP(*Ptr_bsvarTVPs_sd)(SEXP);
+        static Ptr_bsvarTVPs_sd p_bsvarTVPs_sd = NULL;
+        if (p_bsvarTVPs_sd == NULL) {
+            validateSignature("arma::cube(*bsvarTVPs_sd)(const arma::field<arma::mat>&)");
+            p_bsvarTVPs_sd = (Ptr_bsvarTVPs_sd)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_sd");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_bsvarTVPs_sd(Shield<SEXP>(Rcpp::wrap(posterior_cov)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<arma::cube >(rcpp_result_gen);
+    }
+
     inline arma::cube bsvars_structural_shocks(const arma::cube& posterior_B, const arma::cube& posterior_A, const arma::mat& Y, const arma::mat& X) {
         typedef SEXP(*Ptr_bsvars_structural_shocks)(SEXP,SEXP,SEXP,SEXP);
         static Ptr_bsvars_structural_shocks p_bsvars_structural_shocks = NULL;

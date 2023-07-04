@@ -38,6 +38,40 @@ arma::cube bsvarTVPs_fitted_values (
 );
 
 
+arma::field<arma::mat> bsvarTVPs_covariances_rf_mssv (
+    const arma::field<arma::cube>&  posterior_B,  // (S)(N, N, M)
+    const arma::cube&         posterior_xi,       // (M, T, S)
+    const arma::cube&         posterior_sigma     // (N, T, S)
+);
+
+
+arma::field<arma::mat> bsvarTVPs_covariances_rf_sv (
+    const arma::cube&         posterior_B,        // (N, N, S)
+    const arma::cube&         posterior_sigma     // (N, T, S)
+);
+
+
+arma::field<arma::mat> bsvarTVPs_covariances_rf_ms (
+    const arma::field<arma::cube>&  posterior_B,  // (S)(N, N, M)
+    const arma::cube&         posterior_xi        // (M, T, S)
+);
+
+
+arma::cube bsvarTVPs_covariances_rf (
+    const arma::cube&  posterior_B  // (N, N, S)
+);
+
+
+arma::field<arma::mat> bsvarTVPs_cov2cor (
+    const arma::field<arma::mat>&  posterior_cov  // (T, S)(N, N)
+);
+
+
+arma::cube bsvarTVPs_sd (
+    const arma::field<arma::mat>&  posterior_cov  // (T, S)(N, N)
+);
+
+
 arma::cube bsvars_structural_shocks (
     const arma::field<arma::cube>&  posterior_B,    // (S)(N, N, M)
     const arma::cube&         posterior_A,    // (N, K, S)

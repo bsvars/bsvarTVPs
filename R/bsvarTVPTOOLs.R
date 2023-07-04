@@ -464,8 +464,6 @@ compute_TVI_component_density.PosteriorBSVARSVTVI <- function(posterior, VB) {
 
 
 
-
-
 #' @title Extracts the posterior draws of the structural matrix \eqn{B} and returns the as an \code{array}
 #'
 #' @description Extracts the posterior draws of the structural matrix \eqn{B} and returns the as an \code{array}
@@ -547,4 +545,192 @@ structural_to_array.PosteriorBSVARSVMS <- function(posterior) {
 structural_to_array.PosteriorBSVARSVTVI <- function(posterior) {
   
   return(posterior$posterior$B)
+}
+
+
+
+
+#' @title Computes the posterior draws of data conditional covariances
+#'
+#' @description Computes the posterior draws of time-varying conditional 
+#' covariances given the past observations
+#' 
+#' @param posterior Estimation output of a Structural VAR model. An object of class 
+#' PosteriorBSVARSVMSTVI, PosteriorBSVARSVTVI, PosteriorBSVARSVMS, PosteriorBSVARMSTVI, 
+#' PosteriorBSVARTVI, or PosteriorBSVARMS
+#' 
+#' @return An \code{N x N x T x S} array containing the posterior draws of 
+#' the conditional covariances
+#'
+#' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
+#' 
+#' @references
+#' Camehl, A. & Woźniak, T. (2022) What do Data Say About Time-Variation in 
+#' Monetary Policy Shock Identification?
+#' 
+#' @export
+compute_conditional_cov <- function(posterior) {
+  
+  # call method
+  UseMethod("compute_conditional_cov", posterior)
+}
+
+
+#' @inherit compute_conditional_cov
+#' @method compute_conditional_cov PosteriorBSVARSVMSTVI
+#' @inheritParams compute_conditional_cov
+#' 
+#' @export
+compute_conditional_cov.PosteriorBSVARSVMSTVI <- function(posterior) {
+  
+  posterior_B     = posterior$posterior$B
+  posterior_xi    = posterior$posterior$xi
+  posterior_sigma = posterior$posterior$sigma
+  N               = dim(posterior_sigma)[1]
+  T               = dim(posterior_xi)[2]
+  S               = dim(posterior_xi)[3]
+  
+  # compute conditional covariances
+  covs_tmp        = .Call(`_bsvarTVPs_bsvarTVPs_covariances_rf_mssv`, posterior_B, posterior_xi, posterior_sigma)
+  
+  covs_out        = array(NA, c(N, N, T, S))
+  for (s in 1:S) {
+    for (t in 1:T) {
+      covs_out[,,t,s] = covs_tmp[t,s][[1]]
+    }
+  }
+  class(covs_out) = "PosteriorCovariances"
+  return(covs_out)
+}
+
+
+#' @inherit compute_conditional_cov
+#' @method compute_conditional_cov PosteriorBSVARSVMS
+#' @inheritParams compute_conditional_cov
+#' 
+#' @export
+compute_conditional_cov.PosteriorBSVARSVMS <- function(posterior) {
+  
+  posterior_B     = posterior$posterior$B
+  posterior_xi    = posterior$posterior$xi
+  posterior_sigma = posterior$posterior$sigma
+  N               = dim(posterior_sigma)[1]
+  T               = dim(posterior_xi)[2]
+  S               = dim(posterior_xi)[3]
+  
+  # compute conditional covariances
+  covs_tmp        = .Call(`_bsvarTVPs_bsvarTVPs_covariances_rf_mssv`, posterior_B, posterior_xi, posterior_sigma)
+  
+  covs_out        = array(NA, c(N, N, T, S))
+  for (s in 1:S) {
+    for (t in 1:T) {
+      covs_out[,,t,s] = covs_tmp[t,s][[1]]
+    }
+  }
+  class(covs_out) = "PosteriorCovariances"
+  return(covs_out)
+}
+
+
+#' @inherit compute_conditional_cov
+#' @method compute_conditional_cov PosteriorBSVARSVTVI
+#' @inheritParams compute_conditional_cov
+#' 
+#' @export
+compute_conditional_cov.PosteriorBSVARSVTVI <- function(posterior) {
+  
+  posterior_B     = posterior$posterior$B
+  posterior_sigma = posterior$posterior$sigma
+  N               = dim(posterior_sigma)[1]
+  T               = dim(posterior_sigma)[2]
+  S               = dim(posterior_sigma)[3]
+  
+  # compute conditional covariances
+  covs_tmp        = .Call(`_bsvarTVPs_bsvarTVPs_covariances_rf_sv`, posterior_B, posterior_sigma)
+  
+  covs_out        = array(NA, c(N, N, T, S))
+  for (s in 1:S) {
+    for (t in 1:T) {
+      covs_out[,,t,s] = covs_tmp[t,s][[1]]
+    }
+  }
+  class(covs_out) = "PosteriorCovariances"
+  return(covs_out)
+}
+
+
+#' @inherit compute_conditional_cov
+#' @method compute_conditional_cov PosteriorBSVARMSTVI
+#' @inheritParams compute_conditional_cov
+#' 
+#' @export
+compute_conditional_cov.PosteriorBSVARMSTVI <- function(posterior) {
+  
+  posterior_B     = posterior$posterior$B
+  posterior_xi    = posterior$posterior$xi
+  N               = dim(posterior$posterior$B[1,1][[1]])[1]
+  T               = dim(posterior_xi)[2]
+  S               = dim(posterior_xi)[3]
+  
+  # compute conditional covariances
+  covs_tmp        = .Call(`_bsvarTVPs_bsvarTVPs_covariances_rf_ms`, posterior_B, posterior_xi)
+  
+  covs_out        = array(NA, c(N, N, T, S))
+  for (s in 1:S) {
+    for (t in 1:T) {
+      covs_out[,,t,s] = covs_tmp[t,s][[1]]
+    }
+  }
+  class(covs_out) = "PosteriorCovariances"
+  return(covs_out)
+}
+
+
+#' @inherit compute_conditional_cov
+#' @method compute_conditional_cov PosteriorBSVARMS
+#' @inheritParams compute_conditional_cov
+#' 
+#' @export
+compute_conditional_cov.PosteriorBSVARMS <- function(posterior) {
+  
+  posterior_B     = posterior$posterior$B
+  posterior_xi    = posterior$posterior$xi
+  N               = dim(posterior$posterior$B[1,1][[1]])[1]
+  T               = dim(posterior_xi)[2]
+  S               = dim(posterior_xi)[3]
+  
+  # compute conditional covariances
+  covs_tmp        = .Call(`_bsvarTVPs_bsvarTVPs_covariances_rf_ms`, posterior_B, posterior_xi)
+  
+  covs_out        = array(NA, c(N, N, T, S))
+  for (s in 1:S) {
+    for (t in 1:T) {
+      covs_out[,,t,s] = covs_tmp[t,s][[1]]
+    }
+  }
+  class(covs_out) = "PosteriorCovariances"
+  return(covs_out)
+}
+
+
+#' @inherit compute_conditional_cov
+#' @method compute_conditional_cov PosteriorBSVARTVI
+#' @inheritParams compute_conditional_cov
+#' 
+#' @export
+compute_conditional_cov.PosteriorBSVARTVI <- function(posterior) {
+  
+  posterior_B     = posterior$posterior$B
+  N               = dim(posterior_B)[1]
+  S               = dim(posterior_B)[3]
+  
+  # compute conditional covariances
+  covs_tmp        = .Call(`_bsvarTVPs_bsvarTVPs_covariances_rf`, posterior_B)
+
+  covs_out        = array(NA, c(N, N, S))
+  for (s in 1:S) {
+    covs_out[,,s] = covs_tmp[,,s]
+  }
+  class(covs_out) = "PosteriorCovariance"
+  return(covs_out)
 }
