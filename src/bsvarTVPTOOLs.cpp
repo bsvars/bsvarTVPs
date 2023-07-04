@@ -280,7 +280,7 @@ arma::field<arma::mat> bsvarTVPs_cov2cor (
 
 // [[Rcpp::interfaces(cpp, r)]]
 // [[Rcpp::export]]
-arma::cube bsvarTVPs_sd (
+arma::cube bsvarTVPs_cov2sd (
     const arma::field<arma::mat>&  posterior_cov  // (T, S)(N, N)
 ) {
   
@@ -297,7 +297,7 @@ arma::cube bsvarTVPs_sd (
   } // END s loop
   
   return sd_rf;
-} // END bsvarTVPs_sd
+} // END bsvarTVPs_cov2sd
 
 
 

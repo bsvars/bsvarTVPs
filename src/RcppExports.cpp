@@ -375,21 +375,21 @@ RcppExport SEXP _bsvarTVPs_bsvarTVPs_cov2cor(SEXP posterior_covSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
-// bsvarTVPs_sd
-arma::cube bsvarTVPs_sd(const arma::field<arma::mat>& posterior_cov);
-static SEXP _bsvarTVPs_bsvarTVPs_sd_try(SEXP posterior_covSEXP) {
+// bsvarTVPs_cov2sd
+arma::cube bsvarTVPs_cov2sd(const arma::field<arma::mat>& posterior_cov);
+static SEXP _bsvarTVPs_bsvarTVPs_cov2sd_try(SEXP posterior_covSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< const arma::field<arma::mat>& >::type posterior_cov(posterior_covSEXP);
-    rcpp_result_gen = Rcpp::wrap(bsvarTVPs_sd(posterior_cov));
+    rcpp_result_gen = Rcpp::wrap(bsvarTVPs_cov2sd(posterior_cov));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _bsvarTVPs_bsvarTVPs_sd(SEXP posterior_covSEXP) {
+RcppExport SEXP _bsvarTVPs_bsvarTVPs_cov2sd(SEXP posterior_covSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvarTVPs_sd_try(posterior_covSEXP));
+        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvarTVPs_cov2sd_try(posterior_covSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -1853,7 +1853,7 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
         signatures.insert("arma::field<arma::mat>(*bsvarTVPs_covariances_rf_ms)(const arma::field<arma::cube>&,const arma::cube&)");
         signatures.insert("arma::cube(*bsvarTVPs_covariances_rf)(const arma::cube&)");
         signatures.insert("arma::field<arma::mat>(*bsvarTVPs_cov2cor)(const arma::field<arma::mat>&)");
-        signatures.insert("arma::cube(*bsvarTVPs_sd)(const arma::field<arma::mat>&)");
+        signatures.insert("arma::cube(*bsvarTVPs_cov2sd)(const arma::field<arma::mat>&)");
         signatures.insert("arma::cube(*bsvars_structural_shocks)(const arma::cube&,const arma::cube&,const arma::mat&,const arma::mat&)");
         signatures.insert("arma::cube(*bsvars_normalisation_wz2003)(arma::cube,const arma::mat&)");
         signatures.insert("arma::mat(*bsvars_normalisation_wz20031)(arma::mat,const arma::mat&)");
@@ -1906,7 +1906,7 @@ RcppExport SEXP _bsvarTVPs_RcppExport_registerCCallable() {
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_covariances_rf_ms", (DL_FUNC)_bsvarTVPs_bsvarTVPs_covariances_rf_ms_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_covariances_rf", (DL_FUNC)_bsvarTVPs_bsvarTVPs_covariances_rf_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_cov2cor", (DL_FUNC)_bsvarTVPs_bsvarTVPs_cov2cor_try);
-    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_sd", (DL_FUNC)_bsvarTVPs_bsvarTVPs_sd_try);
+    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_cov2sd", (DL_FUNC)_bsvarTVPs_bsvarTVPs_cov2sd_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvars_structural_shocks", (DL_FUNC)_bsvarTVPs_bsvars_structural_shocks_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvars_normalisation_wz2003", (DL_FUNC)_bsvarTVPs_bsvars_normalisation_wz2003_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvars_normalisation_wz20031", (DL_FUNC)_bsvarTVPs_bsvars_normalisation_wz20031_try);
@@ -1958,7 +1958,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bsvarTVPs_bsvarTVPs_covariances_rf_ms", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_covariances_rf_ms, 2},
     {"_bsvarTVPs_bsvarTVPs_covariances_rf", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_covariances_rf, 1},
     {"_bsvarTVPs_bsvarTVPs_cov2cor", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_cov2cor, 1},
-    {"_bsvarTVPs_bsvarTVPs_sd", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_sd, 1},
+    {"_bsvarTVPs_bsvarTVPs_cov2sd", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_cov2sd, 1},
     {"_bsvarTVPs_bsvars_structural_shocks", (DL_FUNC) &_bsvarTVPs_bsvars_structural_shocks, 4},
     {"_bsvarTVPs_bsvars_normalisation_wz2003", (DL_FUNC) &_bsvarTVPs_bsvars_normalisation_wz2003, 2},
     {"_bsvarTVPs_bsvars_normalisation_wz20031", (DL_FUNC) &_bsvarTVPs_bsvars_normalisation_wz20031, 2},

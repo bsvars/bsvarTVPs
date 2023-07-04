@@ -67,7 +67,7 @@ arma::field<arma::mat> bsvarTVPs_cov2cor (
 );
 
 
-arma::cube bsvarTVPs_sd (
+arma::cube bsvarTVPs_cov2sd (
     const arma::field<arma::mat>&  posterior_cov  // (T, S)(N, N)
 );
 

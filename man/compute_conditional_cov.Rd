@@ -2,22 +2,27 @@
 % Please edit documentation in R/bsvarTVPTOOLs.R
 \name{compute_conditional_cov}
 \alias{compute_conditional_cov}
-\title{Computes the posterior draws of data conditional covariances}
+\title{Computes the posterior draws of data conditional covariances, correlations,
+or standard deviations}
 \usage{
-compute_conditional_cov(posterior)
+compute_conditional_cov(posterior, moment = c("cov", "cor", "sd"))
 }
 \arguments{
 \item{posterior}{Estimation output of a Structural VAR model. An object of class 
 PosteriorBSVARSVMSTVI, PosteriorBSVARSVTVI, PosteriorBSVARSVMS, PosteriorBSVARMSTVI, 
 PosteriorBSVARTVI, or PosteriorBSVARMS}
+
+\item{moment}{one of the values \code{"cov"}, \code{"cor"}, or \code{"sd"} denoting
+the second-order moments to compute}
 }
 \value{
-An \code{N x N x T x S} array containing the posterior draws of 
-the conditional covariances
+An array of size \code{N x N x T x S} for \code{moment = "cov"} or \code{moment = "cor"},
+or of size \code{N x T x S} for \code{moment = "sd"} with the draws of the selected
+time-varying second-order moment
 }
 \description{
 Computes the posterior draws of time-varying conditional 
-covariances given the past observations
+covariances, correlations, or standard deviations given the past observations
 }
 \references{
 Camehl, A. & Woźniak, T. (2022) What do Data Say About Time-Variation in 

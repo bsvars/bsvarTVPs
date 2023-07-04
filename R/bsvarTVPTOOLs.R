@@ -550,17 +550,21 @@ structural_to_array.PosteriorBSVARSVTVI <- function(posterior) {
 
 
 
-#' @title Computes the posterior draws of data conditional covariances
+#' @title Computes the posterior draws of data conditional covariances, correlations,
+#' or standard deviations
 #'
 #' @description Computes the posterior draws of time-varying conditional 
-#' covariances given the past observations
+#' covariances, correlations, or standard deviations given the past observations
 #' 
 #' @param posterior Estimation output of a Structural VAR model. An object of class 
 #' PosteriorBSVARSVMSTVI, PosteriorBSVARSVTVI, PosteriorBSVARSVMS, PosteriorBSVARMSTVI, 
 #' PosteriorBSVARTVI, or PosteriorBSVARMS
+#' @param moment one of the values \code{"cov"}, \code{"cor"}, or \code{"sd"} denoting
+#' the second-order moments to compute
 #' 
-#' @return An \code{N x N x T x S} array containing the posterior draws of 
-#' the conditional covariances
+#' @return An array of size \code{N x N x T x S} for \code{moment = "cov"} or \code{moment = "cor"},
+#' or of size \code{N x T x S} for \code{moment = "sd"} with the draws of the selected
+#' time-varying second-order moment
 #'
 #' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
 #' 
@@ -569,10 +573,12 @@ structural_to_array.PosteriorBSVARSVTVI <- function(posterior) {
 #' Monetary Policy Shock Identification?
 #' 
 #' @export
-compute_conditional_cov <- function(posterior) {
+compute_conditional_cov <- function(posterior, moment = c("cov", "cor", "sd")) {
+  
+  moment <- match.arg(moment)
   
   # call method
-  UseMethod("compute_conditional_cov", posterior)
+  UseMethod("compute_conditional_cov")
 }
 
 
@@ -581,7 +587,7 @@ compute_conditional_cov <- function(posterior) {
 #' @inheritParams compute_conditional_cov
 #' 
 #' @export
-compute_conditional_cov.PosteriorBSVARSVMSTVI <- function(posterior) {
+compute_conditional_cov.PosteriorBSVARSVMSTVI <- function(posterior, moment) {
   
   posterior_B     = posterior$posterior$B
   posterior_xi    = posterior$posterior$xi
@@ -592,14 +598,23 @@ compute_conditional_cov.PosteriorBSVARSVMSTVI <- function(posterior) {
   
   # compute conditional covariances
   covs_tmp        = .Call(`_bsvarTVPs_bsvarTVPs_covariances_rf_mssv`, posterior_B, posterior_xi, posterior_sigma)
-  
   covs_out        = array(NA, c(N, N, T, S))
-  for (s in 1:S) {
-    for (t in 1:T) {
-      covs_out[,,t,s] = covs_tmp[t,s][[1]]
+  
+  if ( moment == "cor" ) {
+    covs_tmp      = .Call(`_bsvarTVPs_bsvarTVPs_cov2cor`, covs_tmp)
+  } else if ( moment == "sd" ) {
+    covs_tmp      = .Call(`_bsvarTVPs_bsvarTVPs_cov2sd`, covs_tmp)
+    covs_out      = covs_tmp
+  }
+  
+  if ( moment == "cov" || moment == "cor" ) {
+    for (s in 1:S) {
+      for (t in 1:T) {
+        covs_out[,,t,s] = covs_tmp[t,s][[1]]
+      } 
     }
   }
-  class(covs_out) = "PosteriorCovariances"
+  class(covs_out) = "PosteriorMoments"
   return(covs_out)
 }
 
@@ -609,7 +624,7 @@ compute_conditional_cov.PosteriorBSVARSVMSTVI <- function(posterior) {
 #' @inheritParams compute_conditional_cov
 #' 
 #' @export
-compute_conditional_cov.PosteriorBSVARSVMS <- function(posterior) {
+compute_conditional_cov.PosteriorBSVARSVMS <- function(posterior, moment) {
   
   posterior_B     = posterior$posterior$B
   posterior_xi    = posterior$posterior$xi
@@ -620,14 +635,23 @@ compute_conditional_cov.PosteriorBSVARSVMS <- function(posterior) {
   
   # compute conditional covariances
   covs_tmp        = .Call(`_bsvarTVPs_bsvarTVPs_covariances_rf_mssv`, posterior_B, posterior_xi, posterior_sigma)
-  
   covs_out        = array(NA, c(N, N, T, S))
-  for (s in 1:S) {
-    for (t in 1:T) {
-      covs_out[,,t,s] = covs_tmp[t,s][[1]]
+  
+  if ( moment == "cor" ) {
+    covs_tmp      = .Call(`_bsvarTVPs_bsvarTVPs_cov2cor`, covs_tmp)
+  } else if ( moment == "sd" ) {
+    covs_tmp      = .Call(`_bsvarTVPs_bsvarTVPs_cov2sd`, covs_tmp)
+    covs_out      = covs_tmp
+  }
+  
+  if ( moment == "cov" || moment == "cor" ) {
+    for (s in 1:S) {
+      for (t in 1:T) {
+        covs_out[,,t,s] = covs_tmp[t,s][[1]]
+      } 
     }
   }
-  class(covs_out) = "PosteriorCovariances"
+  class(covs_out) = "PosteriorMoments"
   return(covs_out)
 }
 
@@ -637,7 +661,7 @@ compute_conditional_cov.PosteriorBSVARSVMS <- function(posterior) {
 #' @inheritParams compute_conditional_cov
 #' 
 #' @export
-compute_conditional_cov.PosteriorBSVARSVTVI <- function(posterior) {
+compute_conditional_cov.PosteriorBSVARSVTVI <- function(posterior, moment) {
   
   posterior_B     = posterior$posterior$B
   posterior_sigma = posterior$posterior$sigma
@@ -647,14 +671,23 @@ compute_conditional_cov.PosteriorBSVARSVTVI <- function(posterior) {
   
   # compute conditional covariances
   covs_tmp        = .Call(`_bsvarTVPs_bsvarTVPs_covariances_rf_sv`, posterior_B, posterior_sigma)
-  
   covs_out        = array(NA, c(N, N, T, S))
-  for (s in 1:S) {
-    for (t in 1:T) {
-      covs_out[,,t,s] = covs_tmp[t,s][[1]]
+  
+  if ( moment == "cor" ) {
+    covs_tmp      = .Call(`_bsvarTVPs_bsvarTVPs_cov2cor`, covs_tmp)
+  } else if ( moment == "sd" ) {
+    covs_tmp      = .Call(`_bsvarTVPs_bsvarTVPs_cov2sd`, covs_tmp)
+    covs_out      = covs_tmp
+  }
+  
+  if ( moment == "cov" || moment == "cor" ) {
+    for (s in 1:S) {
+      for (t in 1:T) {
+        covs_out[,,t,s] = covs_tmp[t,s][[1]]
+      } 
     }
   }
-  class(covs_out) = "PosteriorCovariances"
+  class(covs_out) = "PosteriorMoments"
   return(covs_out)
 }
 
@@ -664,7 +697,7 @@ compute_conditional_cov.PosteriorBSVARSVTVI <- function(posterior) {
 #' @inheritParams compute_conditional_cov
 #' 
 #' @export
-compute_conditional_cov.PosteriorBSVARMSTVI <- function(posterior) {
+compute_conditional_cov.PosteriorBSVARMSTVI <- function(posterior, moment) {
   
   posterior_B     = posterior$posterior$B
   posterior_xi    = posterior$posterior$xi
@@ -674,14 +707,23 @@ compute_conditional_cov.PosteriorBSVARMSTVI <- function(posterior) {
   
   # compute conditional covariances
   covs_tmp        = .Call(`_bsvarTVPs_bsvarTVPs_covariances_rf_ms`, posterior_B, posterior_xi)
-  
   covs_out        = array(NA, c(N, N, T, S))
-  for (s in 1:S) {
-    for (t in 1:T) {
-      covs_out[,,t,s] = covs_tmp[t,s][[1]]
+  
+  if ( moment == "cor" ) {
+    covs_tmp      = .Call(`_bsvarTVPs_bsvarTVPs_cov2cor`, covs_tmp)
+  } else if ( moment == "sd" ) {
+    covs_tmp      = .Call(`_bsvarTVPs_bsvarTVPs_cov2sd`, covs_tmp)
+    covs_out      = covs_tmp
+  }
+  
+  if ( moment == "cov" || moment == "cor" ) {
+    for (s in 1:S) {
+      for (t in 1:T) {
+        covs_out[,,t,s] = covs_tmp[t,s][[1]]
+      } 
     }
   }
-  class(covs_out) = "PosteriorCovariances"
+  class(covs_out) = "PosteriorMoments"
   return(covs_out)
 }
 
@@ -691,7 +733,7 @@ compute_conditional_cov.PosteriorBSVARMSTVI <- function(posterior) {
 #' @inheritParams compute_conditional_cov
 #' 
 #' @export
-compute_conditional_cov.PosteriorBSVARMS <- function(posterior) {
+compute_conditional_cov.PosteriorBSVARMS <- function(posterior, moment) {
   
   posterior_B     = posterior$posterior$B
   posterior_xi    = posterior$posterior$xi
@@ -701,14 +743,23 @@ compute_conditional_cov.PosteriorBSVARMS <- function(posterior) {
   
   # compute conditional covariances
   covs_tmp        = .Call(`_bsvarTVPs_bsvarTVPs_covariances_rf_ms`, posterior_B, posterior_xi)
-  
   covs_out        = array(NA, c(N, N, T, S))
-  for (s in 1:S) {
-    for (t in 1:T) {
-      covs_out[,,t,s] = covs_tmp[t,s][[1]]
+  
+  if ( moment == "cor" ) {
+    covs_tmp      = .Call(`_bsvarTVPs_bsvarTVPs_cov2cor`, covs_tmp)
+  } else if ( moment == "sd" ) {
+    covs_tmp      = .Call(`_bsvarTVPs_bsvarTVPs_cov2sd`, covs_tmp)
+    covs_out      = covs_tmp
+  }
+  
+  if ( moment == "cov" || moment == "cor" ) {
+    for (s in 1:S) {
+      for (t in 1:T) {
+        covs_out[,,t,s] = covs_tmp[t,s][[1]]
+      } 
     }
   }
-  class(covs_out) = "PosteriorCovariances"
+  class(covs_out) = "PosteriorMoments"
   return(covs_out)
 }
 
@@ -718,7 +769,7 @@ compute_conditional_cov.PosteriorBSVARMS <- function(posterior) {
 #' @inheritParams compute_conditional_cov
 #' 
 #' @export
-compute_conditional_cov.PosteriorBSVARTVI <- function(posterior) {
+compute_conditional_cov.PosteriorBSVARTVI <- function(posterior, moment) {
   
   posterior_B     = posterior$posterior$B
   N               = dim(posterior_B)[1]
@@ -726,11 +777,15 @@ compute_conditional_cov.PosteriorBSVARTVI <- function(posterior) {
   
   # compute conditional covariances
   covs_tmp        = .Call(`_bsvarTVPs_bsvarTVPs_covariances_rf`, posterior_B)
-
-  covs_out        = array(NA, c(N, N, S))
-  for (s in 1:S) {
-    covs_out[,,s] = covs_tmp[,,s]
+  
+  if ( moment == "cor" ) {
+    covs_tmp      = array(apply(covs_tmp, 3, stats::cov2cor), c(N,N,S))
+  } else if ( moment == "sd" ) {
+    covs_tmp      = sapply(1:S, function(s){sqrt(diag(covs_tmp[,,s]))})
   }
-  class(covs_out) = "PosteriorCovariance"
+  covs_out      = covs_tmp
+  
+  class(covs_out) = "PosteriorMoments"
   return(covs_out)
 }
+

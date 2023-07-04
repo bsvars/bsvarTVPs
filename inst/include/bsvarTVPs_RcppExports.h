@@ -235,17 +235,17 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::field<arma::mat> >(rcpp_result_gen);
     }
 
-    inline arma::cube bsvarTVPs_sd(const arma::field<arma::mat>& posterior_cov) {
-        typedef SEXP(*Ptr_bsvarTVPs_sd)(SEXP);
-        static Ptr_bsvarTVPs_sd p_bsvarTVPs_sd = NULL;
-        if (p_bsvarTVPs_sd == NULL) {
-            validateSignature("arma::cube(*bsvarTVPs_sd)(const arma::field<arma::mat>&)");
-            p_bsvarTVPs_sd = (Ptr_bsvarTVPs_sd)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_sd");
+    inline arma::cube bsvarTVPs_cov2sd(const arma::field<arma::mat>& posterior_cov) {
+        typedef SEXP(*Ptr_bsvarTVPs_cov2sd)(SEXP);
+        static Ptr_bsvarTVPs_cov2sd p_bsvarTVPs_cov2sd = NULL;
+        if (p_bsvarTVPs_cov2sd == NULL) {
+            validateSignature("arma::cube(*bsvarTVPs_cov2sd)(const arma::field<arma::mat>&)");
+            p_bsvarTVPs_cov2sd = (Ptr_bsvarTVPs_cov2sd)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_cov2sd");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_bsvarTVPs_sd(Shield<SEXP>(Rcpp::wrap(posterior_cov)));
+            rcpp_result_gen = p_bsvarTVPs_cov2sd(Shield<SEXP>(Rcpp::wrap(posterior_cov)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
