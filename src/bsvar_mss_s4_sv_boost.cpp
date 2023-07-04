@@ -26,7 +26,7 @@ Rcpp::List bsvar_mss_s4_sv_boost_cpp (
   vec prog_rep_points = arma::round(arma::linspace(0, SS, 50));
   Rcout << "**************************************************|" << endl;
   Rcout << "bsvarTVPs: Bayesian Structural VARs with          |" << endl;
-  Rcout << "  Markov-Switching and Time-Varying Identification|" << endl;
+  Rcout << "  Markov-Switching, Time-Varying Identification   |" << endl;
   Rcout << "  and Stochastic Volatility                       |" << endl;
   Rcout << "**************************************************|" << endl;
   Rcout << " Gibbs sampler for the SVAR-SV model              |" << endl;
