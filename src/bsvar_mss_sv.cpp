@@ -48,7 +48,7 @@ Rcpp::List bsvar_mss_sv_cpp (
   
   mat   aux_PR_TR   = as<mat>(starting_values["PR_TR"]);
   vec   aux_pi_0    = as<vec>(starting_values["pi_0"]);
-  mat  aux_xi      = as<mat>(starting_values["xi"]);
+  mat   aux_xi      = as<mat>(starting_values["xi"]);
   
   mat   aux_h       = as<mat>(starting_values["h"]);
   vec   aux_rho     = as<vec>(starting_values["rho"]);

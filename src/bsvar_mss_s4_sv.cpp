@@ -101,7 +101,6 @@ Rcpp::List bsvar_mss_s4_sv_cpp (
   int   s = 0;
   
   for (int ss=0; ss<SS; ss++) {
-    // Rcout << "Iteration: " << ss << endl;
     
     // Increment progress bar
     if (any(prog_rep_points == ss)) p.increment();
@@ -109,7 +108,6 @@ Rcpp::List bsvar_mss_s4_sv_cpp (
     if (ss % 200 == 0) checkUserInterrupt();
     
     // sample aux_xi
-    // Rcout << "   sample Markov process " << endl;
     mat E = Y - aux_A * X;
     aux_xi_tmp        = aux_xi;
     try {
@@ -120,11 +118,9 @@ Rcpp::List bsvar_mss_s4_sv_cpp (
     aux_xi            = aux_xi_tmp;
     
     // sample aux_PR_TR
-    // Rcout << "   sample transition matrix" << endl;
     bsvars::sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
     
     // sample aux_hyper
-    // Rcout << "   sample hyper" << endl;
     aux_hyper_tmp     = aux_hyper;
     try {
       aux_hyper_tmp   = sample_hyperparameters_mss_s4( aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
@@ -134,7 +130,6 @@ Rcpp::List bsvar_mss_s4_sv_cpp (
     aux_hyper         = aux_hyper_tmp;
     
     // sample aux_B
-    // Rcout << "   sample B " << endl;
     BSL     = List::create(
       _["aux_B"]      = aux_B,
       _["aux_SL"]     = aux_SL
@@ -148,7 +143,6 @@ Rcpp::List bsvar_mss_s4_sv_cpp (
     aux_SL            = as<imat>(BSL["aux_SL"]);
     
     // sample aux_A
-    // Rcout << "   sample A" << endl;
     aux_A_tmp         = aux_A;
     try {
       aux_A_tmp       = sample_A_heterosk1_mss(aux_A, aux_B, aux_xi, aux_hyper, aux_sigma, Y, X, prior);
@@ -158,7 +152,6 @@ Rcpp::List bsvar_mss_s4_sv_cpp (
     aux_A             = aux_A_tmp;
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
-    // Rcout << "   sample SV" << endl;
     mat U(N, T);
     E = Y - aux_A * X;
     for (int m=0; m<M; m++) {

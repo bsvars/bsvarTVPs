@@ -98,11 +98,11 @@ Rcpp::List bsvar_mss_s4_boost_cpp (
     Rcout << "   aux_xi1" << endl;
     aux_xi_tmp        = aux_xi;
     Rcout << "   aux_xi2" << endl;
-    // try {
-    //   aux_xi_tmp      = sample_Markov_process_mss(aux_xi, E, aux_B, aux_sigma, aux_PR_TR, aux_pi_0, true);
-    // } catch (...) {
-    //   acceptance_count(0)++;
-    // }
+    try {
+      aux_xi_tmp      = sample_Markov_process_mss(aux_xi, E, aux_B, aux_sigma, aux_PR_TR, aux_pi_0, true);
+    } catch (...) {
+      acceptance_count(0)++;
+    }
     Rcout << "   aux_xi3" << endl;
     aux_xi            = aux_xi_tmp;
     
@@ -112,7 +112,7 @@ Rcpp::List bsvar_mss_s4_boost_cpp (
     
     Rcout << "   aux_PR_TR" << endl;
     
-    // bsvars::sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
+    bsvars::sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
     
     // sample aux_hyper
     
