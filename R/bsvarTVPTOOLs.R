@@ -587,7 +587,9 @@ compute_conditional_cov <- function(posterior, moment = c("cov", "cor", "sd")) {
 #' @inheritParams compute_conditional_cov
 #' 
 #' @export
-compute_conditional_cov.PosteriorBSVARSVMSTVI <- function(posterior, moment) {
+compute_conditional_cov.PosteriorBSVARSVMSTVI <- function(posterior, moment = c("cov", "cor", "sd")) {
+  
+  moment <- match.arg(moment)
   
   posterior_B     = posterior$posterior$B
   posterior_xi    = posterior$posterior$xi
@@ -599,14 +601,14 @@ compute_conditional_cov.PosteriorBSVARSVMSTVI <- function(posterior, moment) {
   # compute conditional covariances
   covs_tmp        = .Call(`_bsvarTVPs_bsvarTVPs_covariances_rf_mssv`, posterior_B, posterior_xi, posterior_sigma)
   covs_out        = array(NA, c(N, N, T, S))
-  
+  cat("> dim(covs_tmp): ",dim(covs_tmp))
   if ( moment == "cor" ) {
     covs_tmp      = .Call(`_bsvarTVPs_bsvarTVPs_cov2cor`, covs_tmp)
   } else if ( moment == "sd" ) {
     covs_tmp      = .Call(`_bsvarTVPs_bsvarTVPs_cov2sd`, covs_tmp)
     covs_out      = covs_tmp
   }
-  
+  cat("> dim(covs_tmp): ",dim(covs_tmp))
   if ( moment == "cov" || moment == "cor" ) {
     for (s in 1:S) {
       for (t in 1:T) {
@@ -624,7 +626,9 @@ compute_conditional_cov.PosteriorBSVARSVMSTVI <- function(posterior, moment) {
 #' @inheritParams compute_conditional_cov
 #' 
 #' @export
-compute_conditional_cov.PosteriorBSVARSVMS <- function(posterior, moment) {
+compute_conditional_cov.PosteriorBSVARSVMS <- function(posterior, moment = c("cov", "cor", "sd")) {
+  
+  moment <- match.arg(moment)
   
   posterior_B     = posterior$posterior$B
   posterior_xi    = posterior$posterior$xi
@@ -661,7 +665,9 @@ compute_conditional_cov.PosteriorBSVARSVMS <- function(posterior, moment) {
 #' @inheritParams compute_conditional_cov
 #' 
 #' @export
-compute_conditional_cov.PosteriorBSVARSVTVI <- function(posterior, moment) {
+compute_conditional_cov.PosteriorBSVARSVTVI <- function(posterior, moment = c("cov", "cor", "sd")) {
+  
+  moment <- match.arg(moment)
   
   posterior_B     = posterior$posterior$B
   posterior_sigma = posterior$posterior$sigma
@@ -697,7 +703,9 @@ compute_conditional_cov.PosteriorBSVARSVTVI <- function(posterior, moment) {
 #' @inheritParams compute_conditional_cov
 #' 
 #' @export
-compute_conditional_cov.PosteriorBSVARMSTVI <- function(posterior, moment) {
+compute_conditional_cov.PosteriorBSVARMSTVI <- function(posterior, moment = c("cov", "cor", "sd")) {
+  
+  moment <- match.arg(moment)
   
   posterior_B     = posterior$posterior$B
   posterior_xi    = posterior$posterior$xi
@@ -733,7 +741,9 @@ compute_conditional_cov.PosteriorBSVARMSTVI <- function(posterior, moment) {
 #' @inheritParams compute_conditional_cov
 #' 
 #' @export
-compute_conditional_cov.PosteriorBSVARMS <- function(posterior, moment) {
+compute_conditional_cov.PosteriorBSVARMS <- function(posterior, moment = c("cov", "cor", "sd")) {
+  
+  moment <- match.arg(moment)
   
   posterior_B     = posterior$posterior$B
   posterior_xi    = posterior$posterior$xi
@@ -769,7 +779,9 @@ compute_conditional_cov.PosteriorBSVARMS <- function(posterior, moment) {
 #' @inheritParams compute_conditional_cov
 #' 
 #' @export
-compute_conditional_cov.PosteriorBSVARTVI <- function(posterior, moment) {
+compute_conditional_cov.PosteriorBSVARTVI <- function(posterior, moment = c("cov", "cor", "sd")) {
+  
+  moment <- match.arg(moment)
   
   posterior_B     = posterior$posterior$B
   N               = dim(posterior_B)[1]

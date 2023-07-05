@@ -5,7 +5,7 @@
 \title{Computes the posterior draws of data conditional covariances, correlations,
 or standard deviations}
 \usage{
-\method{compute_conditional_cov}{PosteriorBSVARMSTVI}(posterior, moment)
+\method{compute_conditional_cov}{PosteriorBSVARMSTVI}(posterior, moment = c("cov", "cor", "sd"))
 }
 \arguments{
 \item{posterior}{Estimation output of a Structural VAR model. An object of class 
