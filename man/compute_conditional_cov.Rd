@@ -5,7 +5,7 @@
 \title{Computes the posterior draws of data conditional covariances, correlations,
 or standard deviations}
 \usage{
-compute_conditional_cov(posterior, moment = c("cov", "cor", "sd"))
+compute_conditional_cov(posterior, moment = c("cov", "cor", "sd"), thin = 1L)
 }
 \arguments{
 \item{posterior}{Estimation output of a Structural VAR model. An object of class 
@@ -14,6 +14,8 @@ PosteriorBSVARTVI, or PosteriorBSVARMS}
 
 \item{moment}{one of the values \code{"cov"}, \code{"cor"}, or \code{"sd"} denoting
 the second-order moments to compute}
+
+\item{thin}{a positive integer determining MCMC thinning used here to bypass the memory problems}
 }
 \value{
 An array of size \code{N x N x T x S} for \code{moment = "cov"} or \code{moment = "cor"},

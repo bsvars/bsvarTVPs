@@ -4,7 +4,7 @@
 2. Info regarding the time-varying identification and the hierarchical prior included in the package description
 3. Package description in the progress bar
 4. Estimation of models with homoskedastic structural shocks
-5. Computations of in-sample conditional second-order moments: covariances, correlations, and standard deviations
+5. Computations of in-sample conditional reduced form second-order moments: covariances, correlations, and standard deviations
 
 # bsvarTVPs 0.0.3.9000
 
