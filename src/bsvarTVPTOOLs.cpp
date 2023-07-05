@@ -262,8 +262,11 @@ arma::field<arma::mat> bsvarTVPs_cov2cor (
     const arma::field<arma::mat>&  posterior_cov  // (T, S)(N, N)
 ) {
   
-  const int       T = posterior_cov.n_rows;
-  const int       S = posterior_cov.n_cols;
+  const uword     T = posterior_cov.n_rows;
+  const uword     S = posterior_cov.n_cols;
+  
+  Rcout << " T: " << T << " \n S: " << S << endl;
+  
   field<mat>      cor_rf(T, S);
   
   for (int s=0; s<S; s++) {
@@ -284,9 +287,9 @@ arma::cube bsvarTVPs_cov2sd (
     const arma::field<arma::mat>&  posterior_cov  // (T, S)(N, N)
 ) {
   
-  const int       T = posterior_cov.n_rows;
-  const int       S = posterior_cov.n_cols;
-  const int       N = posterior_cov(0, 0).n_rows;
+  const uword     T = posterior_cov.n_rows;
+  const uword     S = posterior_cov.n_cols;
+  const uword     N = posterior_cov(0, 0).n_rows;
   
   cube            sd_rf(N, T, S);
   
