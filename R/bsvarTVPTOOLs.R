@@ -601,18 +601,18 @@ compute_conditional_cov.PosteriorBSVARSVMSTVI <- function(posterior, moment = c(
   # compute conditional covariances
   covs_tmp        = .Call(`_bsvarTVPs_bsvarTVPs_covariances_rf_mssv`, posterior_B, posterior_xi, posterior_sigma)
   covs_out        = array(NA, c(N, N, T, S))
-  cat("> dim(covs_tmp): ",dim(covs_tmp))
+  
   if ( moment == "cor" ) {
     covs_tmp      = .Call(`_bsvarTVPs_bsvarTVPs_cov2cor`, covs_tmp)
   } else if ( moment == "sd" ) {
     covs_tmp      = .Call(`_bsvarTVPs_bsvarTVPs_cov2sd`, covs_tmp)
     covs_out      = covs_tmp
   }
-  cat("> dim(covs_tmp): ",dim(covs_tmp))
+  
   if ( moment == "cov" || moment == "cor" ) {
     for (s in 1:S) {
       for (t in 1:T) {
-        covs_out[,,t,s] = covs_tmp[t,s][[1]]
+        covs_out[,,,s] = covs_tmp[s][[1]]
       } 
     }
   }
@@ -651,7 +651,7 @@ compute_conditional_cov.PosteriorBSVARSVMS <- function(posterior, moment = c("co
   if ( moment == "cov" || moment == "cor" ) {
     for (s in 1:S) {
       for (t in 1:T) {
-        covs_out[,,t,s] = covs_tmp[t,s][[1]]
+        covs_out[,,,s] = covs_tmp[s][[1]]
       } 
     }
   }
@@ -689,7 +689,7 @@ compute_conditional_cov.PosteriorBSVARSVTVI <- function(posterior, moment = c("c
   if ( moment == "cov" || moment == "cor" ) {
     for (s in 1:S) {
       for (t in 1:T) {
-        covs_out[,,t,s] = covs_tmp[t,s][[1]]
+        covs_out[,,,s] = covs_tmp[s][[1]]
       } 
     }
   }
@@ -727,7 +727,7 @@ compute_conditional_cov.PosteriorBSVARMSTVI <- function(posterior, moment = c("c
   if ( moment == "cov" || moment == "cor" ) {
     for (s in 1:S) {
       for (t in 1:T) {
-        covs_out[,,t,s] = covs_tmp[t,s][[1]]
+        covs_out[,,,s] = covs_tmp[s][[1]]
       } 
     }
   }
@@ -765,7 +765,7 @@ compute_conditional_cov.PosteriorBSVARMS <- function(posterior, moment = c("cov"
   if ( moment == "cov" || moment == "cor" ) {
     for (s in 1:S) {
       for (t in 1:T) {
-        covs_out[,,t,s] = covs_tmp[t,s][[1]]
+        covs_out[,,,s] = covs_tmp[s][[1]]
       } 
     }
   }

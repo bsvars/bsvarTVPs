@@ -202,7 +202,7 @@ RcppExport SEXP _bsvarTVPs_bsvarTVPs_structural_shocks(SEXP posterior_BSEXP, SEX
     return rcpp_result_gen;
 }
 // bsvarTVPs_covariances_rf_mssv
-arma::field<arma::mat> bsvarTVPs_covariances_rf_mssv(const arma::field<arma::cube>& posterior_B, const arma::cube& posterior_xi, const arma::cube& posterior_sigma);
+arma::field<arma::cube> bsvarTVPs_covariances_rf_mssv(const arma::field<arma::cube>& posterior_B, const arma::cube& posterior_xi, const arma::cube& posterior_sigma);
 static SEXP _bsvarTVPs_bsvarTVPs_covariances_rf_mssv_try(SEXP posterior_BSEXP, SEXP posterior_xiSEXP, SEXP posterior_sigmaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -238,7 +238,7 @@ RcppExport SEXP _bsvarTVPs_bsvarTVPs_covariances_rf_mssv(SEXP posterior_BSEXP, S
     return rcpp_result_gen;
 }
 // bsvarTVPs_covariances_rf_sv
-arma::field<arma::mat> bsvarTVPs_covariances_rf_sv(const arma::cube& posterior_B, const arma::cube& posterior_sigma);
+arma::field<arma::cube> bsvarTVPs_covariances_rf_sv(const arma::cube& posterior_B, const arma::cube& posterior_sigma);
 static SEXP _bsvarTVPs_bsvarTVPs_covariances_rf_sv_try(SEXP posterior_BSEXP, SEXP posterior_sigmaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -273,7 +273,7 @@ RcppExport SEXP _bsvarTVPs_bsvarTVPs_covariances_rf_sv(SEXP posterior_BSEXP, SEX
     return rcpp_result_gen;
 }
 // bsvarTVPs_covariances_rf_ms
-arma::field<arma::mat> bsvarTVPs_covariances_rf_ms(const arma::field<arma::cube>& posterior_B, const arma::cube& posterior_xi);
+arma::field<arma::cube> bsvarTVPs_covariances_rf_ms(const arma::field<arma::cube>& posterior_B, const arma::cube& posterior_xi);
 static SEXP _bsvarTVPs_bsvarTVPs_covariances_rf_ms_try(SEXP posterior_BSEXP, SEXP posterior_xiSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -342,11 +342,11 @@ RcppExport SEXP _bsvarTVPs_bsvarTVPs_covariances_rf(SEXP posterior_BSEXP) {
     return rcpp_result_gen;
 }
 // bsvarTVPs_cov2cor
-arma::field<arma::mat> bsvarTVPs_cov2cor(const arma::field<arma::mat>& posterior_cov);
+arma::field<arma::cube> bsvarTVPs_cov2cor(const arma::field<arma::cube>& posterior_cov);
 static SEXP _bsvarTVPs_bsvarTVPs_cov2cor_try(SEXP posterior_covSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< const arma::field<arma::mat>& >::type posterior_cov(posterior_covSEXP);
+    Rcpp::traits::input_parameter< const arma::field<arma::cube>& >::type posterior_cov(posterior_covSEXP);
     rcpp_result_gen = Rcpp::wrap(bsvarTVPs_cov2cor(posterior_cov));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
@@ -376,11 +376,11 @@ RcppExport SEXP _bsvarTVPs_bsvarTVPs_cov2cor(SEXP posterior_covSEXP) {
     return rcpp_result_gen;
 }
 // bsvarTVPs_cov2sd
-arma::cube bsvarTVPs_cov2sd(const arma::field<arma::mat>& posterior_cov);
+arma::cube bsvarTVPs_cov2sd(const arma::field<arma::cube>& posterior_cov);
 static SEXP _bsvarTVPs_bsvarTVPs_cov2sd_try(SEXP posterior_covSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< const arma::field<arma::mat>& >::type posterior_cov(posterior_covSEXP);
+    Rcpp::traits::input_parameter< const arma::field<arma::cube>& >::type posterior_cov(posterior_covSEXP);
     rcpp_result_gen = Rcpp::wrap(bsvarTVPs_cov2sd(posterior_cov));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
@@ -1848,12 +1848,12 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
         signatures.insert("arma::cube(*bsvarTVPs_filter_forecast_smooth)(Rcpp::List&,const arma::mat&,const arma::mat&,const bool,const bool)");
         signatures.insert("arma::cube(*bsvarTVPs_fitted_values)(arma::cube&,arma::mat&)");
         signatures.insert("arma::cube(*bsvarTVPs_structural_shocks)(const arma::field<arma::cube>&,const arma::cube&,const arma::cube&,const arma::mat&,const arma::mat&)");
-        signatures.insert("arma::field<arma::mat>(*bsvarTVPs_covariances_rf_mssv)(const arma::field<arma::cube>&,const arma::cube&,const arma::cube&)");
-        signatures.insert("arma::field<arma::mat>(*bsvarTVPs_covariances_rf_sv)(const arma::cube&,const arma::cube&)");
-        signatures.insert("arma::field<arma::mat>(*bsvarTVPs_covariances_rf_ms)(const arma::field<arma::cube>&,const arma::cube&)");
+        signatures.insert("arma::field<arma::cube>(*bsvarTVPs_covariances_rf_mssv)(const arma::field<arma::cube>&,const arma::cube&,const arma::cube&)");
+        signatures.insert("arma::field<arma::cube>(*bsvarTVPs_covariances_rf_sv)(const arma::cube&,const arma::cube&)");
+        signatures.insert("arma::field<arma::cube>(*bsvarTVPs_covariances_rf_ms)(const arma::field<arma::cube>&,const arma::cube&)");
         signatures.insert("arma::cube(*bsvarTVPs_covariances_rf)(const arma::cube&)");
-        signatures.insert("arma::field<arma::mat>(*bsvarTVPs_cov2cor)(const arma::field<arma::mat>&)");
-        signatures.insert("arma::cube(*bsvarTVPs_cov2sd)(const arma::field<arma::mat>&)");
+        signatures.insert("arma::field<arma::cube>(*bsvarTVPs_cov2cor)(const arma::field<arma::cube>&)");
+        signatures.insert("arma::cube(*bsvarTVPs_cov2sd)(const arma::field<arma::cube>&)");
         signatures.insert("arma::cube(*bsvars_structural_shocks)(const arma::cube&,const arma::cube&,const arma::mat&,const arma::mat&)");
         signatures.insert("arma::cube(*bsvars_normalisation_wz2003)(arma::cube,const arma::mat&)");
         signatures.insert("arma::mat(*bsvars_normalisation_wz20031)(arma::mat,const arma::mat&)");

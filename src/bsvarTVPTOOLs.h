@@ -38,20 +38,20 @@ arma::cube bsvarTVPs_fitted_values (
 );
 
 
-arma::field<arma::mat> bsvarTVPs_covariances_rf_mssv (
+arma::field<arma::cube> bsvarTVPs_covariances_rf_mssv (
     const arma::field<arma::cube>&  posterior_B,  // (S)(N, N, M)
     const arma::cube&         posterior_xi,       // (M, T, S)
     const arma::cube&         posterior_sigma     // (N, T, S)
 );
 
 
-arma::field<arma::mat> bsvarTVPs_covariances_rf_sv (
+arma::field<arma::cube> bsvarTVPs_covariances_rf_sv (
     const arma::cube&         posterior_B,        // (N, N, S)
     const arma::cube&         posterior_sigma     // (N, T, S)
 );
 
 
-arma::field<arma::mat> bsvarTVPs_covariances_rf_ms (
+arma::field<arma::cube> bsvarTVPs_covariances_rf_ms (
     const arma::field<arma::cube>&  posterior_B,  // (S)(N, N, M)
     const arma::cube&         posterior_xi        // (M, T, S)
 );
@@ -62,13 +62,13 @@ arma::cube bsvarTVPs_covariances_rf (
 );
 
 
-arma::field<arma::mat> bsvarTVPs_cov2cor (
-    const arma::field<arma::mat>&  posterior_cov  // (T, S)(N, N)
+arma::field<arma::cube> bsvarTVPs_cov2cor (
+    const arma::field<arma::cube>&  posterior_cov  // (S)(N, N, T)
 );
 
 
 arma::cube bsvarTVPs_cov2sd (
-    const arma::field<arma::mat>&  posterior_cov  // (T, S)(N, N)
+    const arma::field<arma::cube>&  posterior_cov  // (S)(N, N, T)
 );
 
 

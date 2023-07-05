@@ -167,21 +167,25 @@ arma::cube bsvarTVPs_structural_shocks (
 
 // [[Rcpp::interfaces(cpp, r)]]
 // [[Rcpp::export]]
-arma::field<arma::mat> bsvarTVPs_covariances_rf_mssv (
+arma::field<arma::cube> bsvarTVPs_covariances_rf_mssv (
     const arma::field<arma::cube>&  posterior_B,  // (S)(N, N, M)
     const arma::cube&         posterior_xi,       // (M, T, S)
     const arma::cube&         posterior_sigma     // (N, T, S)
 ) {
   
+  const int       N = posterior_sigma.n_rows;
   const int       T = posterior_sigma.n_cols;
   const int       S = posterior_sigma.n_slices;
-  field<mat>      cov_rf(T, S);
+  
+  field<cube>     cov_rf(S);
+  cube            cov_tmp(N, N, T);
   
   for (int s=0; s<S; s++) {
     for (int t=0; t<T; t++) {
-      int m         = index_max(posterior_xi.slice(s).col(t));
-      mat Bms_inv   = inv(posterior_B(s).slice(m));
-      cov_rf(t, s)  = Bms_inv * diagmat(square(posterior_sigma.slice(s).col(t))) * Bms_inv.t();
+      int m             = index_max(posterior_xi.slice(s).col(t));
+      mat Bms_inv       = inv(posterior_B(s).slice(m));
+      cov_tmp.slice(t)  = Bms_inv * diagmat(square(posterior_sigma.slice(s).col(t))) * Bms_inv.t();
+      cov_rf(s)         = cov_tmp;
     } // END t loop
   } // END s loop
   
@@ -192,19 +196,23 @@ arma::field<arma::mat> bsvarTVPs_covariances_rf_mssv (
 
 // [[Rcpp::interfaces(cpp, r)]]
 // [[Rcpp::export]]
-arma::field<arma::mat> bsvarTVPs_covariances_rf_sv (
+arma::field<arma::cube> bsvarTVPs_covariances_rf_sv (
     const arma::cube&         posterior_B,        // (N, N, S)
     const arma::cube&         posterior_sigma     // (N, T, S)
 ) {
   
+  const int       N = posterior_sigma.n_rows;
   const int       T = posterior_sigma.n_cols;
   const int       S = posterior_sigma.n_slices;
-  field<mat>      cov_rf(T, S);
+  
+  field<cube>     cov_rf(S);
+  cube            cov_tmp(N, N, T);
   
   for (int s=0; s<S; s++) {
     for (int t=0; t<T; t++) {
-      mat Bs_inv    = inv(posterior_B.slice(s));
-      cov_rf(t, s)  = Bs_inv * diagmat(square(posterior_sigma.slice(s).col(t))) * Bs_inv.t();
+      mat Bs_inv        = inv(posterior_B.slice(s));
+      cov_tmp.slice(t)  = Bs_inv * diagmat(square(posterior_sigma.slice(s).col(t))) * Bs_inv.t();
+      cov_rf(s)         = cov_tmp;
     } // END t loop
   } // END s loop
   
@@ -215,20 +223,24 @@ arma::field<arma::mat> bsvarTVPs_covariances_rf_sv (
 
 // [[Rcpp::interfaces(cpp, r)]]
 // [[Rcpp::export]]
-arma::field<arma::mat> bsvarTVPs_covariances_rf_ms (
+arma::field<arma::cube> bsvarTVPs_covariances_rf_ms (
     const arma::field<arma::cube>&  posterior_B,  // (S)(N, N, M)
     const arma::cube&         posterior_xi        // (M, T, S)
 ) {
   
+  const int       N = posterior_xi.n_rows;
   const int       T = posterior_xi.n_cols;
   const int       S = posterior_xi.n_slices;
-  field<mat>      cov_rf(T, S);
+  
+  field<cube>     cov_rf(S);
+  cube            cov_tmp(N, N, T);
   
   for (int s=0; s<S; s++) {
     for (int t=0; t<T; t++) {
-      int m         = index_max(posterior_xi.slice(s).col(t));
-      mat Bms_inv   = inv(posterior_B(s).slice(m));
-      cov_rf(t, s)  = Bms_inv * Bms_inv.t();
+      int m             = index_max(posterior_xi.slice(s).col(t));
+      mat Bms_inv       = inv(posterior_B(s).slice(m));
+      cov_tmp.slice(t)  = Bms_inv * Bms_inv.t();
+      cov_rf(s)         = cov_tmp;
     } // END t loop
   } // END s loop
   
@@ -258,21 +270,23 @@ arma::cube bsvarTVPs_covariances_rf (
 
 // [[Rcpp::interfaces(cpp, r)]]
 // [[Rcpp::export]]
-arma::field<arma::mat> bsvarTVPs_cov2cor (
-    const arma::field<arma::mat>&  posterior_cov  // (T, S)(N, N)
+arma::field<arma::cube> bsvarTVPs_cov2cor (
+    const arma::field<arma::cube>&  posterior_cov  // (S)(N, N, T)
 ) {
   
-  const uword     T = posterior_cov.n_rows;
-  const uword     S = posterior_cov.n_cols;
+  const uword     N = posterior_cov(0).n_rows;
+  const uword     T = posterior_cov(0).n_slices;
+  const uword     S = posterior_cov.n_elem;
   
-  Rcout << " T: " << T << " \n S: " << S << endl;
-  
-  field<mat>      cor_rf(T, S);
+  field<cube>     cor_rf(S);
+  cube            cov_tmp(N, N, T);
   
   for (int s=0; s<S; s++) {
     for (int t=0; t<T; t++) {
-      vec sd_inv    = diagmat( 1 / sqrt(posterior_cov(t, s).diag()) );
-      cor_rf(t, s)  = sd_inv * posterior_cov(t, s) * sd_inv;
+      mat pcov_tmp      = posterior_cov(s).slice(t);
+      vec sd_inv        = diagmat( 1 / sqrt(pcov_tmp.diag()) );
+      cov_tmp.slice(t)  = sd_inv * pcov_tmp * sd_inv;
+      cor_rf(s)         = cov_tmp;
     } // END t loop
   } // END s loop
   
@@ -284,18 +298,19 @@ arma::field<arma::mat> bsvarTVPs_cov2cor (
 // [[Rcpp::interfaces(cpp, r)]]
 // [[Rcpp::export]]
 arma::cube bsvarTVPs_cov2sd (
-    const arma::field<arma::mat>&  posterior_cov  // (T, S)(N, N)
+    const arma::field<arma::cube>&  posterior_cov  // (S)(N, N, T)
 ) {
   
-  const uword     T = posterior_cov.n_rows;
-  const uword     S = posterior_cov.n_cols;
-  const uword     N = posterior_cov(0, 0).n_rows;
+  const uword     N = posterior_cov(0).n_rows;
+  const uword     T = posterior_cov(0).n_slices;
+  const uword     S = posterior_cov.n_elem;
   
   cube            sd_rf(N, T, S);
   
   for (int s=0; s<S; s++) {
     for (int t=0; t<T; t++) {
-      sd_rf.slice(s).col(t)  = sqrt(posterior_cov(t, s).diag());
+      mat pcov_tmp      = posterior_cov(s).slice(t);
+      sd_rf.slice(s).col(t)  = sqrt(pcov_tmp.diag());
     } // END t loop
   } // END s loop
   
