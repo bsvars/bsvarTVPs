@@ -284,7 +284,7 @@ arma::field<arma::cube> bsvarTVPs_cov2cor (
   for (int s=0; s<S; s++) {
     for (int t=0; t<T; t++) {
       mat pcov_tmp      = posterior_cov(s).slice(t);
-      vec sd_inv        = diagmat( 1 / sqrt(pcov_tmp.diag()) );
+      mat sd_inv        = diagmat( 1 / sqrt(pcov_tmp.diag()) );
       cov_tmp.slice(t)  = sd_inv * pcov_tmp * sd_inv;
       cor_rf(s)         = cov_tmp;
     } // END t loop
