@@ -820,3 +820,47 @@ compute_conditional_cov.PosteriorBSVARTVI <- function(posterior, moment = c("cov
   return(covs_out)
 }
 
+
+
+
+#' @title Computes posterior draws of structural shock conditional standard deviations
+#'
+#' @description Each of the draws from the posterior estimation of a model is transformed into
+#' a draw from the posterior distribution of the structural shock conditional standard deviations. 
+#' 
+#' @param posterior posterior estimation outcome - an object of either of the classes: 
+#' PosteriorBSVARSVMSTVI, PosteriorBSVARSVTVI, PosteriorBSVARSVMS, PosteriorBSVARMSTVI, 
+#' PosteriorBSVARTVI, or PosteriorBSVARMS
+#' 
+#' @return An object of class PosteriorSigma, that is, an \code{NxTxS} array with attribute PosteriorSigma 
+#' containing \code{S} draws of the structural shock conditional standard deviations.
+#'
+#' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
+#' 
+#' @export
+compute_conditional_sd <- function(posterior) {
+  
+  stopifnot("Argument posterior must contain estimation output from the estimate 
+            function for a SVAR model." = any(class(posterior)[1] == 
+                                                         c("PosteriorBSVARSVMSTVI", 
+                                                           "PosteriorBSVARSVTVI", 
+                                                           "PosteriorBSVARSVMS", 
+                                                           "PosteriorBSVARMSTVI",
+                                                           "PosteriorBSVARTVI",
+                                                           "PosteriorBSVARMS")))
+  
+  Y     = posterior$last_draw$data_matrices$Y
+  N     = nrow(Y)
+  T     = ncol(Y)
+  
+  if (any(class(posterior)[1] == c("PosteriorBSVARMSTVI", "PosteriorBSVARTVI", "PosteriorBSVARMS"))) {
+    posterior_sigma       = matrix(1, N, T)
+    message("The structural shocks are homoskedastic. Returning an NxT matrix of conditional sd all equal to 1.")
+  } else {
+    posterior_sigma       = posterior$posterior$sigma
+  }
+  class(posterior_sigma)  = "PosteriorSigma"
+  
+  return(posterior_sigma)
+}
+
