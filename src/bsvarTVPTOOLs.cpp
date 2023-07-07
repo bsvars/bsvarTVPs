@@ -185,8 +185,8 @@ arma::field<arma::cube> bsvarTVPs_covariances_rf_mssv (
       int m             = index_max(posterior_xi.slice(s).col(t));
       mat Bms_inv       = inv(posterior_B(s).slice(m));
       cov_tmp.slice(t)  = Bms_inv * diagmat(square(posterior_sigma.slice(s).col(t))) * Bms_inv.t();
-      cov_rf(s)         = cov_tmp;
     } // END t loop
+    cov_rf(s)         = cov_tmp;
   } // END s loop
   
   return cov_rf;
@@ -212,8 +212,8 @@ arma::field<arma::cube> bsvarTVPs_covariances_rf_sv (
     for (int t=0; t<T; t++) {
       mat Bs_inv        = inv(posterior_B.slice(s));
       cov_tmp.slice(t)  = Bs_inv * diagmat(square(posterior_sigma.slice(s).col(t))) * Bs_inv.t();
-      cov_rf(s)         = cov_tmp;
     } // END t loop
+    cov_rf(s)         = cov_tmp;
   } // END s loop
   
   return cov_rf;
@@ -228,7 +228,7 @@ arma::field<arma::cube> bsvarTVPs_covariances_rf_ms (
     const arma::cube&         posterior_xi        // (M, T, S)
 ) {
   
-  const int       N = posterior_xi.n_rows;
+  const int       N = posterior_B(0).n_rows;
   const int       T = posterior_xi.n_cols;
   const int       S = posterior_xi.n_slices;
   
@@ -240,8 +240,8 @@ arma::field<arma::cube> bsvarTVPs_covariances_rf_ms (
       int m             = index_max(posterior_xi.slice(s).col(t));
       mat Bms_inv       = inv(posterior_B(s).slice(m));
       cov_tmp.slice(t)  = Bms_inv * Bms_inv.t();
-      cov_rf(s)         = cov_tmp;
     } // END t loop
+    cov_rf(s)         = cov_tmp;
   } // END s loop
   
   return cov_rf;
