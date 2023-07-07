@@ -542,8 +542,8 @@ Rcpp::List sample_B_mss_s4_boost (
         ii++;
       }
     }
-    // ivec aux_SL_m           = aux_SL.col(m);
-    List BSL_m              = sample_B_heterosk1_s4(aux_B.slice(m), aux_SL.col(m), aux_A, aux_hyper, aux_sigma_m, Y_m, X_m, prior, VB);
+    
+    List BSL_m              = sample_B_heterosk1_s4_boost(aux_B.slice(m), aux_SL.col(m), aux_A, aux_hyper, aux_sigma_m, Y_m, X_m, prior, VB);
     aux_B.slice(m)          = as<mat>(BSL_m["aux_B"]);
     aux_SL.col(m)           = as<ivec>(BSL_m["aux_SL"]);
   }

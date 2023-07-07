@@ -2,9 +2,10 @@
 #include <RcppArmadillo.h>
 #include "progress.hpp"
 
-#include "bsvars.h"
 #include "sample_ABhyper.h"
 #include "sample_sv_ms.h"
+
+#include "bsvars.h"
 
 using namespace Rcpp;
 using namespace arma;
@@ -22,9 +23,6 @@ Rcpp::List bsvar_mss_s4_boost_cpp (
     const int                     thin = 100  // introduce thinning
 ) {
   // // Progress bar setup
-  
-  Rcout << "check 1" << endl;
-  
   vec prog_rep_points = arma::round(arma::linspace(0, SS, 50));
   Rcout << "**************************************************|" << endl;
   Rcout << "bsvarTVPs: Bayesian Structural VARs with          |" << endl;
@@ -47,7 +45,6 @@ Rcpp::List bsvar_mss_s4_boost_cpp (
   const int   K     = X.n_rows;
   
   cube  aux_B       = as<cube>(starting_values["B"]);
-  ivec  aux_SL      = as<ivec>(starting_values["S4_indicator"]) - 1;      // S4 indicator vector
   mat   aux_A       = as<mat>(starting_values["A"]);
   mat   aux_hyper   = as<mat>(starting_values["hyper"]);  // (2*N+1)x2
   
@@ -58,6 +55,7 @@ Rcpp::List bsvar_mss_s4_boost_cpp (
   const int M       = aux_PR_TR.n_cols;
   vec      Tm       = sum(aux_xi, 1);
   
+  imat  aux_SL      = as<imat>(starting_values["S4_indicator"]) - 1;      // NxM S4 indicator matrix
   mat   aux_sigma(N, T, fill::ones);
   
   const int   S     = floor(SS / thin);
@@ -79,11 +77,7 @@ Rcpp::List bsvar_mss_s4_boost_cpp (
   
   int   s = 0;
   
-  Rcout << "check 2" << endl;
-  
   for (int ss=0; ss<SS; ss++) {
-    
-    Rcout << "   iteration: " << ss << endl;
     
     // Increment progress bar
     if (any(prog_rep_points == ss)) p.increment();
@@ -91,33 +85,19 @@ Rcpp::List bsvar_mss_s4_boost_cpp (
     if (ss % 200 == 0) checkUserInterrupt();
     
     // sample aux_xi
-    
-    Rcout << "   aux_xi" << endl;
-    
     mat E = Y - aux_A * X;
-    Rcout << "   aux_xi1" << endl;
     aux_xi_tmp        = aux_xi;
-    Rcout << "   aux_xi2" << endl;
     try {
-      aux_xi_tmp      = sample_Markov_process_mss(aux_xi, E, aux_B, aux_sigma, aux_PR_TR, aux_pi_0, true);
+      aux_xi_tmp      = sample_Markov_process_mss(aux_xi, E, aux_B, aux_sigma, aux_PR_TR, aux_pi_0);
     } catch (...) {
       acceptance_count(0)++;
     }
-    Rcout << "   aux_xi3" << endl;
     aux_xi            = aux_xi_tmp;
     
-    
-    
     // sample aux_PR_TR
-    
-    Rcout << "   aux_PR_TR" << endl;
-    
     bsvars::sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
     
     // sample aux_hyper
-    
-    Rcout << "   aux_hyper" << endl;
-    
     aux_hyper_tmp     = aux_hyper;
     try {
       aux_hyper_tmp   = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
@@ -127,9 +107,6 @@ Rcpp::List bsvar_mss_s4_boost_cpp (
     aux_hyper         = aux_hyper_tmp;
     
     // sample aux_B
-    
-    Rcout << "   aux_B" << endl;
-    
     BSL     = List::create(
       _["aux_B"]      = aux_B,
       _["aux_SL"]     = aux_SL
@@ -143,9 +120,6 @@ Rcpp::List bsvar_mss_s4_boost_cpp (
     aux_SL            = as<imat>(BSL["aux_SL"]);
     
     // sample aux_A
-    
-    Rcout << "   aux_A" << endl;
-    
     aux_A_tmp         = aux_A;
     try {
       aux_A_tmp       = sample_A_heterosk1_mss_boost(aux_A, aux_B, aux_xi, aux_hyper, aux_sigma, Y, X, prior);
@@ -153,9 +127,6 @@ Rcpp::List bsvar_mss_s4_boost_cpp (
       acceptance_count(3)++;
     }
     aux_A             = aux_A_tmp;
-    
-    
-    Rcout << "   save" << endl;
     
     if (ss % thin == 0) {
       posterior_B(s)                = aux_B;
