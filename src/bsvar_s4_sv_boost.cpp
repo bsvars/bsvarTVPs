@@ -2,10 +2,9 @@
 #include <RcppArmadillo.h>
 #include "progress.hpp"
 
+#include "bsvars.h"
 #include "sample_ABhyper.h"
 #include "sample_sv_ms.h"
-
-#include "bsvars.h"
 
 using namespace Rcpp;
 using namespace arma;
@@ -77,7 +76,7 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
   mat   aux_hyper_tmp       = aux_hyper;
   mat   aux_B_tmp           = aux_B;
   ivec  aux_SL_tmp          = aux_SL;
-  List  BSL_tmp;
+  List  BSL;
   mat   aux_A_tmp           = aux_A;
   List  sv_n_tmp;
   
@@ -100,15 +99,17 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
     aux_hyper           = aux_hyper_tmp;
     
     // sample aux_B
-    aux_B_tmp           = aux_B;
-    aux_SL_tmp          = aux_SL;
+    BSL     = List::create(
+      _["aux_B"]      = aux_B,
+      _["aux_SL"]     = aux_SL
+    );
     try {
-      BSL_tmp           = sample_B_heterosk1_s4_boost(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, Y, X, prior, VB);
+      BSL               = sample_B_heterosk1_s4_boost(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, Y, X, prior, VB);
     } catch (...) {
       acceptance_count(1)++;
     }
-    aux_B               = as<mat>(BSL_tmp["aux_B"]);
-    aux_SL              = as<ivec>(BSL_tmp["aux_SL"]);
+    aux_B               = as<mat>(BSL["aux_B"]);
+    aux_SL              = as<ivec>(BSL["aux_SL"]);
     
     // sample aux_A
     aux_A_tmp           = aux_A;
