@@ -1838,6 +1838,44 @@ RcppExport SEXP _bsvarTVPs_sample_Markov_process_mss(SEXP aux_xiSEXP, SEXP ESEXP
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// sample_transition_probabilities
+Rcpp::List sample_transition_probabilities(arma::mat aux_PR_TR, arma::vec aux_pi_0, const arma::mat& aux_xi, const Rcpp::List& prior, const bool MSnotMIX);
+static SEXP _bsvarTVPs_sample_transition_probabilities_try(SEXP aux_PR_TRSEXP, SEXP aux_pi_0SEXP, SEXP aux_xiSEXP, SEXP priorSEXP, SEXP MSnotMIXSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type aux_PR_TR(aux_PR_TRSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type aux_pi_0(aux_pi_0SEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type aux_xi(aux_xiSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type prior(priorSEXP);
+    Rcpp::traits::input_parameter< const bool >::type MSnotMIX(MSnotMIXSEXP);
+    rcpp_result_gen = Rcpp::wrap(sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior, MSnotMIX));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _bsvarTVPs_sample_transition_probabilities(SEXP aux_PR_TRSEXP, SEXP aux_pi_0SEXP, SEXP aux_xiSEXP, SEXP priorSEXP, SEXP MSnotMIXSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_bsvarTVPs_sample_transition_probabilities_try(aux_PR_TRSEXP, aux_pi_0SEXP, aux_xiSEXP, priorSEXP, MSnotMIXSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 
 // validate (ensure exported C++ functions exist before calling them)
 static int _bsvarTVPs_RcppExport_validate(const char* sig) { 
@@ -1890,6 +1928,7 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
         signatures.insert("arma::mat(*filtering)(const arma::cube&,const arma::mat&,const arma::vec&)");
         signatures.insert("arma::mat(*smoothing)(const arma::mat&,const arma::mat&)");
         signatures.insert("arma::mat(*sample_Markov_process_mss)(arma::mat,const arma::mat&,const arma::cube&,const arma::mat&,const arma::mat&,const arma::vec&,const bool)");
+        signatures.insert("Rcpp::List(*sample_transition_probabilities)(arma::mat,arma::vec,const arma::mat&,const Rcpp::List&,const bool)");
     }
     return signatures.find(sig) != signatures.end();
 }
@@ -1943,6 +1982,7 @@ RcppExport SEXP _bsvarTVPs_RcppExport_registerCCallable() {
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_filtering", (DL_FUNC)_bsvarTVPs_filtering_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_smoothing", (DL_FUNC)_bsvarTVPs_smoothing_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_sample_Markov_process_mss", (DL_FUNC)_bsvarTVPs_sample_Markov_process_mss_try);
+    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_sample_transition_probabilities", (DL_FUNC)_bsvarTVPs_sample_transition_probabilities_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_RcppExport_validate", (DL_FUNC)_bsvarTVPs_RcppExport_validate);
     return R_NilValue;
 }
@@ -1995,6 +2035,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bsvarTVPs_filtering", (DL_FUNC) &_bsvarTVPs_filtering, 3},
     {"_bsvarTVPs_smoothing", (DL_FUNC) &_bsvarTVPs_smoothing, 2},
     {"_bsvarTVPs_sample_Markov_process_mss", (DL_FUNC) &_bsvarTVPs_sample_Markov_process_mss, 7},
+    {"_bsvarTVPs_sample_transition_probabilities", (DL_FUNC) &_bsvarTVPs_sample_transition_probabilities, 5},
     {"_bsvarTVPs_RcppExport_registerCCallable", (DL_FUNC) &_bsvarTVPs_RcppExport_registerCCallable, 0},
     {NULL, NULL, 0}
 };
