@@ -56,4 +56,14 @@ arma::mat sample_Markov_process_mss (
     const bool        finiteM = true
 );
 
+
+Rcpp::List sample_transition_probabilities (
+    arma::mat           aux_PR_TR,    // MxM 
+    arma::vec           aux_pi_0,     // Mx1
+    const arma::mat&    aux_xi,       // MxT
+    const Rcpp::List&   prior,         // a list of priors - original dimensions
+    const bool          MSnotMIX = true
+);
+
+
 #endif  // _SAMPLE_SV_MS_H_

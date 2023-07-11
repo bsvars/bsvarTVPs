@@ -394,3 +394,43 @@ arma::mat sample_Markov_process_mss (
 
 
 
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+Rcpp::List sample_transition_probabilities (
+    arma::mat           aux_PR_TR,    // MxM 
+    arma::vec           aux_pi_0,     // Mx1
+    const arma::mat&    aux_xi,       // MxT
+    const Rcpp::List&   prior,         // a list of priors - original dimensions
+    const bool          MSnotMIX = true
+) {
+  // the function changes the value of aux_PR_TR and aux_pi_0 by reference (filling it with a new draw)
+  const int   M           = aux_PR_TR.n_rows;
+  const mat   prior_PR_TR = as<mat>(prior["PR_TR"]);
+  
+  if ( MSnotMIX ) {
+    mat transitions       = bsvars::count_regime_transitions(aux_xi);
+    mat posterior_alpha   = transitions + prior_PR_TR;
+    
+    for (int m=0; m<M; m++) {
+      aux_PR_TR.row(m)    = bsvars::rDirichlet1(posterior_alpha.row(m));
+    }
+    vec prob_xi1          = aux_PR_TR *aux_xi.col(0);
+    prob_xi1             /= sum(prob_xi1);
+    int S0_draw           = bsvars::csample_num1(wrap(seq_len(M)), wrap(prob_xi1));
+    rowvec posterior_alpha_0(M, fill::value((1.0)));
+    posterior_alpha_0(S0_draw-1)++;
+    aux_pi_0              = trans(bsvars::rDirichlet1(posterior_alpha_0));
+  } else {
+    rowvec occurrences    = trans(sum(aux_xi, 1));
+    rowvec posterior_alpha= occurrences + prior_PR_TR.row(0);
+    aux_pi_0              = trans(bsvars::rDirichlet1(posterior_alpha));
+    for (int m=0; m<M; m++) {
+      aux_PR_TR.row(m)    = aux_pi_0.t();
+    }
+  }
+  
+  return List::create(
+    _["aux_PR_TR"]        = aux_PR_TR,
+    _["aux_pi_0"]         = aux_pi_0
+    );
+} // END sample_transition_probabilities

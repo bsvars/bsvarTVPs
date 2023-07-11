@@ -1012,6 +1012,27 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::mat >(rcpp_result_gen);
     }
 
+    inline Rcpp::List sample_transition_probabilities(arma::mat aux_PR_TR, arma::vec aux_pi_0, const arma::mat& aux_xi, const Rcpp::List& prior, const bool MSnotMIX = true) {
+        typedef SEXP(*Ptr_sample_transition_probabilities)(SEXP,SEXP,SEXP,SEXP,SEXP);
+        static Ptr_sample_transition_probabilities p_sample_transition_probabilities = NULL;
+        if (p_sample_transition_probabilities == NULL) {
+            validateSignature("Rcpp::List(*sample_transition_probabilities)(arma::mat,arma::vec,const arma::mat&,const Rcpp::List&,const bool)");
+            p_sample_transition_probabilities = (Ptr_sample_transition_probabilities)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_transition_probabilities");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_sample_transition_probabilities(Shield<SEXP>(Rcpp::wrap(aux_PR_TR)), Shield<SEXP>(Rcpp::wrap(aux_pi_0)), Shield<SEXP>(Rcpp::wrap(aux_xi)), Shield<SEXP>(Rcpp::wrap(prior)), Shield<SEXP>(Rcpp::wrap(MSnotMIX)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<Rcpp::List >(rcpp_result_gen);
+    }
+
 }
 
 #endif // RCPP_bsvarTVPs_RCPPEXPORTS_H_GEN_

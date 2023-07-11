@@ -93,6 +93,7 @@ Rcpp::List bsvar_mss_sv_cpp (
   cube  aux_B_tmp         = aux_B;
   mat   aux_A_tmp         = aux_A;
   List  sv_n_tmp;
+  List  PR_TR_tmp;
   
   int   s = 0;
   
@@ -113,8 +114,10 @@ Rcpp::List bsvar_mss_sv_cpp (
     }
     aux_xi            = aux_xi_tmp;
     
-    // sample aux_PR_TR
-    bsvars::sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
+    // sample aux_PR_TR and aux_pi_0
+    PR_TR_tmp         = sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
+    aux_PR_TR         = as<mat>(PR_TR_tmp["aux_PR_TR"]);
+    aux_pi_0          = as<vec>(PR_TR_tmp["aux_pi_0"]);
     
     // sample aux_hyper
     aux_hyper_tmp     = aux_hyper;
