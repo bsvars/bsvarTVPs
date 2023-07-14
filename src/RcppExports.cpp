@@ -711,6 +711,46 @@ RcppExport SEXP _bsvarTVPs_bsvar_mss_s4_sv_boost_cpp(SEXP SSSEXP, SEXP YSEXP, SE
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// bsvar_mss_s4_sv_fix_cpp
+Rcpp::List bsvar_mss_s4_sv_fix_cpp(const int& SS, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB, const Rcpp::List& starting_values, const int thin);
+static SEXP _bsvarTVPs_bsvar_mss_s4_sv_fix_cpp_try(SEXP SSSEXP, SEXP YSEXP, SEXP XSEXP, SEXP priorSEXP, SEXP VBSEXP, SEXP starting_valuesSEXP, SEXP thinSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const int& >::type SS(SSSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type prior(priorSEXP);
+    Rcpp::traits::input_parameter< const arma::field<arma::mat>& >::type VB(VBSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type starting_values(starting_valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type thin(thinSEXP);
+    rcpp_result_gen = Rcpp::wrap(bsvar_mss_s4_sv_fix_cpp(SS, Y, X, prior, VB, starting_values, thin));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _bsvarTVPs_bsvar_mss_s4_sv_fix_cpp(SEXP SSSEXP, SEXP YSEXP, SEXP XSEXP, SEXP priorSEXP, SEXP VBSEXP, SEXP starting_valuesSEXP, SEXP thinSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvar_mss_s4_sv_fix_cpp_try(SSSEXP, YSEXP, XSEXP, priorSEXP, VBSEXP, starting_valuesSEXP, thinSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 // bsvar_mss_sv_cpp
 Rcpp::List bsvar_mss_sv_cpp(const int& SS, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB, const Rcpp::List& starting_values, const int thin);
 static SEXP _bsvarTVPs_bsvar_mss_sv_cpp_try(SEXP SSSEXP, SEXP YSEXP, SEXP XSEXP, SEXP priorSEXP, SEXP VBSEXP, SEXP starting_valuesSEXP, SEXP thinSEXP) {
@@ -772,6 +812,46 @@ RcppExport SEXP _bsvarTVPs_bsvar_mss_sv_boost_cpp(SEXP SSSEXP, SEXP YSEXP, SEXP 
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
         rcpp_result_gen = PROTECT(_bsvarTVPs_bsvar_mss_sv_boost_cpp_try(SSSEXP, YSEXP, XSEXP, priorSEXP, VBSEXP, starting_valuesSEXP, thinSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// bsvar_mss_sv_fix_cpp
+Rcpp::List bsvar_mss_sv_fix_cpp(const int& SS, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB, const Rcpp::List& starting_values, const int thin);
+static SEXP _bsvarTVPs_bsvar_mss_sv_fix_cpp_try(SEXP SSSEXP, SEXP YSEXP, SEXP XSEXP, SEXP priorSEXP, SEXP VBSEXP, SEXP starting_valuesSEXP, SEXP thinSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const int& >::type SS(SSSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type prior(priorSEXP);
+    Rcpp::traits::input_parameter< const arma::field<arma::mat>& >::type VB(VBSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type starting_values(starting_valuesSEXP);
+    Rcpp::traits::input_parameter< const int >::type thin(thinSEXP);
+    rcpp_result_gen = Rcpp::wrap(bsvar_mss_sv_fix_cpp(SS, Y, X, prior, VB, starting_values, thin));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _bsvarTVPs_bsvar_mss_sv_fix_cpp(SEXP SSSEXP, SEXP YSEXP, SEXP XSEXP, SEXP priorSEXP, SEXP VBSEXP, SEXP starting_valuesSEXP, SEXP thinSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvar_mss_sv_fix_cpp_try(SSSEXP, YSEXP, XSEXP, priorSEXP, VBSEXP, starting_valuesSEXP, thinSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -1900,8 +1980,10 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
         signatures.insert("Rcpp::List(*bsvar_mss_s4_boost_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int)");
         signatures.insert("Rcpp::List(*bsvar_mss_s4_sv_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int)");
         signatures.insert("Rcpp::List(*bsvar_mss_s4_sv_boost_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int)");
+        signatures.insert("Rcpp::List(*bsvar_mss_s4_sv_fix_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int)");
         signatures.insert("Rcpp::List(*bsvar_mss_sv_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int)");
         signatures.insert("Rcpp::List(*bsvar_mss_sv_boost_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int)");
+        signatures.insert("Rcpp::List(*bsvar_mss_sv_fix_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int)");
         signatures.insert("Rcpp::List(*bsvar_s4_boost_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int)");
         signatures.insert("Rcpp::List(*bsvar_s4_sv_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int)");
         signatures.insert("Rcpp::List(*bsvar_s4_sv_boost_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int)");
@@ -1954,8 +2036,10 @@ RcppExport SEXP _bsvarTVPs_RcppExport_registerCCallable() {
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvar_mss_s4_boost_cpp", (DL_FUNC)_bsvarTVPs_bsvar_mss_s4_boost_cpp_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvar_mss_s4_sv_cpp", (DL_FUNC)_bsvarTVPs_bsvar_mss_s4_sv_cpp_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvar_mss_s4_sv_boost_cpp", (DL_FUNC)_bsvarTVPs_bsvar_mss_s4_sv_boost_cpp_try);
+    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvar_mss_s4_sv_fix_cpp", (DL_FUNC)_bsvarTVPs_bsvar_mss_s4_sv_fix_cpp_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvar_mss_sv_cpp", (DL_FUNC)_bsvarTVPs_bsvar_mss_sv_cpp_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvar_mss_sv_boost_cpp", (DL_FUNC)_bsvarTVPs_bsvar_mss_sv_boost_cpp_try);
+    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvar_mss_sv_fix_cpp", (DL_FUNC)_bsvarTVPs_bsvar_mss_sv_fix_cpp_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvar_s4_boost_cpp", (DL_FUNC)_bsvarTVPs_bsvar_s4_boost_cpp_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvar_s4_sv_cpp", (DL_FUNC)_bsvarTVPs_bsvar_s4_sv_cpp_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvar_s4_sv_boost_cpp", (DL_FUNC)_bsvarTVPs_bsvar_s4_sv_boost_cpp_try);
@@ -2007,8 +2091,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bsvarTVPs_bsvar_mss_s4_boost_cpp", (DL_FUNC) &_bsvarTVPs_bsvar_mss_s4_boost_cpp, 7},
     {"_bsvarTVPs_bsvar_mss_s4_sv_cpp", (DL_FUNC) &_bsvarTVPs_bsvar_mss_s4_sv_cpp, 7},
     {"_bsvarTVPs_bsvar_mss_s4_sv_boost_cpp", (DL_FUNC) &_bsvarTVPs_bsvar_mss_s4_sv_boost_cpp, 7},
+    {"_bsvarTVPs_bsvar_mss_s4_sv_fix_cpp", (DL_FUNC) &_bsvarTVPs_bsvar_mss_s4_sv_fix_cpp, 7},
     {"_bsvarTVPs_bsvar_mss_sv_cpp", (DL_FUNC) &_bsvarTVPs_bsvar_mss_sv_cpp, 7},
     {"_bsvarTVPs_bsvar_mss_sv_boost_cpp", (DL_FUNC) &_bsvarTVPs_bsvar_mss_sv_boost_cpp, 7},
+    {"_bsvarTVPs_bsvar_mss_sv_fix_cpp", (DL_FUNC) &_bsvarTVPs_bsvar_mss_sv_fix_cpp, 7},
     {"_bsvarTVPs_bsvar_s4_boost_cpp", (DL_FUNC) &_bsvarTVPs_bsvar_s4_boost_cpp, 7},
     {"_bsvarTVPs_bsvar_s4_sv_cpp", (DL_FUNC) &_bsvarTVPs_bsvar_s4_sv_cpp, 7},
     {"_bsvarTVPs_bsvar_s4_sv_boost_cpp", (DL_FUNC) &_bsvarTVPs_bsvar_s4_sv_boost_cpp, 7},
