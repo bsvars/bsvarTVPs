@@ -2,7 +2,7 @@
 #include <RcppArmadillo.h>
 #include "Rcpp/Rmath.h"
 
-#include "bsvars.h"
+#include "sample_sv_ms.h"
 
 using namespace Rcpp;
 using namespace arma;
@@ -42,7 +42,7 @@ arma::mat sample_B_heterosk1 (
     mat Un                  = chol(posterior_nu * inv_sympd(posterior_S_inv));
     mat B_tmp               = aux_B;
     B_tmp.shed_row(n);
-    rowvec w                = trans(bsvars::orthogonal_complement_matrix_TW(B_tmp.t()));
+    rowvec w                = trans(orthogonal_complement_matrix_TW(B_tmp.t()));
     vec w1_tmp              = trans(w * VB(n).t() * Un.t());
     double w1w1_tmp         = as_scalar(sum(pow(w1_tmp, 2)));
     mat w1                  = w1_tmp.t()/sqrt(w1w1_tmp);
@@ -51,7 +51,7 @@ arma::mat sample_B_heterosk1 (
     if (rn==1) {
       Wn                    = w1;
     } else {
-      Wn                    = join_rows(w1.t(), bsvars::orthogonal_complement_matrix_TW(w1.t()));
+      Wn                    = join_rows(w1.t(), orthogonal_complement_matrix_TW(w1.t()));
     }
     
     vec   alpha(rn);
@@ -169,7 +169,7 @@ Rcpp::List sample_B_heterosk1_s4 (
       mat Un                  = chol(posterior_nu * inv_sympd(posterior_S_inv));
       mat B_tmp               = aux_B;
       B_tmp.shed_row(n);
-      rowvec w                = trans(bsvars::orthogonal_complement_matrix_TW(B_tmp.t()));
+      rowvec w                = trans(orthogonal_complement_matrix_TW(B_tmp.t()));
       vec w1_tmp              = trans(w * VB(ll).t() * Un.t());
       double w1w1_tmp         = as_scalar(sum(pow(w1_tmp, 2)));
       mat w1                  = w1_tmp.t()/sqrt(w1w1_tmp);
@@ -178,7 +178,7 @@ Rcpp::List sample_B_heterosk1_s4 (
       if (rn==1) {
         Wn                    = w1;
       } else {
-        Wn                    = join_rows(w1.t(), bsvars::orthogonal_complement_matrix_TW(w1.t()));
+        Wn                    = join_rows(w1.t(), orthogonal_complement_matrix_TW(w1.t()));
       }
       
       vec   alpha(rn);
@@ -215,7 +215,7 @@ Rcpp::List sample_B_heterosk1_s4 (
       
       // Sample S4 indicator
       NumericVector seq_1S    = wrap(seq_len(Lm(n)) - 1);
-      NumericVector indi_tmp  = bsvars::csample_num1(seq_1S, wrap(pr_s4));
+      NumericVector indi_tmp  = csample_num1(seq_1S, wrap(pr_s4));
       index_s4                = indi_tmp(0);
     }
     aux_SL(n)                 = index_s4;
@@ -316,7 +316,7 @@ arma::mat sample_B_heterosk1_boost (
     mat Un                  = chol(posterior_nu * inv_sympd(posterior_S_inv));
     mat B_tmp               = aux_B;
     B_tmp.shed_row(n);
-    rowvec w                = trans(bsvars::orthogonal_complement_matrix_TW(B_tmp.t()));
+    rowvec w                = trans(orthogonal_complement_matrix_TW(B_tmp.t()));
     vec w1_tmp              = trans(w * VB(n).t() * Un.t());
     double w1w1_tmp         = as_scalar(sum(pow(w1_tmp, 2)));
     mat w1                  = w1_tmp.t()/sqrt(w1w1_tmp);
@@ -325,7 +325,7 @@ arma::mat sample_B_heterosk1_boost (
     if (rn==1) {
       Wn                    = w1;
     } else {
-      Wn                    = join_rows(w1.t(), bsvars::orthogonal_complement_matrix_TW(w1.t()));
+      Wn                    = join_rows(w1.t(), orthogonal_complement_matrix_TW(w1.t()));
     }
     
     vec   alpha(rn);
@@ -444,7 +444,7 @@ Rcpp::List sample_B_heterosk1_s4_boost (
       mat Un                  = chol(posterior_nu * inv_sympd(posterior_S_inv));
       mat B_tmp               = aux_B;
       B_tmp.shed_row(n);
-      rowvec w                = trans(bsvars::orthogonal_complement_matrix_TW(B_tmp.t()));
+      rowvec w                = trans(orthogonal_complement_matrix_TW(B_tmp.t()));
       vec w1_tmp              = trans(w * VB(ll).t() * Un.t());
       double w1w1_tmp         = as_scalar(sum(pow(w1_tmp, 2)));
       mat w1                  = w1_tmp.t()/sqrt(w1w1_tmp);
@@ -453,7 +453,7 @@ Rcpp::List sample_B_heterosk1_s4_boost (
       if (rn==1) {
         Wn                    = w1;
       } else {
-        Wn                    = join_rows(w1.t(), bsvars::orthogonal_complement_matrix_TW(w1.t()));
+        Wn                    = join_rows(w1.t(), orthogonal_complement_matrix_TW(w1.t()));
       }
       
       vec   alpha(rn);
@@ -490,7 +490,7 @@ Rcpp::List sample_B_heterosk1_s4_boost (
       
       // Sample S4 indicator
       NumericVector seq_1S    = wrap(seq_len(Lm(n)) - 1);
-      NumericVector indi_tmp  = bsvars::csample_num1(seq_1S, wrap(pr_s4));
+      NumericVector indi_tmp  = csample_num1(seq_1S, wrap(pr_s4));
       index_s4                = indi_tmp(0);
     }
     aux_SL(n)                 = index_s4;

@@ -25,6 +25,27 @@ namespace bsvarTVPs {
         }
     }
 
+    inline arma::cube bsvars_ir1(arma::mat& aux_B, arma::mat& aux_A, const int horizon, const int p, const bool standardise = false) {
+        typedef SEXP(*Ptr_bsvars_ir1)(SEXP,SEXP,SEXP,SEXP,SEXP);
+        static Ptr_bsvars_ir1 p_bsvars_ir1 = NULL;
+        if (p_bsvars_ir1 == NULL) {
+            validateSignature("arma::cube(*bsvars_ir1)(arma::mat&,arma::mat&,const int,const int,const bool)");
+            p_bsvars_ir1 = (Ptr_bsvars_ir1)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_bsvars_ir1");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_bsvars_ir1(Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(aux_A)), Shield<SEXP>(Rcpp::wrap(horizon)), Shield<SEXP>(Rcpp::wrap(p)), Shield<SEXP>(Rcpp::wrap(standardise)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<arma::cube >(rcpp_result_gen);
+    }
+
     inline arma::field<arma::cube> bsvarTVPs_ir_ms(arma::field<arma::cube>& posterior_B, arma::cube& posterior_A, const int horizon, const int p, const bool standardise = false) {
         typedef SEXP(*Ptr_bsvarTVPs_ir_ms)(SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_bsvarTVPs_ir_ms p_bsvarTVPs_ir_ms = NULL;
@@ -275,6 +296,27 @@ namespace bsvarTVPs {
         if (rcpp_result_gen.inherits("try-error"))
             throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
         return Rcpp::as<arma::cube >(rcpp_result_gen);
+    }
+
+    inline arma::rowvec normalisation_wz2003_s(const arma::mat& B, const arma::mat& B_hat_inv, const arma::mat& Sigma_inv, const arma::mat& diag_signs) {
+        typedef SEXP(*Ptr_normalisation_wz2003_s)(SEXP,SEXP,SEXP,SEXP);
+        static Ptr_normalisation_wz2003_s p_normalisation_wz2003_s = NULL;
+        if (p_normalisation_wz2003_s == NULL) {
+            validateSignature("arma::rowvec(*normalisation_wz2003_s)(const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&)");
+            p_normalisation_wz2003_s = (Ptr_normalisation_wz2003_s)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_normalisation_wz2003_s");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_normalisation_wz2003_s(Shield<SEXP>(Rcpp::wrap(B)), Shield<SEXP>(Rcpp::wrap(B_hat_inv)), Shield<SEXP>(Rcpp::wrap(Sigma_inv)), Shield<SEXP>(Rcpp::wrap(diag_signs)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<arma::rowvec >(rcpp_result_gen);
     }
 
     inline arma::cube bsvars_normalisation_wz2003(arma::cube posterior_B, const arma::mat& B_hat) {
@@ -1283,6 +1325,27 @@ namespace bsvarTVPs {
         if (rcpp_result_gen.inherits("try-error"))
             throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
         return Rcpp::as<Rcpp::List >(rcpp_result_gen);
+    }
+
+    inline arma::mat orthogonal_complement_matrix_TW(const arma::mat& x) {
+        typedef SEXP(*Ptr_orthogonal_complement_matrix_TW)(SEXP);
+        static Ptr_orthogonal_complement_matrix_TW p_orthogonal_complement_matrix_TW = NULL;
+        if (p_orthogonal_complement_matrix_TW == NULL) {
+            validateSignature("arma::mat(*orthogonal_complement_matrix_TW)(const arma::mat&)");
+            p_orthogonal_complement_matrix_TW = (Ptr_orthogonal_complement_matrix_TW)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_orthogonal_complement_matrix_TW");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_orthogonal_complement_matrix_TW(Shield<SEXP>(Rcpp::wrap(x)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<arma::mat >(rcpp_result_gen);
     }
 
 }

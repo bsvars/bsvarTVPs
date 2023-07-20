@@ -127,4 +127,7 @@ Rcpp::List sample_transition_probabilities (
 );
 
 
+arma::mat orthogonal_complement_matrix_TW (const arma::mat& x);
+
+
 #endif  // _SAMPLE_SV_MS_H_
