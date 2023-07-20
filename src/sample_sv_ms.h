@@ -5,6 +5,57 @@
 #include <RcppArmadillo.h>
 
 
+int csample_num1 (
+    Rcpp::NumericVector x,
+    Rcpp::NumericVector prob = Rcpp::NumericVector::create()
+);
+
+
+arma::vec find_mixture_indicator_cdf (
+    const arma::vec& datanorm           // provide all that is conditionally normal
+);
+
+
+arma::uvec inverse_transform_sampling (
+    const arma::vec&  mixprob,
+    const int         T
+);
+
+
+double do_rgig1(
+    double lambda, 
+    double chi, 
+    double psi
+);
+
+
+Rcpp::List cholesky_tridiagonal(
+    const arma::vec&    omega_diag,
+    const double&       omega_offdiag
+);
+
+
+arma::vec forward_algorithm(
+    const arma::vec& chol_diag,
+    const arma::vec& chol_offdiag,
+    const arma::vec& covector
+);
+
+
+arma::vec backward_algorithm(
+    const arma::vec& chol_diag,
+    const arma::vec& chol_offdiag,
+    const arma::vec& htmp
+);
+
+
+arma::vec precision_sampler_ar1(
+    const arma::vec&     precision_diag,
+    const double&        precision_offdiag,
+    const arma::vec&     location
+);
+
+
 Rcpp::List svar_nc1 (
     arma::rowvec    aux_h_n,                  // 1xT
     double          aux_rho_n,
@@ -30,6 +81,16 @@ Rcpp::List svar_nc1_mss (
     const arma::rowvec&   u,                  // 1xT
     const Rcpp::List&     prior,
     bool                  sample_s_ = true
+);
+
+
+arma::mat count_regime_transitions (
+    const arma::mat& xi
+);
+
+
+arma::rowvec rDirichlet1 (
+    const arma::rowvec&   alpha     // Kx1
 );
 
 

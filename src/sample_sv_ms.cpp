@@ -1,12 +1,195 @@
 
+#include <RcppArmadilloExtensions/sample.h>
 #include <RcppArmadillo.h>
 #include "RcppTN.h"
-#include "bsvars.h"
 #include "sample_ABhyper.h"
 
 using namespace Rcpp;
 using namespace arma;
 
+
+
+//---------------------------------------------------------------------------------------------------
+// a transformed sample implementation taken from Rcpp Gallery:
+// https://gallery.rcpp.org/articles/using-the-Rcpp-based-sample-implementation/
+// fixed to one draw, sampling without replacement, and changed output type to int
+// IMPORTANT: always #include <RcppArmadilloExtensions/sample.h>
+//---------------------------------------------------------------------------------------------------
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+int csample_num1 (
+    Rcpp::NumericVector x,
+    Rcpp::NumericVector prob = NumericVector::create()
+) {
+  bool replace = false;
+  NumericVector ret = Rcpp::RcppArmadillo::sample(x, 1, replace, prob);
+  int out           = ret(0);
+  return out;
+} // END csample_num1
+
+
+
+/*______________________function find_mixture_indicator_cdf______________________*/
+// utility function from file utils_latent_states.cc from the source code of package stochvol
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+arma::vec find_mixture_indicator_cdf (
+    const arma::vec& datanorm           // provide all that is conditionally normal
+){
+  // fixed values for auxiliary mixture
+  const NumericVector alpha_s = NumericVector::create(1.92677,1.34744,0.73504,0.02266,0-0.85173,-1.97278,-3.46788,-5.55246,-8.68384,-14.65000);
+  const NumericVector sigma_s = NumericVector::create(0.11265,0.17788,0.26768,0.40611,0.62699,0.98583,1.57469,2.54498,4.16591,7.33342);
+  const NumericVector pr_s    = NumericVector::create(0.00609,0.04775,0.13057,0.20674,0.22715,0.18842,0.12047,0.05591,0.01575,0.00115);
+  
+  const int T = datanorm.n_elem;
+  vec mixprob(10 * T);
+  for (int j = 0; j < T; j++) {  // TODO slow (10*T calls to exp)!
+    const int first_index = 10*j;
+    mixprob(first_index) = std::exp(pr_s(0) - (datanorm(j) - alpha_s(0)) * (datanorm(j) - alpha_s(0)) / sigma_s(0) );
+    for (int r = 1; r < 10; r++) {
+      mixprob(first_index+r) = mixprob(first_index+r-1) + std::exp(pr_s(r) - (datanorm(j) - alpha_s(r)) * (datanorm(j) - alpha_s(r)) / sigma_s(r) );
+    }
+  }
+  return mixprob;
+} // END find_mixture_indicator_cdf
+
+
+
+
+/*______________________function inverse_transform_sampling______________________*/
+// utility function from file utils_latent_states.cc from the source code of package stochvol
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+arma::uvec inverse_transform_sampling (
+    const arma::vec&  mixprob,
+    const int         T
+) {
+  uvec r(T);
+  for (int j = 0; j < T; j++) {
+    int index = (10-1)/2;  // start searching in the middle
+    const double unnorm_cdf_value = R::unif_rand()*mixprob[9 + 10*j];  // current (non-normalized) value
+    bool larger = false;  // indicates that we already went up
+    bool smaller = false; // indicates that we already went down
+    while(true) {
+      if (unnorm_cdf_value > mixprob[index +  10*j]) {
+        index++;
+        if (smaller) {
+          break;
+        } else {
+          larger = true;
+        }
+      } else if (larger || index == 0) {
+        break;
+      } else {
+        index--;
+        smaller = true;
+      }
+    }
+    r[j] = index;
+  }
+  return r;
+} // END inverse_transform_sampling
+
+
+
+
+/*______________________function do_rgig1______________________*/
+// utility function copied from package factorstochvol
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+double do_rgig1(
+    double lambda, 
+    double chi, 
+    double psi
+) { 
+  SEXP (*fun)(int, double, double, double) = NULL;
+  if (!fun) fun = (SEXP(*)(int, double, double, double)) R_GetCCallable("GIGrvg", "do_rgig");
+  return as<double>(fun(1, lambda, chi, psi));
+} // END do_rgig1
+
+
+
+
+
+/*______________________function cholesky_tridiagonal______________________*/
+// utility function from file precision_sampler.cpp
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+Rcpp::List cholesky_tridiagonal(
+    const arma::vec&    omega_diag,
+    const double&       omega_offdiag
+) {
+  const int T = omega_diag.n_elem - 1;
+  vec chol_diag(T+1);
+  vec chol_offdiag(T+1);
+  chol_diag[0] = sqrt(omega_diag[0]);
+  for (int j = 1; j < T+1; j++) {
+    chol_offdiag[j-1] = omega_offdiag/chol_diag[j-1];
+    chol_diag[j] = std::sqrt(omega_diag[j]-chol_offdiag[j-1]*chol_offdiag[j-1]);
+  }
+  return List::create(_["chol_diag"]=chol_diag, _["chol_offdiag"]=chol_offdiag);
+} // END cholesky_tridiagonal
+
+
+
+/*______________________function forward_algorithm______________________*/
+// utility function from file precision_sampler.cpp
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+arma::vec forward_algorithm(
+    const arma::vec& chol_diag,
+    const arma::vec& chol_offdiag,
+    const arma::vec& covector
+) {
+  const int T = chol_diag.n_elem - 1;
+  vec htmp(T+1);
+  htmp[0] = covector[0]/chol_diag[0];
+  for (int j = 1; j < T+1; j++) {
+    htmp[j] = (covector[j] - chol_offdiag[j-1]*htmp[j-1])/chol_diag[j];
+  }
+  return htmp;
+} // END forward_algorithm
+
+
+
+/*______________________function backward_algorithm______________________*/
+// utility function from file precision_sampler.cpp
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+arma::vec backward_algorithm(
+    const arma::vec& chol_diag,
+    const arma::vec& chol_offdiag,
+    const arma::vec& htmp
+) {
+  const int T = chol_diag.size() - 1;
+  vec h(T+1);
+  h[T] = htmp[T] / chol_diag[T];
+  for (int j = T-1; j >= 0; j--) {
+    h[j] = (htmp[j] - chol_offdiag[j] * h[j+1]) / chol_diag[j];
+  }
+  return h;
+} // END backward_algorithm
+
+/*______________________function precision_sampler_ar1______________________*/
+// utility function from file precision_sampler.cpp
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+arma::vec precision_sampler_ar1(
+    const arma::vec&     precision_diag,
+    const double&        precision_offdiag,
+    const arma::vec&     location
+) {
+  int T               = location.n_rows;
+  vec  epsilon(T, fill::randn);
+  List precision_chol = cholesky_tridiagonal(precision_diag, precision_offdiag);    // Cholesky decomposition using a dedicated technique
+  vec  aa             = forward_algorithm(precision_chol["chol_diag"],              // this forward substitution can be performed outside of the loop
+                                          precision_chol["chol_offdiag"],
+                                                        location);
+  vec draw_ssar1      = backward_algorithm(precision_chol["chol_diag"],
+                                           precision_chol["chol_offdiag"],
+                                                         aa + epsilon);     // this has to be done in the loop as function backward_algorithm requires covector to be a vector (not a matrix)
+  return draw_ssar1;
+} // END precision_sampler_ar1
 
 
 
@@ -44,8 +227,8 @@ Rcpp::List svar_nc1 (
   mat           HH_rho  = H_rho.t() * H_rho;
   
   // sample auxiliary mixture states aux_S
-  const vec   mixprob   = bsvars::find_mixture_indicator_cdf(trans(U - aux_omega_n*aux_h_n));
-  aux_S_n               = trans(bsvars::inverse_transform_sampling(mixprob, T));
+  const vec   mixprob   = find_mixture_indicator_cdf(trans(U - aux_omega_n*aux_h_n));
+  aux_S_n               = trans(inverse_transform_sampling(mixprob, T));
   
   rowvec    alpha_S(T);
   rowvec    sigma_S_inv(T);
@@ -60,7 +243,7 @@ Rcpp::List svar_nc1 (
   }
   
   // sample aux_sigma2_omega
-  aux_sigma2_omega_n    = bsvars::do_rgig1( prior_sv_a_-0.5, pow(aux_omega_n,2), 2/aux_s_n );
+  aux_sigma2_omega_n    = do_rgig1( prior_sv_a_-0.5, pow(aux_omega_n,2), 2/aux_s_n );
   
   // sample aux_rho
   rowvec    hm1         = aux_h_n.cols(0,T-2);
@@ -82,12 +265,12 @@ Rcpp::List svar_nc1 (
   // sample aux_h
   mat       V_h         = pow(omega_aux, 2) * diagmat(sigma_S_inv) + HH_rho;
   vec       h_bar       = omega_aux * diagmat(sigma_S_inv) * (U - alpha_S).t();
-  rowvec    h_aux       = trans(bsvars::precision_sampler_ar1( V_h.diag(), V_h(1, 0), h_bar));
+  rowvec    h_aux       = trans(precision_sampler_ar1( V_h.diag(), V_h(1, 0), h_bar));
   
   // ASIS
   rowvec    aux_h_tilde = omega_aux * h_aux;
   double    hHHh        = as_scalar( aux_h_tilde * HH_rho * aux_h_tilde.t() );
-  aux_sigma2v_n         = bsvars::do_rgig1( -0.5*(T-1), hHHh, 1/aux_sigma2_omega_n );
+  aux_sigma2v_n         = do_rgig1( -0.5*(T-1), hHHh, 1/aux_sigma2_omega_n );
   int       ss=1;
   if (R::runif(0,1)<0.5) ss *= -1;
   aux_omega_n           = ss * sqrt(aux_sigma2v_n);
@@ -155,8 +338,8 @@ Rcpp::List svar_nc1_mss (
   }
   
   // sample auxiliary mixture states aux_S
-  const vec   mixprob   = bsvars::find_mixture_indicator_cdf(trans(U - aux_h_n % omega_T));
-  aux_S_n               = trans(bsvars::inverse_transform_sampling(mixprob, T));
+  const vec   mixprob   = find_mixture_indicator_cdf(trans(U - aux_h_n % omega_T));
+  aux_S_n               = trans(inverse_transform_sampling(mixprob, T));
   
   rowvec    alpha_S(T);
   rowvec    sigma_S_inv(T);
@@ -171,7 +354,7 @@ Rcpp::List svar_nc1_mss (
   }
   
   // sample aux_sigma2_omega
-  aux_sigma2_omega_n    = bsvars::do_rgig1( prior_sv_a_ - 0.5 * M, accu(square(aux_omega_n)), 2/aux_s_n );
+  aux_sigma2_omega_n    = do_rgig1( prior_sv_a_ - 0.5 * M, accu(square(aux_omega_n)), 2/aux_s_n );
   
   // sample aux_rho
   rowvec    hm1         = aux_h_n.cols(0,T-2);
@@ -214,7 +397,7 @@ Rcpp::List svar_nc1_mss (
   // sample aux_h
   mat       V_h         = diagmat(square(omega_T)) * diagmat(sigma_S_inv) + HH_rho;
   vec       h_bar       = diagmat(omega_T) * diagmat(sigma_S_inv) * (U - alpha_S).t();
-  rowvec    h_aux       = trans(bsvars::precision_sampler_ar1( V_h.diag(), V_h(1, 0), h_bar));
+  rowvec    h_aux       = trans(precision_sampler_ar1( V_h.diag(), V_h(1, 0), h_bar));
   
   // ASIS
   rowvec    aux_h_tilde = h_aux % omega_T;
@@ -227,7 +410,7 @@ Rcpp::List svar_nc1_mss (
         hHHh           += pow(aux_h_tilde(t), 2);
       }
     }
-    double  sigma2_aux  = bsvars::do_rgig1( -0.5*(Tm(m)-1), hHHh, 1/aux_sigma2_omega_n );
+    double  sigma2_aux  = do_rgig1( -0.5*(Tm(m)-1), hHHh, 1/aux_sigma2_omega_n );
     int     ss = 1;
     if (R::runif(0,1)<0.5) ss *= -1;
     aux_omega_n(m)      = ss * sqrt(sigma2_aux);
@@ -255,6 +438,39 @@ Rcpp::List svar_nc1_mss (
     _["aux_S_n"]              = aux_S_n
   );
 } // END sv_nc1
+
+
+
+// [[Rcpp::interfaces(cpp, r)]]
+// [[Rcpp::export]]
+arma::mat count_regime_transitions (
+    const arma::mat& xi
+) {
+  const int M = xi.n_rows;
+  const int T = xi.n_cols;
+  
+  mat count(M, M);
+  urowvec s   = index_max( xi, 0 );
+  for (int t=1; t<T; t++) {
+    count( s(t-1), s(t))++;
+  }
+  return count;
+} // END count_regime_transitions
+
+
+
+// [[Rcpp::interfaces(cpp, r)]]
+// [[Rcpp::export]]
+arma::rowvec rDirichlet1 (
+    const arma::rowvec&   alpha     // Kx1
+) {
+  const int K   = alpha.size();
+  rowvec    draw(K);
+  for (int k=0; k<K; k++) {
+    draw(k)     = randg(distr_param(alpha(k), 1.0));
+  }
+  return draw/sum(draw);
+} // END rDirichlet1
 
 
 
@@ -363,13 +579,13 @@ arma::mat sample_Markov_process_mss (
   mat    aj       = eye(M, M);
   
   mat xi(M, T);
-  int draw        = bsvars::csample_num1(wrap(seq_len(M)), wrap(smoothed.col(T-1)));
+  int draw        = csample_num1(wrap(seq_len(M)), wrap(smoothed.col(T-1)));
   aux_xi_tmp.col(T-1)     = aj.col(draw-1);
   
   if ( minimum_regime_occurrences==0 ) {
     for (int t=T-2; t>=0; --t) {
       vec xi_Tmj    = (aux_PR_TR * (aux_xi.col(t+1)/(aux_PR_TR.t() * filtered.col(t)))) % filtered.col(t);
-      draw          = bsvars::csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
+      draw          = csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
       aux_xi_tmp.col(t)   = aj.col(draw-1);
     }
     aux_xi_out = aux_xi_tmp;
@@ -379,10 +595,10 @@ arma::mat sample_Markov_process_mss (
     while ( (regime_occurrences<minimum_regime_occurrences) & (iterations<max_iterations) ) {
       for (int t=T-2; t>=0; --t) {
         vec xi_Tmj    = (aux_PR_TR * (aux_xi.col(t+1)/(aux_PR_TR.t() * filtered.col(t)))) % filtered.col(t);
-        draw          = bsvars::csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
+        draw          = csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
         aux_xi_tmp.col(t)   = aj.col(draw-1);
       }
-      mat transitions       = bsvars::count_regime_transitions(aux_xi_tmp);
+      mat transitions       = count_regime_transitions(aux_xi_tmp);
       regime_occurrences    = min(transitions.diag());
       iterations++;
     } // END while
@@ -408,22 +624,22 @@ Rcpp::List sample_transition_probabilities (
   const mat   prior_PR_TR = as<mat>(prior["PR_TR"]);
   
   if ( MSnotMIX ) {
-    mat transitions       = bsvars::count_regime_transitions(aux_xi);
+    mat transitions       = count_regime_transitions(aux_xi);
     mat posterior_alpha   = transitions + prior_PR_TR;
     
     for (int m=0; m<M; m++) {
-      aux_PR_TR.row(m)    = bsvars::rDirichlet1(posterior_alpha.row(m));
+      aux_PR_TR.row(m)    = rDirichlet1(posterior_alpha.row(m));
     }
     vec prob_xi1          = aux_PR_TR *aux_xi.col(0);
     prob_xi1             /= sum(prob_xi1);
-    int S0_draw           = bsvars::csample_num1(wrap(seq_len(M)), wrap(prob_xi1));
+    int S0_draw           = csample_num1(wrap(seq_len(M)), wrap(prob_xi1));
     rowvec posterior_alpha_0(M, fill::value((1.0)));
     posterior_alpha_0(S0_draw-1)++;
-    aux_pi_0              = trans(bsvars::rDirichlet1(posterior_alpha_0));
+    aux_pi_0              = trans(rDirichlet1(posterior_alpha_0));
   } else {
     rowvec occurrences    = trans(sum(aux_xi, 1));
     rowvec posterior_alpha= occurrences + prior_PR_TR.row(0);
-    aux_pi_0              = trans(bsvars::rDirichlet1(posterior_alpha));
+    aux_pi_0              = trans(rDirichlet1(posterior_alpha));
     for (int m=0; m<M; m++) {
       aux_PR_TR.row(m)    = aux_pi_0.t();
     }
