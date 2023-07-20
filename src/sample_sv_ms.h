@@ -130,4 +130,30 @@ Rcpp::List sample_transition_probabilities (
 arma::mat orthogonal_complement_matrix_TW (const arma::mat& x);
 
 
+Rcpp::List sample_B_heterosk1_s4 (
+    arma::mat                     aux_B,          // NxN
+    arma::ivec                    aux_SL,         // Nx1 row-specific S4 indicators
+    const arma::mat&              aux_A,          // NxK
+    const arma::vec&              aux_hyper,      // NxM
+    const arma::mat&              aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+    const arma::mat&              Y,              // NxT dependent variables
+    const arma::mat&              X,              // KxT dependent variables
+    const Rcpp::List&             prior,          // a list of priors - original dimensions
+    const arma::field<arma::mat>& VBL       // restrictions on B0 in S4 arrangement
+);
+
+
+Rcpp::List sample_B_heterosk1_s4_boost (
+    arma::mat                     aux_B,          // NxN
+    arma::ivec                    aux_SL,         // Nx1 row-specific S4 indicators
+    const arma::mat&              aux_A,          // NxK
+    const arma::mat&              aux_hyper,      // (2*N+1)x2
+    const arma::mat&              aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+    const arma::mat&              Y,              // NxT dependent variables
+    const arma::mat&              X,              // KxT dependent variables
+    const Rcpp::List&             prior,          // a list of priors - original dimensions
+    const arma::field<arma::mat>& VBL       // restrictions on B0 in S4 arrangement
+);
+
+
 #endif  // _SAMPLE_SV_MS_H_

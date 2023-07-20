@@ -3,6 +3,7 @@
 #include "progress.hpp"
 
 #include "sample_ABhyper.h"
+#include "sample_sv_ms.h"
 
 using namespace Rcpp;
 using namespace arma;
