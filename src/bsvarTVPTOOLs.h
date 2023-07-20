@@ -5,6 +5,15 @@
 #include <RcppArmadillo.h>
 
 
+arma::cube bsvars_ir1 (
+    arma::mat&    aux_B,              // (N, N)
+    arma::mat&    aux_A,              // (N, K)
+    const int     horizon,
+    const int     p,
+    const bool    standardise = false
+);
+
+
 arma::field<arma::cube> bsvarTVPs_ir_ms (
     arma::field<arma::cube>&  posterior_B,        // (S)(N, N, M)
     arma::cube&               posterior_A,        // (N, K, S)
@@ -86,6 +95,14 @@ arma::cube bsvars_structural_shocks (
     const arma::cube&     posterior_A,    // (N, K, S)
     const arma::mat&      Y,              // NxT dependent variables
     const arma::mat&      X               // KxT dependent variables
+);
+
+
+arma::rowvec normalisation_wz2003_s (
+    const arma::mat& B,                   // NxN
+    const arma::mat& B_hat_inv,           // NxN
+    const arma::mat& Sigma_inv,           // NxN
+    const arma::mat& diag_signs           // KxN
 );
 
 
