@@ -5,8 +5,6 @@
 #include "sample_ABhyper.h"
 #include "sample_sv_ms.h"
 
-#include "bsvars.h"
-
 using namespace Rcpp;
 using namespace arma;
 

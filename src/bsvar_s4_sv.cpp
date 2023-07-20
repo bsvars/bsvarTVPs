@@ -2,7 +2,6 @@
 #include <RcppArmadillo.h>
 #include "progress.hpp"
 
-#include "bsvars.h"
 #include "sample_ABhyper.h"
 #include "sample_sv_ms.h"
 
