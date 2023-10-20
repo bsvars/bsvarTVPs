@@ -17,5 +17,6 @@ Imports:
     RcppProgress,
     RcppTN
 LinkingTo: bsvars, Rcpp, RcppArmadillo, RcppProgress, RcppTN
+BugReports: https://github.com/bsvars/bsvarTVPs/issues
 Encoding: UTF-8
 RoxygenNote: 7.2.3
