@@ -22,7 +22,7 @@ Install the **bsvars** package first:
 
 Now, just type in **R** to install the **bsvarTVPs** package:
 
-    devtools::install_git("https://github.com/donotdespair/bsvarTVPs.git")
+    devtools::install_git("https://github.com/bsvars/bsvarTVPs.git")
 
 # Checks
 

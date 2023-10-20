@@ -6,6 +6,7 @@
 4. Estimation of models with homoskedastic structural shocks
 5. Computations of in-sample conditional reduced form second-order moments: covariances, correlations, and standard deviations
 6. Removed cpp dependencies on functions exported from bsvars package
+7. Moved to GitHub Organisation **bsvars** at [github.com/bsvars/bsvarTVPs](https://github.com/bsvars/bsvarTVPs)
 
 # bsvarTVPs 0.0.3.9000
 
