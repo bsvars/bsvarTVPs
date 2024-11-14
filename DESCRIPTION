@@ -1,22 +1,29 @@
 Package: bsvarTVPs
 Type: Package
-Title: Bayesian Estimation of Heteroskedastic Structural Vector Autoregressions with Markov-Switching and Time-Varying Identification of the Structural Matrix
-Version: 0.0.4.9000
-Date: 2023-06-14
-Authors@R: person("Tomasz", "Woźniak", , "wozniak.tom@pm.me", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-2212-2378"))
+Title: Bayesian Structural VARs with Time-Varying Identification
+Version: 0.0.5.9000
+Date: 2024-11-14
+Authors@R: c(person("Tomasz", "Woźniak", , "wozniak.tom@pm.me", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-2212-2378")), person("Annika", "Camehl", , "camehl@ese.eur.nl", role = c("aut"), comment = c(ORCID = "0000-0002-3963-0793")))
 Maintainer: Tomasz Woźniak <wozniak.tom@pm.me>
-Description: Efficient algorithms for Bayesian estimation of Structural Vector Autoregressions with Stochastic Volatility heteroskedasticity, Markov-switching and Time-Varying Identification of the Structural Matrix, and a three-level global-local hierarchical prior shrinkage for the structural and autoregressive matrices. The models were developed for a paper by Camehl, Annika & Woźniak, Tomasz (2023) What do Data Say About Time-Variation in Monetary Policy Shock Identification?
+Description: Efficient algorithms for Bayesian estimation of Structural Vector Autoregressions (VARs) with Stochastic Volatility heteroskedasticity, Markov-switching and Time-Varying Identification of the Structural Matrix, and a three-level global-local hierarchical prior shrinkage for the structural and autoregressive matrices. The models were developed for a paper by Camehl & Woźniak (2023) <doi:10.48550/arXiv.2311.05883>. The 'bsvarTVPs' package is aligned regarding objects, workflows, and code structure with the R packages 'bsvars' by Woźniak (2024) <doi:10.32614/CRAN.package.bsvars> and 'bsvarSIGNs' by Wang & Woźniak (2024) <doi:10.32614/CRAN.package.bsvarSIGNs>, and they constitute an integrated toolset.
 License: GPL (>= 3)
 Imports: 
-    bsvars,
     GIGrvg,
     HDInterval,
     R6,
     Rcpp (>= 1.0.9),
     RcppProgress,
     RcppTN
-LinkingTo: bsvars, Rcpp, RcppArmadillo, RcppProgress, RcppTN
+LinkingTo: 
+    bsvars, 
+    Rcpp, 
+    RcppArmadillo, 
+    RcppProgress, 
+    RcppTN
+Depends: 
+    R (>= 2.10),
+    RcppArmadillo,
+    bsvars
 BugReports: https://github.com/bsvars/bsvarTVPs/issues
 Encoding: UTF-8
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2

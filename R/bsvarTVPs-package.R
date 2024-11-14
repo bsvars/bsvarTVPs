@@ -20,17 +20,18 @@
 #  refer to <http://www.gnu.org/licenses/>.
 #  #####################################################################################
 #
-#' @title Bayesian Estimation of Heteroskedastic Structural Vector Autoregressions 
-#' with Markov-Switching and Time-Varying Identification of the Structural Matrix
+#' @title Bayesian Structural Vector Autoregressions with Time-Varying Identification
 #'
 #' @description Efficient algorithms for Bayesian estimation of Structural 
-#' Vector Autoregressions with Stochastic Volatility heteroskedasticity, 
+#' Vector Autoregressions (VARs) with Stochastic Volatility heteroskedasticity, 
 #' Markov-switching and Time-Varying Identification of the Structural Matrix, 
-#' and a three-level global-local hierarchical prior shrinkage for the structural 
-#' and autoregressive matrices.
-#' The models were developed for a paper 
-#' Camehl, Annika & Woźniak, Tomasz (2022) What do Data Say About 
-#' Time-Variation in Monetary Policy Shock Identification?
+#' and a three-level global-local hierarchical prior shrinkage for the 
+#' structural and autoregressive matrices. The models were developed for a paper 
+#' by Camehl & Woźniak (2023) <doi:10.48550/arXiv.2311.05883>. The 'bsvarTVPs' 
+#' package is aligned regarding objects, workflows, and code structure with the 
+#' R packages 'bsvars' by Woźniak (2024) <doi:10.32614/CRAN.package.bsvars> and 
+#' 'bsvarSIGNs' by Wang & Woźniak (2024) <doi:10.32614/CRAN.package.bsvarSIGNs>, 
+#' and they constitute an integrated toolset.
 #' 
 #' @details 
 #' All the SVAR models in this package are specified by two equations, including 
@@ -54,20 +55,32 @@
 #' 
 #' @name bsvarTVPs-package
 #' @aliases bsvarTVPs-package bsvarTVPs
-#' @docType package
 #' @useDynLib bsvarTVPs, .registration = TRUE
-#' @importFrom bsvars specify_bsvar_sv
+#' 
+#' @importFrom bsvars specify_bsvar_sv estimate forecast compute_impulse_responses compute_fitted_values compute_historical_decompositions compute_structural_shocks compute_variance_decompositions compute_regime_probabilities compute_conditional_sd
 #' @importFrom HDInterval hdi
 #' @importFrom GIGrvg rgig
 #' @importFrom R6 R6Class
-#' @importFrom Rcpp sourceCpp
-#' @import RcppProgress
 #' @importFrom RcppTN rtn
+#' @importFrom Rcpp sourceCpp
+#' @import RcppArmadillo
+#' @import RcppProgress
+#' 
 #' @note This package is currently in active development. Your comments,
 #' suggestions and requests are warmly welcome!
-#' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
+#' 
+#' @author Tomasz Woźniak \email{wozniak.tom@pm.me} & Annika Camehl \email{camehl@ese.eur.nl}
+#' 
 #' @references
-#' Camehl, A. & Woźniak, T. (2022) What do Data Say About Time-Variation in Monetary Policy Shock Identification?
+#' 
+#' Camehl, A. & Woźniak, T. (2023) Time-Varying Identification of Monetary Policy Shocks, <doi:10.48550/arXiv.2311.05883>.
+#' 
+#' Wang & Woźniak (2024) bsvarSIGNs: Bayesian SVARs with Sign, Zero, and Narrative Restrictions. 
+#' R package version 1.0.1, <doi:10.32614/CRAN.package.bsvarSIGNs>.
+#' 
+#' Woźniak (2024) bsvars: Bayesian Estimation of Structural Vector Autoregressive Models. 
+#' R package version 3.2, <doi:10.32614/CRAN.package.bsvars>.
+#' 
 #' @keywords package models ts
 #' 
 #' @examples
