@@ -41,7 +41,6 @@ Rcpp::List bsvar_mssa_s4_sv_boost_cpp (
   
   const int   T     = Y.n_cols;
   const int   N     = Y.n_rows;
-  const int   K     = X.n_rows;
   
   cube  aux_B       = as<cube>(starting_values["B"]);
   cube  aux_A       = as<cube>(starting_values["A"]);
