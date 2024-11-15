@@ -31,7 +31,7 @@
 normalise <- function(posterior, VB) {
   
   # check the args
-  stopifnot("Argument posterior must contain estimation output from the estimate function." = any(class(posterior)[1] == c("PosteriorBSVARSVMSTVI", "PosteriorBSVARSVMS", "PosteriorBSVARSVTVI", "PosteriorBSVARMSTVI", "PosteriorBSVARMS", "PosteriorBSVARTVI")))
+  # stopifnot("Argument posterior must contain estimation output from the estimate function." = any(class(posterior)[1] == c("PosteriorBSVARSVMSTVI", "PosteriorBSVARSVMS", "PosteriorBSVARSVTVI", "PosteriorBSVARMSTVI", "PosteriorBSVARMS", "PosteriorBSVARTVI")))
   stopifnot("Argument VB must be a list." = is.list(VB))
   
   # call method
