@@ -367,6 +367,31 @@ structural_to_array.PosteriorBSVARSVMSTVI <- function(posterior) {
 }
 
 
+
+#' @inherit structural_to_array
+#' @method structural_to_array PosteriorBSVARSVMSATVI
+#' @inheritParams structural_to_array
+#' 
+#' @return An \code{N x N x M x S} array containing the posterior draws 
+#' of the structural matrix \eqn{B}
+#' 
+#' @export
+structural_to_array.PosteriorBSVARSVMSATVI <- function(posterior) {
+  
+  B_posterior = posterior$posterior$B
+  S       = dim(B_posterior)[1]
+  N       = dim(B_posterior[1,1][[1]])[1]
+  M       = dim(B_posterior[1,1][[1]])[3]
+  
+  B_out   = array(NA, c(N, N, M, S))
+  for (s in 1:S) {
+    B_out[,,,s]  = B_posterior[s,1][[1]]
+  }
+  
+  return(B_out)
+}
+
+
 #' @inherit structural_to_array
 #' @method structural_to_array PosteriorBSVARSVMS
 #' @inheritParams structural_to_array
@@ -403,6 +428,57 @@ structural_to_array.PosteriorBSVARSVTVI <- function(posterior) {
   
   return(posterior$posterior$B)
 }
+
+
+
+#' @title Extracts the posterior draws of the autoregressive matrix \eqn{A} and returns the as an \code{array}
+#'
+#' @description Extracts the posterior draws of the autoregressive matrix \eqn{A} and returns the as an \code{array}
+#' 
+#' @param posterior Posterior draws of from a Markov-switching model
+#' 
+#' @return An array containing the posterior draws of the autoregressive matrix \eqn{A}
+#'
+#' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
+#' 
+#' @references
+#' Camehl, A. & Woźniak, T. (2022) What do Data Say About Time-Variation in 
+#' Monetary Policy Shock Identification?
+#' 
+#' @export
+autoregressive_to_array <- function(posterior) {
+  
+  # call method
+  UseMethod("autoregressive_to_array", posterior)
+}
+
+
+#' @inherit autoregressive_to_array
+#' @method autoregressive_to_array PosteriorBSVARSVMSATVI
+#' @inheritParams autoregressive_to_array
+#' 
+#' @return An \code{N x K x M x S} array containing the posterior draws 
+#' of the autoregressive matrix \eqn{A}
+#' 
+#' @export
+autoregressive_to_array.PosteriorBSVARSVMSATVI <- function(posterior) {
+  
+  A_posterior = posterior$posterior$A
+  S       = dim(A_posterior)[1]
+  N       = dim(A_posterior[1,1][[1]])[1]
+  K       = dim(A_posterior[1,1][[1]])[2]
+  M       = dim(A_posterior[1,1][[1]])[3]
+  
+  A_out   = array(NA, c(N, K, M, S))
+  for (s in 1:S) {
+    A_out[,,,s]  = A_posterior[s,1][[1]]
+  }
+  
+  return(A_out)
+}
+
+
+
 
 
 
