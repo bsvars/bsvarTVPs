@@ -183,7 +183,7 @@ normalise.PosteriorBSVARSVMSATVI <- function(posterior, VB) {
   TVI_equation = 3
   
   M             = dim(posterior$posterior$xi)[1]
-  N             = dim(posterior$posterior$A)[1]
+  N             = dim(posterior$posterior$sigma)[1]
   comp          = VB[length(VB)][[1]]
   TVI_indicator  = posterior$posterior$S4_indicator
   B_hat         = array(NA, c(N, N, M, comp[TVI_equation]))
