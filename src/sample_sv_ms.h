@@ -118,6 +118,19 @@ arma::mat sample_Markov_process_mss (
 );
 
 
+arma::mat sample_Markov_process_mssa (
+    arma::mat         aux_xi,             // MxT
+    const arma::cube& aux_B,              // NxNxM
+    const arma::cube& aux_A,              // NxKxM
+    const arma::mat&  Y,
+    const arma::mat&  X,
+    const arma::mat&  aux_sigma,          // NxM
+    const arma::mat&  aux_PR_TR,          // MxM
+    const arma::vec&  aux_pi_0,           // Mx1
+    const bool        finiteM = true
+);
+
+
 Rcpp::List sample_transition_probabilities (
     arma::mat           aux_PR_TR,    // MxM 
     arma::vec           aux_pi_0,     // Mx1

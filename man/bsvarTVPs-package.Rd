@@ -53,7 +53,7 @@ Woźniak (2024) bsvars: Bayesian Estimation of Structural Vector Autoregressive 
 R package version 3.2, <doi:10.32614/CRAN.package.bsvars>.
 }
 \author{
-Tomasz Woźniak \email{wozniak.tom@pm.me}
+Tomasz Woźniak \email{wozniak.tom@pm.me} & Annika Camehl \email{camehl@ese.eur.nl}
 }
 \keyword{models}
 \keyword{package}
