@@ -86,11 +86,7 @@ Rcpp::List bsvar_mss_s4_boost_cpp (
     // sample aux_xi
     mat E = Y - aux_A * X;
     aux_xi_tmp        = aux_xi;
-    try {
-      aux_xi_tmp      = sample_Markov_process_mss(aux_xi, E, aux_B, aux_sigma, aux_PR_TR, aux_pi_0);
-    } catch (...) {
-      acceptance_count(0)++;
-    }
+    aux_xi_tmp        = sample_Markov_process_mss(aux_xi, E, aux_B, aux_sigma, aux_PR_TR, aux_pi_0);
     aux_xi            = aux_xi_tmp;
     
     // sample aux_PR_TR and aux_pi_0
@@ -100,11 +96,7 @@ Rcpp::List bsvar_mss_s4_boost_cpp (
     
     // sample aux_hyper
     aux_hyper_tmp     = aux_hyper;
-    try {
-      aux_hyper_tmp   = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
-    } catch (...) {
-      acceptance_count(1)++;
-    }
+    aux_hyper_tmp     = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
     aux_hyper         = aux_hyper_tmp;
     
     // sample aux_B
@@ -112,21 +104,13 @@ Rcpp::List bsvar_mss_s4_boost_cpp (
       _["aux_B"]      = aux_B,
       _["aux_SL"]     = aux_SL
     );
-    try {
-      BSL             = sample_B_mss_s4_boost(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, aux_xi, Y, X, prior, VB);
-    } catch (...) {
-      acceptance_count(2)++;
-    }
+    BSL               = sample_B_mss_s4_boost(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, aux_xi, Y, X, prior, VB);
     aux_B             = as<cube>(BSL["aux_B"]);
     aux_SL            = as<imat>(BSL["aux_SL"]);
     
     // sample aux_A
     aux_A_tmp         = aux_A;
-    try {
-      aux_A_tmp       = sample_A_heterosk1_mss_boost(aux_A, aux_B, aux_xi, aux_hyper, aux_sigma, Y, X, prior);
-    } catch (...) {
-      acceptance_count(3)++;
-    }
+    aux_A_tmp         = sample_A_heterosk1_mss_boost(aux_A, aux_B, aux_xi, aux_hyper, aux_sigma, Y, X, prior);
     aux_A             = aux_A_tmp;
     
     if (ss % thin == 0) {

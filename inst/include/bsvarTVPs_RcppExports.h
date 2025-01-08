@@ -739,11 +739,11 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::mat >(rcpp_result_gen);
     }
 
-    inline arma::mat sample_hyperparameters_mss_s4_boost(arma::vec aux_hyper, const arma::cube& aux_B, const arma::mat& aux_A, const arma::field<arma::mat>& VB, const arma::imat& aux_SL, const Rcpp::List& prior) {
+    inline arma::mat sample_hyperparameters_mss_s4_boost(arma::mat aux_hyper, const arma::cube& aux_B, const arma::mat& aux_A, const arma::field<arma::mat>& VB, const arma::imat& aux_SL, const Rcpp::List& prior) {
         typedef SEXP(*Ptr_sample_hyperparameters_mss_s4_boost)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_sample_hyperparameters_mss_s4_boost p_sample_hyperparameters_mss_s4_boost = NULL;
         if (p_sample_hyperparameters_mss_s4_boost == NULL) {
-            validateSignature("arma::mat(*sample_hyperparameters_mss_s4_boost)(arma::vec,const arma::cube&,const arma::mat&,const arma::field<arma::mat>&,const arma::imat&,const Rcpp::List&)");
+            validateSignature("arma::mat(*sample_hyperparameters_mss_s4_boost)(arma::mat,const arma::cube&,const arma::mat&,const arma::field<arma::mat>&,const arma::imat&,const Rcpp::List&)");
             p_sample_hyperparameters_mss_s4_boost = (Ptr_sample_hyperparameters_mss_s4_boost)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_hyperparameters_mss_s4_boost");
         }
         RObject rcpp_result_gen;
@@ -760,11 +760,11 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::mat >(rcpp_result_gen);
     }
 
-    inline arma::mat sample_hyperparameters_mssa_s4_boost(arma::vec aux_hyper, const arma::cube& aux_B, const arma::cube& aux_A, const arma::field<arma::mat>& VB, const arma::imat& aux_SL, const Rcpp::List& prior) {
+    inline arma::mat sample_hyperparameters_mssa_s4_boost(arma::mat aux_hyper, const arma::cube& aux_B, const arma::cube& aux_A, const arma::field<arma::mat>& VB, const arma::imat& aux_SL, const Rcpp::List& prior) {
         typedef SEXP(*Ptr_sample_hyperparameters_mssa_s4_boost)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_sample_hyperparameters_mssa_s4_boost p_sample_hyperparameters_mssa_s4_boost = NULL;
         if (p_sample_hyperparameters_mssa_s4_boost == NULL) {
-            validateSignature("arma::mat(*sample_hyperparameters_mssa_s4_boost)(arma::vec,const arma::cube&,const arma::cube&,const arma::field<arma::mat>&,const arma::imat&,const Rcpp::List&)");
+            validateSignature("arma::mat(*sample_hyperparameters_mssa_s4_boost)(arma::mat,const arma::cube&,const arma::cube&,const arma::field<arma::mat>&,const arma::imat&,const Rcpp::List&)");
             p_sample_hyperparameters_mssa_s4_boost = (Ptr_sample_hyperparameters_mssa_s4_boost)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_hyperparameters_mssa_s4_boost");
         }
         RObject rcpp_result_gen;

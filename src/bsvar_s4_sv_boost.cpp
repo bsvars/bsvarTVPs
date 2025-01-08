@@ -90,11 +90,7 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
     
     // sample aux_hyper
     aux_hyper_tmp       = aux_hyper;
-    try {
-      aux_hyper_tmp     = sample_hyperparameter_boost_s4( aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
-    } catch (...) {
-      acceptance_count(0)++;
-    }
+    aux_hyper_tmp       = sample_hyperparameter_boost_s4( aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
     aux_hyper           = aux_hyper_tmp;
     
     // sample aux_B
@@ -102,21 +98,13 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
       _["aux_B"]      = aux_B,
       _["aux_SL"]     = aux_SL
     );
-    try {
-      BSL               = sample_B_heterosk1_s4_boost(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, Y, X, prior, VB);
-    } catch (...) {
-      acceptance_count(1)++;
-    }
+    BSL                 = sample_B_heterosk1_s4_boost(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, Y, X, prior, VB);
     aux_B               = as<mat>(BSL["aux_B"]);
     aux_SL              = as<ivec>(BSL["aux_SL"]);
     
     // sample aux_A
     aux_A_tmp           = aux_A;
-    try {
-      aux_A_tmp         = sample_A_heterosk1_boost(aux_A, aux_B, aux_hyper, aux_sigma, Y, X, prior);
-    } catch (...) {
-      acceptance_count(2)++;
-    }
+    aux_A_tmp           = sample_A_heterosk1_boost(aux_A, aux_B, aux_hyper, aux_sigma, Y, X, prior);
     aux_A               = aux_A_tmp;
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
@@ -142,11 +130,7 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
         _["aux_S_n"]              = S_tmp
       );
       
-      try {
-        sv_n_tmp        = svar_nc1( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, U_tmp, prior, true );
-      } catch (...) {
-        acceptance_count(3 + n)++;
-      }
+      sv_n_tmp          = svar_nc1( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, U_tmp, prior, true );
       
       List sv_n         = sv_n_tmp;
       aux_h.row(n)      = as<rowvec>(sv_n["aux_h_n"]);

@@ -105,11 +105,7 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     // sample aux_xi
     mat E             = Y - aux_A * X;
     aux_xi_tmp        = aux_xi;
-    try {
-      aux_xi_tmp      = sample_Markov_process_mss(aux_xi, E, aux_B, aux_sigma, aux_PR_TR, aux_pi_0);
-    } catch (...) {
-      acceptance_count(0)++;
-    }
+    aux_xi_tmp        = sample_Markov_process_mss(aux_xi, E, aux_B, aux_sigma, aux_PR_TR, aux_pi_0);
     aux_xi            = aux_xi_tmp;
     
     // sample aux_PR_TR and aux_pi_0
@@ -119,29 +115,17 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     
     // sample aux_hyper
     aux_hyper_tmp     = aux_hyper;
-    try {
-      aux_hyper_tmp   = sample_hyperparameters_mss_boost( aux_hyper, aux_B, aux_A, VB, prior);
-    } catch(...) {
-      acceptance_count(1)++;
-    }
+    aux_hyper_tmp     = sample_hyperparameters_mss_boost( aux_hyper, aux_B, aux_A, VB, prior);
     aux_hyper         = aux_hyper_tmp;
     
     // sample aux_B
     aux_B_tmp         = aux_B;
-    try {
-      aux_B_tmp       = sample_B_mss_boost(aux_B, aux_A, aux_hyper, aux_sigma, aux_xi, Y, X, prior, VB);
-    } catch (...) {
-      acceptance_count(2)++;
-    }
+    aux_B_tmp         = sample_B_mss_boost(aux_B, aux_A, aux_hyper, aux_sigma, aux_xi, Y, X, prior, VB);
     aux_B             = aux_B_tmp;
     
     // sample aux_A
     aux_A_tmp         = aux_A;
-    try {
-      aux_A_tmp       = sample_A_heterosk1_mss_boost(aux_A, aux_B, aux_xi, aux_hyper, aux_sigma, Y, X, prior);
-    } catch (...) {
-      acceptance_count(3)++;
-    }
+    aux_A_tmp         = sample_A_heterosk1_mss_boost(aux_A, aux_B, aux_xi, aux_hyper, aux_sigma, Y, X, prior);
     aux_A             = aux_A_tmp;
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
@@ -173,11 +157,8 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
         _["aux_S_n"]              = S_tmp
       );
       
-      try {
-        sv_n_tmp        = svar_nc1_mss( h_tmp, rho_tmp, omega_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior);
-      } catch (...) {
-        acceptance_count(4 + n)++;
-      }
+      sv_n_tmp          = svar_nc1_mss( h_tmp, rho_tmp, omega_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior);
+      
       List  sv_n        = sv_n_tmp;
       aux_h.row(n)      = as<rowvec>(sv_n["aux_h_n"]);
       aux_rho(n)        = as<double>(sv_n["aux_rho_n"]);
