@@ -1,7 +1,7 @@
 Package: bsvarTVPs
 Type: Package
 Title: Bayesian Structural VARs with Time-Varying Identification
-Version: 0.0.5.9000
+Version: 0.0.6.9000
 Date: 2024-11-14
 Authors@R: c(person("Tomasz", "Woźniak", , "wozniak.tom@pm.me", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-2212-2378")), person("Annika", "Camehl", , "camehl@ese.eur.nl", role = c("aut"), comment = c(ORCID = "0000-0002-3963-0793")))
 Maintainer: Tomasz Woźniak <wozniak.tom@pm.me>
