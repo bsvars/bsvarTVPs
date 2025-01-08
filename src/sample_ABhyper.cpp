@@ -1036,7 +1036,7 @@ arma::mat sample_hyperparameters_mss_boost (
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
 arma::mat sample_hyperparameters_mss_s4_boost (
-    arma::vec               aux_hyper,
+    arma::mat               aux_hyper,
     const arma::cube&       aux_B,            // NxNxM
     const arma::mat&        aux_A,
     const arma::field<arma::mat>& VB,
@@ -1123,7 +1123,7 @@ arma::mat sample_hyperparameters_mss_s4_boost (
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
 arma::mat sample_hyperparameters_mssa_s4_boost (
-    arma::vec               aux_hyper,
+    arma::mat               aux_hyper,
     const arma::cube&       aux_B,            // NxNxM
     const arma::cube&       aux_A,            // NxKxM
     const arma::field<arma::mat>& VB,
