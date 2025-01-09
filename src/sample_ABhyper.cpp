@@ -8,70 +8,70 @@ using namespace Rcpp;
 using namespace arma;
 
 
-
-// [[Rcpp::interfaces(cpp)]]
-// [[Rcpp::export]]
-arma::mat sample_B_heterosk1 (
-    arma::mat         aux_B,          // NxN
-    const arma::mat&  aux_A,          // NxK
-    const arma::vec&  aux_hyper,      // NxM
-    const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&  Y,              // NxT dependent variables
-    const arma::mat&  X,              // KxT dependent variables
-    const Rcpp::List& prior,          // a list of priors - original dimensions
-    const arma::field<arma::mat>& VB        // restrictions on B0
-) {
-  // the function changes the value of aux_B0 and aux_Bplus by reference (filling it with a new draw)
-  const int N               = aux_B.n_rows;
-  const int T               = Y.n_cols;
-  
-  const int posterior_nu    = T + as<int>(prior["B_nu"]);
-  mat prior_SS_inv          = pow(aux_hyper(0), -1) * as<mat>(prior["B_V_inv"]);
-  mat shocks                = Y - aux_A * X;
-  
-  
-  for (int n=0; n<N; n++) {
-    
-    // set scale matrix
-    mat shocks_sigma        = shocks.each_row() / aux_sigma.row(n);
-    mat posterior_SS_inv    = prior_SS_inv + shocks_sigma * shocks_sigma.t();
-    mat posterior_S_inv     = VB(n) * posterior_SS_inv * VB(n).t();
-    posterior_S_inv         = 0.5*( posterior_S_inv + posterior_S_inv.t() );
-    
-    // sample B
-    mat Un                  = chol(posterior_nu * inv_sympd(posterior_S_inv));
-    mat B_tmp               = aux_B;
-    B_tmp.shed_row(n);
-    rowvec w                = trans(orthogonal_complement_matrix_TW(B_tmp.t()));
-    vec w1_tmp              = trans(w * VB(n).t() * Un.t());
-    double w1w1_tmp         = as_scalar(sum(pow(w1_tmp, 2)));
-    mat w1                  = w1_tmp.t()/sqrt(w1w1_tmp);
-    mat Wn;
-    const int rn            = VB(n).n_rows;
-    if (rn==1) {
-      Wn                    = w1;
-    } else {
-      Wn                    = join_rows(w1.t(), orthogonal_complement_matrix_TW(w1.t()));
-    }
-    
-    vec   alpha(rn);
-    vec   u(posterior_nu+1, fill::randn);
-    u                      *= pow(posterior_nu, -0.5);
-    alpha(0)                = pow(as_scalar(sum(pow(u,2))), 0.5);
-    if (R::runif(0,1)<0.5) {
-      alpha(0)       *= -1;
-    }
-    if (rn>1){
-      vec nn(rn-1, fill::randn);
-      nn                   *= pow(posterior_nu, -0.5);
-      alpha.rows(1,rn-1)    = nn;
-    }
-    rowvec b0n              = alpha.t() * Wn * Un;
-    aux_B.row(n)           = b0n * VB(n);
-  } // END n loop
-  
-  return aux_B;
-} // END sample_B_heterosk1
+// 
+// // [[Rcpp::interfaces(cpp)]]
+// // [[Rcpp::export]]
+// arma::mat sample_B_heterosk1 (
+//     arma::mat         aux_B,          // NxN
+//     const arma::mat&  aux_A,          // NxK
+//     const arma::mat&  aux_hyper,      //
+//     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+//     const arma::mat&  Y,              // NxT dependent variables
+//     const arma::mat&  X,              // KxT dependent variables
+//     const Rcpp::List& prior,          // a list of priors - original dimensions
+//     const arma::field<arma::mat>& VB        // restrictions on B0
+// ) {
+//   // the function changes the value of aux_B0 and aux_Bplus by reference (filling it with a new draw)
+//   const int N               = aux_B.n_rows;
+//   const int T               = Y.n_cols;
+//   
+//   const int posterior_nu    = T + as<int>(prior["B_nu"]);
+//   mat prior_SS_inv          = pow(aux_hyper(0), -1) * as<mat>(prior["B_V_inv"]);
+//   mat shocks                = Y - aux_A * X;
+//   
+//   
+//   for (int n=0; n<N; n++) {
+//     
+//     // set scale matrix
+//     mat shocks_sigma        = shocks.each_row() / aux_sigma.row(n);
+//     mat posterior_SS_inv    = prior_SS_inv + shocks_sigma * shocks_sigma.t();
+//     mat posterior_S_inv     = VB(n) * posterior_SS_inv * VB(n).t();
+//     posterior_S_inv         = 0.5*( posterior_S_inv + posterior_S_inv.t() );
+//     
+//     // sample B
+//     mat Un                  = chol(posterior_nu * inv_sympd(posterior_S_inv));
+//     mat B_tmp               = aux_B;
+//     B_tmp.shed_row(n);
+//     rowvec w                = trans(orthogonal_complement_matrix_TW(B_tmp.t()));
+//     vec w1_tmp              = trans(w * VB(n).t() * Un.t());
+//     double w1w1_tmp         = as_scalar(sum(pow(w1_tmp, 2)));
+//     mat w1                  = w1_tmp.t()/sqrt(w1w1_tmp);
+//     mat Wn;
+//     const int rn            = VB(n).n_rows;
+//     if (rn==1) {
+//       Wn                    = w1;
+//     } else {
+//       Wn                    = join_rows(w1.t(), orthogonal_complement_matrix_TW(w1.t()));
+//     }
+//     
+//     vec   alpha(rn);
+//     vec   u(posterior_nu+1, fill::randn);
+//     u                      *= pow(posterior_nu, -0.5);
+//     alpha(0)                = pow(as_scalar(sum(pow(u,2))), 0.5);
+//     if (R::runif(0,1)<0.5) {
+//       alpha(0)       *= -1;
+//     }
+//     if (rn>1){
+//       vec nn(rn-1, fill::randn);
+//       nn                   *= pow(posterior_nu, -0.5);
+//       alpha.rows(1,rn-1)    = nn;
+//     }
+//     rowvec b0n              = alpha.t() * Wn * Un;
+//     aux_B.row(n)           = b0n * VB(n);
+//   } // END n loop
+//   
+//   return aux_B;
+// } // END sample_B_heterosk1
 
 
 
@@ -274,7 +274,7 @@ arma::cube sample_B_mss_boost (
         ii++;
       }
     }
-    aux_B.slice(m)    = sample_B_heterosk1(aux_B.slice(m), aux_A, aux_hyper, aux_sigma_m, Y_m, X_m, prior, VB);
+    aux_B.slice(m)    = sample_B_heterosk1_boost(aux_B.slice(m), aux_A, aux_hyper, aux_sigma_m, Y_m, X_m, prior, VB);
   }
   
   return aux_B;

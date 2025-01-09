@@ -95,6 +95,7 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
   
   int   s = 0;
   
+  // Rcout << "befor loop" << endl;
   for (int ss=0; ss<SS; ss++) {
     
     // Increment progress bar
@@ -103,32 +104,38 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     if (ss % 200 == 0) checkUserInterrupt();
     
     // sample aux_xi
+    // Rcout << "befor aux_xi" << endl;
     mat E             = Y - aux_A * X;
     aux_xi_tmp        = aux_xi;
     aux_xi_tmp        = sample_Markov_process_mss(aux_xi, E, aux_B, aux_sigma, aux_PR_TR, aux_pi_0);
     aux_xi            = aux_xi_tmp;
     
     // sample aux_PR_TR and aux_pi_0
+    // Rcout << "befor aux_xPR_TR" << endl;
     PR_TR_tmp         = sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
     aux_PR_TR         = as<mat>(PR_TR_tmp["aux_PR_TR"]);
     aux_pi_0          = as<vec>(PR_TR_tmp["aux_pi_0"]);
     
     // sample aux_hyper
+    // Rcout << "befor aux_h" << endl;
     aux_hyper_tmp     = aux_hyper;
     aux_hyper_tmp     = sample_hyperparameters_mss_boost( aux_hyper, aux_B, aux_A, VB, prior);
     aux_hyper         = aux_hyper_tmp;
     
     // sample aux_B
+    // Rcout << "befor aux_B" << endl;
     aux_B_tmp         = aux_B;
     aux_B_tmp         = sample_B_mss_boost(aux_B, aux_A, aux_hyper, aux_sigma, aux_xi, Y, X, prior, VB);
     aux_B             = aux_B_tmp;
     
     // sample aux_A
+    // Rcout << "befor aux_A" << endl;
     aux_A_tmp         = aux_A;
     aux_A_tmp         = sample_A_heterosk1_mss_boost(aux_A, aux_B, aux_xi, aux_hyper, aux_sigma, Y, X, prior);
     aux_A             = aux_A_tmp;
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
+    // Rcout << "befor aux_sv" << endl;
     mat U(N, T);
     E = Y - aux_A * X;
     for (int m=0; m<M; m++) {
