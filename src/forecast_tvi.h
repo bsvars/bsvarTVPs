@@ -3,15 +3,39 @@
 
 
 Rcpp::List forecast_mssa_sv (
-    const arma::field<arma::cube>&  posterior_B,          // (S)(N,N,M)
-    const arma::field<arma::cube>&  posterior_A,          // (S)(N,K,M)
-    const arma::cube&               posterior_PR_TR,      // (M,M,S)
-    const arma::mat&                posterior_xi_T,       // (M,S)
-    const arma::mat&                posterior_h_T,        // (N,S)
-    const arma::mat&                posterior_rho,        // (N,S)
-    const arma::cube&               posterior_omega,      // (N,M,S)
-    const arma::vec&                X_T,                   // (K)
-    const int&                      horizon
+    arma::field<arma::cube>&  posterior_B,          // (S)(N,N,M)
+    arma::field<arma::cube>&  posterior_A,          // (S)(N,K,M)
+    arma::cube&               posterior_PR_TR,      // (M,M,S)
+    arma::mat&                posterior_xi_T,       // (M,S)
+    arma::mat&                posterior_h_T,        // (N,S)
+    arma::mat&                posterior_rho,        // (N,S)
+    arma::cube&               posterior_omega,      // (N,M,S)
+    arma::vec&                X_T,                   // (K)
+    const int&                horizon
+);
+
+
+Rcpp::List forecast_mss_sv (
+    arma::field<arma::cube>&  posterior_B,          // (S)(N,N,M)
+    arma::cube&               posterior_A,          // (N,K,S)
+    arma::cube&               posterior_PR_TR,      // (M,M,S)
+    arma::mat&                posterior_xi_T,       // (M,S)
+    arma::mat&                posterior_h_T,        // (N,S)
+    arma::mat&                posterior_rho,        // (N,S)
+    arma::cube&               posterior_omega,      // (N,M,S)
+    arma::vec&                X_T,                   // (K)
+    const int&                horizon
+);
+
+
+Rcpp::List forecast_sv (
+    arma::cube&               posterior_B,          // (N,N,S)
+    arma::cube&               posterior_A,          // (N,K,S)
+    arma::mat&                posterior_h_T,        // (N,S)
+    arma::mat&                posterior_rho,        // (N,S)
+    arma::mat&                posterior_omega,      // (N,S)
+    arma::vec&                X_T,                   // (K)
+    const int&                horizon
 );
 
 
