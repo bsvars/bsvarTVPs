@@ -43,8 +43,9 @@ forecast_bsvar_mssa_sv <- function(posterior, X, horizon = 1L, non_explosive = F
   
   output          = .Call(`_bsvarTVPs_forecast_mssa_sv`, posterior_B, posterior_A, posterior_PR_TR, posterior_xi_T, posterior_h_T, posterior_rho, posterior_omega, X_T, horizon, non_explosive)
   
-  forecast_cov    = array(NA, c(N, N, horizon, S))
-  for (s in 1:S) forecast_cov[,,,s] = output$forecast_cov[s,][[1]]
+  SS              = dim(output$forecast)[1]
+  forecast_cov    = array(NA, c(N, N, horizon, SS))
+  for (s in 1:SS) forecast_cov[,,,s] = output$forecast_cov[s,][[1]]
   output$forecast_cov = forecast_cov
   
   class(output)   = "Forecasts"
@@ -96,8 +97,9 @@ forecast_bsvar_mss_sv <- function(posterior, X, horizon = 1L, non_explosive = FA
   
   output          = .Call(`_bsvarTVPs_forecast_mss_sv`, posterior_B, posterior_A, posterior_PR_TR, posterior_xi_T, posterior_h_T, posterior_rho, posterior_omega, X_T, horizon, non_explosive)
   
-  forecast_cov    = array(NA, c(N, N, horizon, S))
-  for (s in 1:S) forecast_cov[,,,s] = output$forecast_cov[s,][[1]]
+  SS              = dim(output$forecast)[1]
+  forecast_cov    = array(NA, c(N, N, horizon, SS))
+  for (s in 1:SS) forecast_cov[,,,s] = output$forecast_cov[s,][[1]]
   output$forecast_cov = forecast_cov
   
   class(output)   = "Forecasts"
@@ -146,8 +148,9 @@ forecast_bsvar_sv <- function(posterior, X, horizon = 1L, non_explosive = FALSE)
   
   output          = .Call(`_bsvarTVPs_forecast_sv`, posterior_B, posterior_A, posterior_h_T, posterior_rho, posterior_omega, X_T, horizon, non_explosive)
   
-  forecast_cov    = array(NA, c(N, N, horizon, S))
-  for (s in 1:S) forecast_cov[,,,s] = output$forecast_cov[s,][[1]]
+  SS              = dim(output$forecast)[1]
+  forecast_cov    = array(NA, c(N, N, horizon, SS))
+  for (s in 1:SS) forecast_cov[,,,s] = output$forecast_cov[s,][[1]]
   output$forecast_cov = forecast_cov
   
   class(output)   = "Forecasts"
