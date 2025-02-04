@@ -10,6 +10,8 @@
 #' @param posterior a list containing Bayesian estimation output
 #' @param X a \code{KxT} matrix with regressors
 #' @param horizon a positive integer specifying the forecast horizon
+#' @param non_explosive a logical indicating whether only non explosive processes
+#' should be used for forecasting
 #' 
 #' @return An object of class \code{Forecasts} - a list containing the Bayesian 
 #' forecasting output with three elements:
@@ -25,7 +27,7 @@
 #' Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions
 #' 
 #' @export
-forecast_bsvar_mssa_sv <- function(posterior, X, horizon = 1L) {
+forecast_bsvar_mssa_sv <- function(posterior, X, horizon = 1L, non_explosive = FALSE) {
   
   T               = dim(posterior$posterior$h)[2]
   N               = dim(posterior$posterior$h)[1]
@@ -39,7 +41,7 @@ forecast_bsvar_mssa_sv <- function(posterior, X, horizon = 1L) {
   posterior_omega = posterior$posterior$omega
   X_T             = X[,T]
   
-  output          = .Call(`_bsvarTVPs_forecast_mssa_sv`, posterior_B, posterior_A, posterior_PR_TR, posterior_xi_T, posterior_h_T, posterior_rho, posterior_omega, X_T, horizon)
+  output          = .Call(`_bsvarTVPs_forecast_mssa_sv`, posterior_B, posterior_A, posterior_PR_TR, posterior_xi_T, posterior_h_T, posterior_rho, posterior_omega, X_T, horizon, non_explosive)
   
   forecast_cov    = array(NA, c(N, N, horizon, S))
   for (s in 1:S) forecast_cov[,,,s] = output$forecast_cov[s,][[1]]
@@ -61,6 +63,8 @@ forecast_bsvar_mssa_sv <- function(posterior, X, horizon = 1L) {
 #' @param posterior a list containing Bayesian estimation output
 #' @param X a \code{KxT} matrix with regressors
 #' @param horizon a positive integer specifying the forecast horizon
+#' @param non_explosive a logical indicating whether only non explosive processes
+#' should be used for forecasting
 #' 
 #' @return An object of class \code{Forecasts} - a list containing the Bayesian 
 #' forecasting output with three elements:
@@ -76,7 +80,7 @@ forecast_bsvar_mssa_sv <- function(posterior, X, horizon = 1L) {
 #' Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions
 #' 
 #' @export
-forecast_bsvar_mss_sv <- function(posterior, X, horizon = 1L) {
+forecast_bsvar_mss_sv <- function(posterior, X, horizon = 1L, non_explosive = FALSE) {
   
   T               = dim(posterior$posterior$h)[2]
   N               = dim(posterior$posterior$h)[1]
@@ -90,7 +94,7 @@ forecast_bsvar_mss_sv <- function(posterior, X, horizon = 1L) {
   posterior_omega = posterior$posterior$omega
   X_T             = X[,T]
   
-  output          = .Call(`_bsvarTVPs_forecast_mss_sv`, posterior_B, posterior_A, posterior_PR_TR, posterior_xi_T, posterior_h_T, posterior_rho, posterior_omega, X_T, horizon)
+  output          = .Call(`_bsvarTVPs_forecast_mss_sv`, posterior_B, posterior_A, posterior_PR_TR, posterior_xi_T, posterior_h_T, posterior_rho, posterior_omega, X_T, horizon, non_explosive)
   
   forecast_cov    = array(NA, c(N, N, horizon, S))
   for (s in 1:S) forecast_cov[,,,s] = output$forecast_cov[s,][[1]]
@@ -111,6 +115,8 @@ forecast_bsvar_mss_sv <- function(posterior, X, horizon = 1L) {
 #' @param posterior a list containing Bayesian estimation output
 #' @param X a \code{KxT} matrix with regressors
 #' @param horizon a positive integer specifying the forecast horizon
+#' @param non_explosive a logical indicating whether only non explosive processes
+#' should be used for forecasting
 #' 
 #' @return An object of class \code{Forecasts} - a list containing the Bayesian 
 #' forecasting output with three elements:
@@ -126,7 +132,7 @@ forecast_bsvar_mss_sv <- function(posterior, X, horizon = 1L) {
 #' Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions
 #' 
 #' @export
-forecast_bsvar_sv <- function(posterior, X, horizon = 1L) {
+forecast_bsvar_sv <- function(posterior, X, horizon = 1L, non_explosive = FALSE) {
   
   T               = dim(posterior$posterior$h)[2]
   N               = dim(posterior$posterior$h)[1]
@@ -138,7 +144,7 @@ forecast_bsvar_sv <- function(posterior, X, horizon = 1L) {
   posterior_omega = posterior$posterior$omega
   X_T             = X[,T]
   
-  output          = .Call(`_bsvarTVPs_forecast_sv`, posterior_B, posterior_A, posterior_h_T, posterior_rho, posterior_omega, X_T, horizon)
+  output          = .Call(`_bsvarTVPs_forecast_sv`, posterior_B, posterior_A, posterior_h_T, posterior_rho, posterior_omega, X_T, horizon, non_explosive)
   
   forecast_cov    = array(NA, c(N, N, horizon, S))
   for (s in 1:S) forecast_cov[,,,s] = output$forecast_cov[s,][[1]]

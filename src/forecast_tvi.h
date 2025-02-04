@@ -11,7 +11,8 @@ Rcpp::List forecast_mssa_sv (
     arma::mat&                posterior_rho,        // (N,S)
     arma::cube&               posterior_omega,      // (N,M,S)
     arma::vec&                X_T,                   // (K)
-    const int&                horizon
+    const int&                horizon, 
+    const bool                non_explosive = false
 );
 
 
@@ -24,7 +25,8 @@ Rcpp::List forecast_mss_sv (
     arma::mat&                posterior_rho,        // (N,S)
     arma::cube&               posterior_omega,      // (N,M,S)
     arma::vec&                X_T,                   // (K)
-    const int&                horizon
+    const int&                horizon, 
+    const bool                non_explosive = false
 );
 
 
@@ -35,7 +37,8 @@ Rcpp::List forecast_sv (
     arma::mat&                posterior_rho,        // (N,S)
     arma::mat&                posterior_omega,      // (N,S)
     arma::vec&                X_T,                   // (K)
-    const int&                horizon
+    const int&                horizon, 
+    const bool                non_explosive = false
 );
 
 

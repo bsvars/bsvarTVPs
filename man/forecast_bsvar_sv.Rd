@@ -4,7 +4,7 @@
 \alias{forecast_bsvar_sv}
 \title{Bayesian forecasting of Structural Vector Autoregressions with TVI}
 \usage{
-forecast_bsvar_sv(posterior, X, horizon = 1L)
+forecast_bsvar_sv(posterior, X, horizon = 1L, non_explosive = FALSE)
 }
 \arguments{
 \item{posterior}{a list containing Bayesian estimation output}
@@ -12,6 +12,9 @@ forecast_bsvar_sv(posterior, X, horizon = 1L)
 \item{X}{a \code{KxT} matrix with regressors}
 
 \item{horizon}{a positive integer specifying the forecast horizon}
+
+\item{non_explosive}{a logical indicating whether only non explosive processes
+should be used for forecasting}
 }
 \value{
 An object of class \code{Forecasts} - a list containing the Bayesian 

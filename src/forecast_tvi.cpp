@@ -5,6 +5,40 @@ using namespace Rcpp;
 using namespace arma;
 
 
+bool is_non_explosive_mat (
+    mat& A
+) {
+  int N = A.n_rows;
+  int p = (A.n_cols - 1) / N;
+  
+  mat AA = A.cols(0, N - 1);
+  
+  if (p > 1) {
+    for (int i=1; i<p; i++) {
+      AA += A.cols(i*N, (i+1)*N - 1);
+    }
+  }
+  
+  cx_vec eigval = eig_gen( AA );
+  
+  return max(abs(eigval)) <= 1;
+} // END is_non_explosive_mat
+
+
+bool is_non_explosive_cube (
+    cube& A
+) {
+  int M = A.n_slices;
+  
+  bool non_explosive = true;
+  for (int m=0; m<M; m++) {
+    non_explosive *= is_non_explosive_mat(A.slice(m));
+  }
+  
+  return non_explosive;
+} // END is_non_explosive_cube
+
+
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
 Rcpp::List forecast_mssa_sv (
@@ -16,7 +50,8 @@ Rcpp::List forecast_mssa_sv (
     arma::mat&                posterior_rho,        // (N,S)
     arma::cube&               posterior_omega,      // (N,M,S)
     arma::vec&                X_T,                   // (K)
-    const int&                horizon
+    const int&                horizon, 
+    const bool                non_explosive = false
 ) {
   const int   N = posterior_h_T.n_rows;
   const int   K = X_T.n_elem;
@@ -29,7 +64,15 @@ Rcpp::List forecast_mssa_sv (
     
   NumericVector zeroM = wrap(seq_len(M) - 1);
   
+  int ss = 0;
+  
   for (int s=0; s<S; s++) {
+    
+    bool      ine  = is_non_explosive_cube(posterior_A(s));
+    
+    if (non_explosive && !ine) {
+      continue;
+    }
     
     int       ST(M);
     vec       XT      = X_T;
@@ -47,23 +90,30 @@ Rcpp::List forecast_mssa_sv (
       sigma2T     = exp(posterior_omega.slice(s).col(ST) % HT); 
       BT_inv      = inv(posterior_B(s).slice(ST));
       SigmaT.slice(h) = BT_inv * diagmat(sigma2T) * BT_inv.t();
-      out_forecast_mean.slice(s).col(h) = posterior_A(s).slice(ST) * XT;
-      vec draw    = mvnrnd( out_forecast_mean.slice(s).col(h), SigmaT.slice(h) );
-      out_forecast.slice(s).col(h) = draw;
+      out_forecast_mean.slice(ss).col(h) = posterior_A(s).slice(ST) * XT;
+      vec draw    = mvnrnd( out_forecast_mean.slice(ss).col(h), SigmaT.slice(h) );
+      out_forecast.slice(ss).col(h) = draw;
       
       if ( h != horizon - 1 ) {
         XT        = join_cols( draw, XT.subvec(N, K - 1) );
       } // END if h
     } // END h loop
     
-    out_forecast_cov(s) = SigmaT;
-    
+    out_forecast_cov(ss) = SigmaT;
+
+    ss++;
   } // END s loop
   
+  Rcout << "Fraction of used MCMC draws: " << (double) 100 * ss / S << endl;
+  
+  cube _forecast = out_forecast.slices(0, ss - 1);
+  cube _forecast_mean = out_forecast_mean.slices(0, ss - 1);
+  field<cube> _forecast_cov = out_forecast_cov.rows(0, ss - 1);
+  
   return List::create(
-    _["forecast"]       = out_forecast,
-    _["forecast_mean"]  = out_forecast_mean,
-    _["forecast_cov"]   = out_forecast_cov
+    _["forecast"]       = _forecast,
+    _["forecast_mean"]  = _forecast_mean,
+    _["forecast_cov"]   = _forecast_cov
   );
 } // END forecast_mssa_sv
 
@@ -79,7 +129,8 @@ Rcpp::List forecast_mss_sv (
     arma::mat&                posterior_rho,        // (N,S)
     arma::cube&               posterior_omega,      // (N,M,S)
     arma::vec&                X_T,                   // (K)
-    const int&                horizon
+    const int&                horizon, 
+    const bool                non_explosive = false
 ) {
   const int   N = posterior_h_T.n_rows;
   const int   K = X_T.n_elem;
@@ -92,7 +143,15 @@ Rcpp::List forecast_mss_sv (
   
   NumericVector zeroM = wrap(seq_len(M) - 1);
   
+  int ss = 0;
+  
   for (int s=0; s<S; s++) {
+    
+    bool      ine  = is_non_explosive_mat(posterior_A.slice(s));
+    
+    if (non_explosive && !ine) {
+      continue;
+    }
     
     int       ST(M);
     vec       XT      = X_T;
@@ -110,23 +169,30 @@ Rcpp::List forecast_mss_sv (
       sigma2T     = exp(posterior_omega.slice(s).col(ST) % HT); 
       BT_inv      = inv(posterior_B(s).slice(ST));
       SigmaT.slice(h) = BT_inv * diagmat(sigma2T) * BT_inv.t();
-      out_forecast_mean.slice(s).col(h) = posterior_A.slice(s) * XT;
-      vec draw    = mvnrnd( out_forecast_mean.slice(s).col(h), SigmaT.slice(h) );
-      out_forecast.slice(s).col(h) = draw;
+      out_forecast_mean.slice(ss).col(h) = posterior_A.slice(s) * XT;
+      vec draw    = mvnrnd( out_forecast_mean.slice(ss).col(h), SigmaT.slice(h) );
+      out_forecast.slice(ss).col(h) = draw;
       
       if ( h != horizon - 1 ) {
         XT        = join_cols( draw, XT.subvec(N, K - 1) );
       } // END if h
     } // END h loop
     
-    out_forecast_cov(s) = SigmaT;
+    out_forecast_cov(ss) = SigmaT;
     
+    ss++;
   } // END s loop
   
+  Rcout << "Fraction of used MCMC draws: " << (double) 100 * ss / S << endl;
+  
+  cube _forecast = out_forecast.slices(0, ss - 1);
+  cube _forecast_mean = out_forecast_mean.slices(0, ss - 1);
+  field<cube> _forecast_cov = out_forecast_cov.rows(0, ss - 1);
+  
   return List::create(
-    _["forecast"]       = out_forecast,
-    _["forecast_mean"]  = out_forecast_mean,
-    _["forecast_cov"]   = out_forecast_cov
+    _["forecast"]       = _forecast,
+    _["forecast_mean"]  = _forecast_mean,
+    _["forecast_cov"]   = _forecast_cov
   );
 } // END forecast_mss_sv
 
@@ -140,7 +206,8 @@ Rcpp::List forecast_sv (
     arma::mat&                posterior_rho,        // (N,S)
     arma::mat&                posterior_omega,      // (N,S)
     arma::vec&                X_T,                   // (K)
-    const int&                horizon
+    const int&                horizon, 
+    const bool                non_explosive = false
 ) {
   const int   N = posterior_h_T.n_rows;
   const int   K = X_T.n_elem;
@@ -150,7 +217,15 @@ Rcpp::List forecast_sv (
   cube        out_forecast_mean(N, horizon, S);
   field<cube> out_forecast_cov(S);
   
+  int ss = 0;
+  
   for (int s=0; s<S; s++) {
+    
+    bool      ine  = is_non_explosive_mat(posterior_A.slice(s));
+    
+    if (non_explosive && !ine) {
+      continue;
+    }
     
     vec       XT      = X_T;
     vec       HT      = posterior_h_T.col(s);  
@@ -164,23 +239,30 @@ Rcpp::List forecast_sv (
       sigma2T     = exp(posterior_omega.col(s) % HT); 
       BT_inv      = inv(posterior_B.slice(s));
       SigmaT.slice(h) = BT_inv * diagmat(sigma2T) * BT_inv.t();
-      out_forecast_mean.slice(s).col(h) = posterior_A.slice(s) * XT;
-      vec draw    = mvnrnd( out_forecast_mean.slice(s).col(h), SigmaT.slice(h) );
-      out_forecast.slice(s).col(h) = draw;
+      out_forecast_mean.slice(ss).col(h) = posterior_A.slice(s) * XT;
+      vec draw    = mvnrnd( out_forecast_mean.slice(ss).col(h), SigmaT.slice(h) );
+      out_forecast.slice(ss).col(h) = draw;
       
       if ( h != horizon - 1 ) {
         XT        = join_cols( draw, XT.subvec(N, K - 1) );
       } // END if h
     } // END h loop
     
-    out_forecast_cov(s) = SigmaT;
+    out_forecast_cov(ss) = SigmaT;
     
+    ss++;
   } // END s loop
   
+  Rcout << "Fraction of used MCMC draws: " << (double) 100 * ss / S << endl;
+  
+  cube _forecast = out_forecast.slices(0, ss - 1);
+  cube _forecast_mean = out_forecast_mean.slices(0, ss - 1);
+  field<cube> _forecast_cov = out_forecast_cov.rows(0, ss - 1);
+  
   return List::create(
-    _["forecast"]       = out_forecast,
-    _["forecast_mean"]  = out_forecast_mean,
-    _["forecast_cov"]   = out_forecast_cov
+    _["forecast"]       = _forecast,
+    _["forecast_mean"]  = _forecast_mean,
+    _["forecast_cov"]   = _forecast_cov
   );
 } // END forecast_sv
 
