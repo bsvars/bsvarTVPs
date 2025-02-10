@@ -89,7 +89,8 @@ Rcpp::List forecast_mssa_sv (
       HT          = posterior_omega.slice(s).col(ST) % HT + randn(N);
       sigma2T     = exp(posterior_omega.slice(s).col(ST) % HT); 
       BT_inv      = inv(posterior_B(s).slice(ST));
-      SigmaT.slice(h) = BT_inv * diagmat(sigma2T) * BT_inv.t();
+      mat Sigma_tmp = BT_inv * diagmat(sigma2T) * BT_inv.t();
+      SigmaT.slice(h) = 0.5 * (Sigma_tmp + Sigma_tmp.t());
       out_forecast_mean.slice(ss).col(h) = posterior_A(s).slice(ST) * XT;
       vec draw    = mvnrnd( out_forecast_mean.slice(ss).col(h), SigmaT.slice(h) );
       out_forecast.slice(ss).col(h) = draw;
@@ -168,7 +169,8 @@ Rcpp::List forecast_mss_sv (
       HT          = posterior_omega.slice(s).col(ST) % HT + randn(N);
       sigma2T     = exp(posterior_omega.slice(s).col(ST) % HT); 
       BT_inv      = inv(posterior_B(s).slice(ST));
-      SigmaT.slice(h) = BT_inv * diagmat(sigma2T) * BT_inv.t();
+      mat Sigma_tmp = BT_inv * diagmat(sigma2T) * BT_inv.t();
+      SigmaT.slice(h) = 0.5 * (Sigma_tmp + Sigma_tmp.t());
       out_forecast_mean.slice(ss).col(h) = posterior_A.slice(s) * XT;
       vec draw    = mvnrnd( out_forecast_mean.slice(ss).col(h), SigmaT.slice(h) );
       out_forecast.slice(ss).col(h) = draw;
@@ -238,7 +240,8 @@ Rcpp::List forecast_sv (
       HT          = posterior_omega.col(s) % HT + randn(N);
       sigma2T     = exp(posterior_omega.col(s) % HT); 
       BT_inv      = inv(posterior_B.slice(s));
-      SigmaT.slice(h) = BT_inv * diagmat(sigma2T) * BT_inv.t();
+      mat Sigma_tmp = BT_inv * diagmat(sigma2T) * BT_inv.t();
+      SigmaT.slice(h) = 0.5 * (Sigma_tmp + Sigma_tmp.t());
       out_forecast_mean.slice(ss).col(h) = posterior_A.slice(s) * XT;
       vec draw    = mvnrnd( out_forecast_mean.slice(ss).col(h), SigmaT.slice(h) );
       out_forecast.slice(ss).col(h) = draw;
