@@ -43,10 +43,10 @@ forecast_bsvar_mssa_sv <- function(posterior, X, horizon = 1L, non_explosive = F
   
   output          = .Call(`_bsvarTVPs_forecast_mssa_sv`, posterior_B, posterior_A, posterior_PR_TR, posterior_xi_T, posterior_h_T, posterior_rho, posterior_omega, X_T, horizon, non_explosive)
   
-  SS              = dim(output$forecast)[1]
-  forecast_cov    = array(NA, c(N, N, horizon, SS))
-  for (s in 1:SS) forecast_cov[,,,s] = output$forecast_cov[s,][[1]]
-  output$forecast_cov = forecast_cov
+  SS                  = dim(output$forecast)[3]
+  forecast_covariance = array(NA, c(N, N, horizon, SS))
+  for (s in 1:SS) forecast_covariance[,,,s] = output$forecast_cov[s,][[1]]
+  output$forecast_covariance = forecast_covariance
   
   class(output)   = "Forecasts"
   return(output)
@@ -97,10 +97,10 @@ forecast_bsvar_mss_sv <- function(posterior, X, horizon = 1L, non_explosive = FA
   
   output          = .Call(`_bsvarTVPs_forecast_mss_sv`, posterior_B, posterior_A, posterior_PR_TR, posterior_xi_T, posterior_h_T, posterior_rho, posterior_omega, X_T, horizon, non_explosive)
   
-  SS              = dim(output$forecast)[1]
-  forecast_cov    = array(NA, c(N, N, horizon, SS))
-  for (s in 1:SS) forecast_cov[,,,s] = output$forecast_cov[s,][[1]]
-  output$forecast_cov = forecast_cov
+  SS                  = dim(output$forecast)[3]
+  forecast_covariance = array(NA, c(N, N, horizon, SS))
+  for (s in 1:SS) forecast_covariance[,,,s] = output$forecast_cov[s,][[1]]
+  output$forecast_covariance = forecast_covariance
   
   class(output)   = "Forecasts"
   return(output)
@@ -125,8 +125,10 @@ forecast_bsvar_mss_sv <- function(posterior, X, horizon = 1L, non_explosive = FA
 #' \code{forecast} an \code{N x horizon x S} array with draws from predictive density
 #' \code{forecast_mean} an \code{N x horizon x S} array with the mean of the
 #' predictive density
-#' \code{forecast_cov} an \code{N x N x horizon x S} array with the covariance 
+#' \code{forecast_covariance} an \code{N x N x horizon x S} array with the covariance 
 #' of the predictive density
+#' \code{forecast_cov} an \code{S}-field of \code{N x N x horizon} arrays with 
+#' the covariance of the predictive density
 #'
 #' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
 #' 
@@ -148,10 +150,10 @@ forecast_bsvar_sv <- function(posterior, X, horizon = 1L, non_explosive = FALSE)
   
   output          = .Call(`_bsvarTVPs_forecast_sv`, posterior_B, posterior_A, posterior_h_T, posterior_rho, posterior_omega, X_T, horizon, non_explosive)
   
-  SS              = dim(output$forecast)[1]
-  forecast_cov    = array(NA, c(N, N, horizon, SS))
-  for (s in 1:SS) forecast_cov[,,,s] = output$forecast_cov[s,][[1]]
-  output$forecast_cov = forecast_cov
+  SS                  = dim(output$forecast)[3]
+  forecast_covariance = array(NA, c(N, N, horizon, SS))
+  for (s in 1:SS) forecast_covariance[,,,s] = output$forecast_cov[s,][[1]]
+  output$forecast_covariance = forecast_covariance
   
   class(output)   = "Forecasts"
   return(output)
