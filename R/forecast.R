@@ -139,9 +139,9 @@ forecast_bsvar_mss_sv <- function(posterior, X, horizon = 1L, non_explosive = FA
 #' @export
 forecast_bsvar_mss <- function(posterior, X, horizon = 1L, non_explosive = FALSE) {
   
-  T               = dim(posterior$posterior$h)[2]
-  N               = dim(posterior$posterior$h)[1]
-  S               = dim(posterior$posterior$h)[3]
+  T               = dim(posterior$posterior$xi)[2]
+  N               = dim(posterior$posterior$A)[1]
+  S               = dim(posterior$posterior$A)[3]
   posterior_B     = posterior$posterior$B
   posterior_A     = posterior$posterior$A
   posterior_PR_TR = posterior$posterior$PR_TR
