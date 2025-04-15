@@ -30,6 +30,17 @@ Rcpp::List forecast_mss_sv (
 );
 
 
+Rcpp::List forecast_mss (
+    arma::field<arma::cube>&  posterior_B,          // (S)(N,N,M)
+    arma::cube&               posterior_A,          // (N,K,S)
+    arma::cube&               posterior_PR_TR,      // (M,M,S)
+    arma::mat&                posterior_xi_T,       // (M,S)
+    arma::vec&                X_T,                   // (K)
+    const int&                horizon, 
+    const bool                non_explosive = false
+);
+
+
 Rcpp::List forecast_sv (
     arma::cube&               posterior_B,          // (N,N,S)
     arma::cube&               posterior_A,          // (N,K,S)
