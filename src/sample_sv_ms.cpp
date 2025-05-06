@@ -481,7 +481,7 @@ Rcpp::List svar_ce1 (
   mat           HH_rho  = H_rho.t() * H_rho;
   
   // sample auxiliary mixture states aux_S
-  const vec   mixprob   = find_mixture_indicator_cdf(trans(U - aux_omega_n*aux_h_n));
+  const vec   mixprob   = find_mixture_indicator_cdf(trans(U - aux_h_n));
   aux_S_n               = trans(inverse_transform_sampling(mixprob, T));
   
   rowvec    alpha_S(T);
@@ -574,7 +574,7 @@ Rcpp::List svar_ce1_mss (
   }
   
   // sample auxiliary mixture states aux_S
-  const vec   mixprob   = find_mixture_indicator_cdf(trans(U - aux_omega_n*aux_h_n));
+  const vec   mixprob   = find_mixture_indicator_cdf(trans(U - aux_h_n));
   aux_S_n               = trans(inverse_transform_sampling(mixprob, T));
   
   rowvec    alpha_S(T);
@@ -594,7 +594,7 @@ Rcpp::List svar_ce1_mss (
   
   // sample aux_rho
   rowvec    hm1         = aux_h_n.cols(0,T-2);
-  mat       sigma_v2_inv_diag = diagmat(sigma2v_T_inv);
+  mat       sigma_v2_inv_diag = diagmat(sigma2v_T_inv.cols(0,T-2));
   double    aux_rho_var = as_scalar(pow( hm1 * sigma_v2_inv_diag * hm1.t(), -1));
   double    aux_rho_mean = as_scalar(aux_rho_var * (hm1 * sigma_v2_inv_diag * aux_h_n.cols(1,T-1).t() ) );
   aux_rho_n             = RcppTN::rtn1(aux_rho_mean, pow(aux_rho_var, 0.5),-1,1);
