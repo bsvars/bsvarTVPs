@@ -4,7 +4,16 @@
 \alias{bsvar_tvi_sv_boost}
 \title{Bayesian estimation of Structural Vector Autoregressions with TVI in the Structural Matrix}
 \usage{
-bsvar_tvi_sv_boost(SS, Y, X, prior, VB, starting_values, thin = 100L)
+bsvar_tvi_sv_boost(
+  SS,
+  Y,
+  X,
+  prior,
+  VB,
+  starting_values,
+  thin = 100L,
+  centred_sv = FALSE
+)
 }
 \arguments{
 \item{SS}{a positive integer, the number of posterior draws to be generated}
@@ -20,6 +29,9 @@ bsvar_tvi_sv_boost(SS, Y, X, prior, VB, starting_values, thin = 100L)
 \item{starting_values}{a list providing starting values to the estimated parameters}
 
 \item{thin}{a positive integer determining MCMC thinning}
+
+\item{centred_sv}{a logical value indicating whether the SV model should be 
+in its centred form}
 }
 \value{
 An object of class \code{PosteriorBSVARSVTVI} - a list containing the Bayesian estimation output in two elements:
