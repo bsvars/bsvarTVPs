@@ -151,6 +151,7 @@ Rcpp::List bsvar_mss_s4_sv_boost_cpp (
       rowvec  h_tmp     = aux_h.row(n);
       double  rho_tmp   = aux_rho(n);
       rowvec  omega_tmp = aux_omega.row(n);
+      rowvec  sigma_v2_tmp = square(aux_omega.row(n));
       urowvec S_tmp     = aux_S.row(n);
       rowvec  U_tmp     = U.row(n);
       double  s2o_tmp   = aux_sigma2_omega(n);
@@ -165,7 +166,7 @@ Rcpp::List bsvar_mss_s4_sv_boost_cpp (
         _["aux_S_n"]              = S_tmp
       );
       
-      sv_n_tmp          = svar_nc1_mss( h_tmp, rho_tmp, omega_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior);
+      sv_n_tmp          = svar_nc1_mss( h_tmp, rho_tmp, omega_tmp, sigma_v2_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior);
       
       List  sv_n        = sv_n_tmp;
       aux_h.row(n)      = as<rowvec>(sv_n["aux_h_n"]);
