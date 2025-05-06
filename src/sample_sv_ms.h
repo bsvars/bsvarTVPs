@@ -74,6 +74,7 @@ Rcpp::List svar_nc1_mss (
     arma::rowvec&         aux_h_n,            // 1xT
     double&               aux_rho_n,
     arma::rowvec&         aux_omega_n,        // 1xM nth equation regime-dependent omegas
+    arma::rowvec&         aux_sigma2v_n,      // 1xM nth equation regime-dependent omegas^2
     double&               aux_sigma2_omega_n, // omega prior hyper-parameter 
     double&               aux_s_n,            // scale of IG2 prior for aux_sigma2_omega_n
     arma::urowvec&        aux_S_n,            // 1xT
@@ -81,6 +82,35 @@ Rcpp::List svar_nc1_mss (
     const arma::rowvec&   u,                  // 1xT
     const Rcpp::List&     prior,
     bool                  sample_s_ = true
+);
+
+
+Rcpp::List svar_ce1 (
+    arma::rowvec&       aux_h_n,            // 1xT
+    double&             aux_rho_n,
+    double&             aux_omega_n,
+    double&             aux_sigma2v_n,
+    double&             aux_sigma2_omega_n, // omega prior hyper-parameter 
+    double&             aux_s_n,             // scale of IG2 prior for aux_sigma2_omega_n
+    arma::urowvec&      aux_S_n,            // 1xT
+    const arma::rowvec& u,                  // 1xT
+    const Rcpp::List&   prior,
+    bool                sample_s_ = true
+);
+
+
+Rcpp::List svar_ce1_mss (
+    arma::rowvec&       aux_h_n,            // 1xT
+    double&             aux_rho_n,
+    arma::rowvec&       aux_omega_n,        // 1xM nth equation regime-dependent omegas
+    arma::rowvec&       aux_sigma2v_n,      // 1xM nth equation regime-dependent omegas^2
+    double&             aux_sigma2_omega_n, // omega prior hyper-parameter 
+    double&             aux_s_n,             // scale of IG2 prior for aux_sigma2_omega_n
+    arma::urowvec&      aux_S_n,            // 1xT
+    const arma::mat&    aux_xi,             // MxT
+    const arma::rowvec& u,                  // 1xT
+    const Rcpp::List&   prior,
+    bool                sample_s_ = true
 );
 
 
