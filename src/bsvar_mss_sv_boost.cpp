@@ -18,7 +18,8 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     const Rcpp::List&             prior,      // a list of priors - original dimensions
     const arma::field<arma::mat>& VB,        // restrictions on B0
     const Rcpp::List&             starting_values,
-    const int                     thin = 100  // introduce thinning
+    const int                     thin = 100, // introduce thinning
+    const bool                    centred_sv = false
 ) {
   // // Progress bar setup
   vec prog_rep_points = arma::round(arma::linspace(0, SS, 50));
@@ -51,6 +52,7 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
   mat   aux_h       = as<mat>(starting_values["h"]);
   vec   aux_rho     = as<vec>(starting_values["rho"]);
   mat   aux_omega   = as<mat>(starting_values["omega"]);
+  mat   aux_sigma2v = as<mat>(starting_values["sigma2v"]);
   umat  aux_S       = as<umat>(starting_values["S"]);
   vec   aux_sigma2_omega = as<vec>(starting_values["sigma2_omega"]);
   vec   aux_s_      = as<vec>(starting_values["s_"]);
@@ -60,11 +62,17 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
   vec      Tm       = sum(aux_xi, 1);
   
   rowvec    omega_T_n(T);
-  for (int n=0; n<N; n++) {
-    for (int t=0; t<T; t++){
-      omega_T_n(t)    = aux_omega(n, aux_xi.col(t).index_max());
+  if ( centred_sv ) {
+    for (int n=0; n<N; n++) {
+      aux_sigma.row(n) = exp(0.5 * aux_h.row(n));
     }
-    aux_sigma.row(n)  = exp(0.5 * (aux_h.row(n) % omega_T_n));
+  } else {
+    for (int n=0; n<N; n++) {
+      for (int t=0; t<T; t++){
+        omega_T_n(t)    = aux_omega(n, aux_xi.col(t).index_max());
+      }
+      aux_sigma.row(n) = exp(0.5 * (aux_h.row(n) % omega_T_n));
+    }
   }
   
   const int   S     = floor(SS / thin);
@@ -80,17 +88,14 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
   cube  posterior_h(N, T, S);
   mat   posterior_rho(N, S);
   cube  posterior_omega(N, M, S);
+  cube  posterior_sigma2v(N, M, S);
   ucube posterior_S(N, T, S);
   mat   posterior_sigma2_omega(N, S);
   mat   posterior_s_(N, S);
   cube  posterior_sigma(N, T, S);
   
   vec   acceptance_count(4 + N);
-  mat   aux_xi_tmp        = aux_xi;
-  mat   aux_hyper_tmp     = aux_hyper;
-  cube  aux_B_tmp         = aux_B;
-  mat   aux_A_tmp         = aux_A;
-  List  sv_n_tmp;
+  List  sv_n;
   List  PR_TR_tmp;
   
   int   s = 0;
@@ -106,9 +111,7 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     // sample aux_xi
     // Rcout << "befor aux_xi" << endl;
     mat E             = Y - aux_A * X;
-    aux_xi_tmp        = aux_xi;
-    aux_xi_tmp        = sample_Markov_process_mss(aux_xi, E, aux_B, aux_sigma, aux_PR_TR, aux_pi_0);
-    aux_xi            = aux_xi_tmp;
+    aux_xi            = sample_Markov_process_mss(aux_xi, E, aux_B, aux_sigma, aux_PR_TR, aux_pi_0);
     
     // sample aux_PR_TR and aux_pi_0
     // Rcout << "befor aux_xPR_TR" << endl;
@@ -118,21 +121,15 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     
     // sample aux_hyper
     // Rcout << "befor aux_h" << endl;
-    aux_hyper_tmp     = aux_hyper;
-    aux_hyper_tmp     = sample_hyperparameters_mss_boost( aux_hyper, aux_B, aux_A, VB, prior);
-    aux_hyper         = aux_hyper_tmp;
+    aux_hyper         = sample_hyperparameters_mss_boost( aux_hyper, aux_B, aux_A, VB, prior);
     
     // sample aux_B
     // Rcout << "befor aux_B" << endl;
-    aux_B_tmp         = aux_B;
-    aux_B_tmp         = sample_B_mss_boost(aux_B, aux_A, aux_hyper, aux_sigma, aux_xi, Y, X, prior, VB);
-    aux_B             = aux_B_tmp;
+    aux_B             = sample_B_mss_boost(aux_B, aux_A, aux_hyper, aux_sigma, aux_xi, Y, X, prior, VB);
     
     // sample aux_A
     // Rcout << "befor aux_A" << endl;
-    aux_A_tmp         = aux_A;
-    aux_A_tmp         = sample_A_heterosk1_mss_boost(aux_A, aux_B, aux_xi, aux_hyper, aux_sigma, Y, X, prior);
-    aux_A             = aux_A_tmp;
+    aux_A             = sample_A_heterosk1_mss_boost(aux_A, aux_B, aux_xi, aux_hyper, aux_sigma, Y, X, prior);
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
     // Rcout << "befor aux_sv" << endl;
@@ -150,35 +147,34 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
       rowvec  h_tmp     = aux_h.row(n);
       double  rho_tmp   = aux_rho(n);
       rowvec  omega_tmp = aux_omega.row(n);
-      rowvec  sigma_v2_tmp = square(aux_omega.row(n));
+      rowvec  sigma2v_tmp = square(aux_omega.row(n));
       urowvec S_tmp     = aux_S.row(n);
       rowvec  U_tmp     = U.row(n);
       double  s2o_tmp   = aux_sigma2_omega(n);
       double  s_n       = aux_s_(n);
       
-      sv_n_tmp          = List::create(
-        _["aux_h_n"]              = h_tmp,
-        _["aux_rho_n"]            = rho_tmp,
-        _["aux_omega_n"]          = omega_tmp,
-        _["aux_sigma2_omega_n"]   = s2o_tmp,
-        _["aux_s_n"]              = s_n,
-        _["aux_S_n"]              = S_tmp
-      );
+      if ( centred_sv ) {
+        sv_n              = svar_ce1_mss( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior, true);
+      } else {
+        sv_n              = svar_nc1_mss( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior, true);
+      }
       
-      sv_n_tmp          = svar_nc1_mss( h_tmp, rho_tmp, omega_tmp, sigma_v2_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior);
-      
-      List  sv_n        = sv_n_tmp;
       aux_h.row(n)      = as<rowvec>(sv_n["aux_h_n"]);
       aux_rho(n)        = as<double>(sv_n["aux_rho_n"]);
       aux_omega.row(n)  = as<rowvec>(sv_n["aux_omega_n"]);
+      aux_sigma2v.row(n) = as<rowvec>(sv_n["aux_sigma2v_n"]);
       aux_S.row(n)      = as<urowvec>(sv_n["aux_S_n"]);
       aux_sigma2_omega(n)         = as<double>(sv_n["aux_sigma2_omega_n"]);
       aux_s_(n)         = as<double>(sv_n["aux_s_n"]);
       
-      for (int t=0; t<T; t++){
-        omega_T_n(t)    = aux_omega(n, aux_xi.col(t).index_max());
+      if ( centred_sv ) {
+        aux_sigma.row(n) = exp(0.5 * aux_h.row(n));
+      } else {
+        for (int t=0; t<T; t++){
+          omega_T_n(t)    = aux_omega(n, aux_xi.col(t).index_max());
+        }
+        aux_sigma.row(n) = exp(0.5 * (aux_h.row(n) % omega_T_n));
       }
-      aux_sigma.row(n)  = exp(0.5 * (aux_h.row(n) % omega_T_n));
     } // END n loop
     
     if (ss % thin == 0) {
@@ -191,6 +187,7 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
       posterior_h.slice(s)          = aux_h;
       posterior_rho.col(s)          = aux_rho;
       posterior_omega.slice(s)      = aux_omega;
+      posterior_sigma2v.slice(s)    = aux_sigma2v;
       posterior_S.slice(s)          = aux_S;
       posterior_sigma2_omega.col(s) = aux_sigma2_omega;
       posterior_s_.col(s)           = aux_s_;
@@ -210,6 +207,7 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
       _["h"]        = aux_h,
       _["rho"]      = aux_rho,
       _["omega"]    = aux_omega,
+      _["sigma2v"]  = aux_sigma2v,
       _["S"]        = aux_S,
       _["sigma2_omega"] = aux_sigma2_omega,
       _["s_"]       = aux_s_,
@@ -225,6 +223,7 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
       _["h"]        = posterior_h,
       _["rho"]      = posterior_rho,
       _["omega"]    = posterior_omega,
+      _["sigma2v"]  = posterior_sigma2v,
       _["S"]        = posterior_S,
       _["sigma2_omega"] = posterior_sigma2_omega,
       _["s_"]        = posterior_s_,
