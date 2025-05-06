@@ -1846,13 +1846,14 @@ RcppExport SEXP _bsvarTVPs_svar_nc1(SEXP aux_h_nSEXP, SEXP aux_rho_nSEXP, SEXP a
     return rcpp_result_gen;
 }
 // svar_nc1_mss
-Rcpp::List svar_nc1_mss(arma::rowvec& aux_h_n, double& aux_rho_n, arma::rowvec& aux_omega_n, double& aux_sigma2_omega_n, double& aux_s_n, arma::urowvec& aux_S_n, const arma::mat& aux_xi, const arma::rowvec& u, const Rcpp::List& prior, bool sample_s_);
-static SEXP _bsvarTVPs_svar_nc1_mss_try(SEXP aux_h_nSEXP, SEXP aux_rho_nSEXP, SEXP aux_omega_nSEXP, SEXP aux_sigma2_omega_nSEXP, SEXP aux_s_nSEXP, SEXP aux_S_nSEXP, SEXP aux_xiSEXP, SEXP uSEXP, SEXP priorSEXP, SEXP sample_s_SEXP) {
+Rcpp::List svar_nc1_mss(arma::rowvec& aux_h_n, double& aux_rho_n, arma::rowvec& aux_omega_n, arma::rowvec& aux_sigma2v_n, double& aux_sigma2_omega_n, double& aux_s_n, arma::urowvec& aux_S_n, const arma::mat& aux_xi, const arma::rowvec& u, const Rcpp::List& prior, bool sample_s_);
+static SEXP _bsvarTVPs_svar_nc1_mss_try(SEXP aux_h_nSEXP, SEXP aux_rho_nSEXP, SEXP aux_omega_nSEXP, SEXP aux_sigma2v_nSEXP, SEXP aux_sigma2_omega_nSEXP, SEXP aux_s_nSEXP, SEXP aux_S_nSEXP, SEXP aux_xiSEXP, SEXP uSEXP, SEXP priorSEXP, SEXP sample_s_SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< arma::rowvec& >::type aux_h_n(aux_h_nSEXP);
     Rcpp::traits::input_parameter< double& >::type aux_rho_n(aux_rho_nSEXP);
     Rcpp::traits::input_parameter< arma::rowvec& >::type aux_omega_n(aux_omega_nSEXP);
+    Rcpp::traits::input_parameter< arma::rowvec& >::type aux_sigma2v_n(aux_sigma2v_nSEXP);
     Rcpp::traits::input_parameter< double& >::type aux_sigma2_omega_n(aux_sigma2_omega_nSEXP);
     Rcpp::traits::input_parameter< double& >::type aux_s_n(aux_s_nSEXP);
     Rcpp::traits::input_parameter< arma::urowvec& >::type aux_S_n(aux_S_nSEXP);
@@ -1860,15 +1861,102 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::rowvec& >::type u(uSEXP);
     Rcpp::traits::input_parameter< const Rcpp::List& >::type prior(priorSEXP);
     Rcpp::traits::input_parameter< bool >::type sample_s_(sample_s_SEXP);
-    rcpp_result_gen = Rcpp::wrap(svar_nc1_mss(aux_h_n, aux_rho_n, aux_omega_n, aux_sigma2_omega_n, aux_s_n, aux_S_n, aux_xi, u, prior, sample_s_));
+    rcpp_result_gen = Rcpp::wrap(svar_nc1_mss(aux_h_n, aux_rho_n, aux_omega_n, aux_sigma2v_n, aux_sigma2_omega_n, aux_s_n, aux_S_n, aux_xi, u, prior, sample_s_));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _bsvarTVPs_svar_nc1_mss(SEXP aux_h_nSEXP, SEXP aux_rho_nSEXP, SEXP aux_omega_nSEXP, SEXP aux_sigma2_omega_nSEXP, SEXP aux_s_nSEXP, SEXP aux_S_nSEXP, SEXP aux_xiSEXP, SEXP uSEXP, SEXP priorSEXP, SEXP sample_s_SEXP) {
+RcppExport SEXP _bsvarTVPs_svar_nc1_mss(SEXP aux_h_nSEXP, SEXP aux_rho_nSEXP, SEXP aux_omega_nSEXP, SEXP aux_sigma2v_nSEXP, SEXP aux_sigma2_omega_nSEXP, SEXP aux_s_nSEXP, SEXP aux_S_nSEXP, SEXP aux_xiSEXP, SEXP uSEXP, SEXP priorSEXP, SEXP sample_s_SEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_svar_nc1_mss_try(aux_h_nSEXP, aux_rho_nSEXP, aux_omega_nSEXP, aux_sigma2_omega_nSEXP, aux_s_nSEXP, aux_S_nSEXP, aux_xiSEXP, uSEXP, priorSEXP, sample_s_SEXP));
+        rcpp_result_gen = PROTECT(_bsvarTVPs_svar_nc1_mss_try(aux_h_nSEXP, aux_rho_nSEXP, aux_omega_nSEXP, aux_sigma2v_nSEXP, aux_sigma2_omega_nSEXP, aux_s_nSEXP, aux_S_nSEXP, aux_xiSEXP, uSEXP, priorSEXP, sample_s_SEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// svar_ce1
+Rcpp::List svar_ce1(arma::rowvec& aux_h_n, double& aux_rho_n, double& aux_omega_n, double& aux_sigma2v_n, double& aux_sigma2_omega_n, double& aux_s_n, arma::urowvec& aux_S_n, const arma::rowvec& u, const Rcpp::List& prior, bool sample_s_);
+static SEXP _bsvarTVPs_svar_ce1_try(SEXP aux_h_nSEXP, SEXP aux_rho_nSEXP, SEXP aux_omega_nSEXP, SEXP aux_sigma2v_nSEXP, SEXP aux_sigma2_omega_nSEXP, SEXP aux_s_nSEXP, SEXP aux_S_nSEXP, SEXP uSEXP, SEXP priorSEXP, SEXP sample_s_SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< arma::rowvec& >::type aux_h_n(aux_h_nSEXP);
+    Rcpp::traits::input_parameter< double& >::type aux_rho_n(aux_rho_nSEXP);
+    Rcpp::traits::input_parameter< double& >::type aux_omega_n(aux_omega_nSEXP);
+    Rcpp::traits::input_parameter< double& >::type aux_sigma2v_n(aux_sigma2v_nSEXP);
+    Rcpp::traits::input_parameter< double& >::type aux_sigma2_omega_n(aux_sigma2_omega_nSEXP);
+    Rcpp::traits::input_parameter< double& >::type aux_s_n(aux_s_nSEXP);
+    Rcpp::traits::input_parameter< arma::urowvec& >::type aux_S_n(aux_S_nSEXP);
+    Rcpp::traits::input_parameter< const arma::rowvec& >::type u(uSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type prior(priorSEXP);
+    Rcpp::traits::input_parameter< bool >::type sample_s_(sample_s_SEXP);
+    rcpp_result_gen = Rcpp::wrap(svar_ce1(aux_h_n, aux_rho_n, aux_omega_n, aux_sigma2v_n, aux_sigma2_omega_n, aux_s_n, aux_S_n, u, prior, sample_s_));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _bsvarTVPs_svar_ce1(SEXP aux_h_nSEXP, SEXP aux_rho_nSEXP, SEXP aux_omega_nSEXP, SEXP aux_sigma2v_nSEXP, SEXP aux_sigma2_omega_nSEXP, SEXP aux_s_nSEXP, SEXP aux_S_nSEXP, SEXP uSEXP, SEXP priorSEXP, SEXP sample_s_SEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_bsvarTVPs_svar_ce1_try(aux_h_nSEXP, aux_rho_nSEXP, aux_omega_nSEXP, aux_sigma2v_nSEXP, aux_sigma2_omega_nSEXP, aux_s_nSEXP, aux_S_nSEXP, uSEXP, priorSEXP, sample_s_SEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// svar_ce1_mss
+Rcpp::List svar_ce1_mss(arma::rowvec& aux_h_n, double& aux_rho_n, arma::rowvec& aux_omega_n, arma::rowvec& aux_sigma2v_n, double& aux_sigma2_omega_n, double& aux_s_n, arma::urowvec& aux_S_n, const arma::mat& aux_xi, const arma::rowvec& u, const Rcpp::List& prior, bool sample_s_);
+static SEXP _bsvarTVPs_svar_ce1_mss_try(SEXP aux_h_nSEXP, SEXP aux_rho_nSEXP, SEXP aux_omega_nSEXP, SEXP aux_sigma2v_nSEXP, SEXP aux_sigma2_omega_nSEXP, SEXP aux_s_nSEXP, SEXP aux_S_nSEXP, SEXP aux_xiSEXP, SEXP uSEXP, SEXP priorSEXP, SEXP sample_s_SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< arma::rowvec& >::type aux_h_n(aux_h_nSEXP);
+    Rcpp::traits::input_parameter< double& >::type aux_rho_n(aux_rho_nSEXP);
+    Rcpp::traits::input_parameter< arma::rowvec& >::type aux_omega_n(aux_omega_nSEXP);
+    Rcpp::traits::input_parameter< arma::rowvec& >::type aux_sigma2v_n(aux_sigma2v_nSEXP);
+    Rcpp::traits::input_parameter< double& >::type aux_sigma2_omega_n(aux_sigma2_omega_nSEXP);
+    Rcpp::traits::input_parameter< double& >::type aux_s_n(aux_s_nSEXP);
+    Rcpp::traits::input_parameter< arma::urowvec& >::type aux_S_n(aux_S_nSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type aux_xi(aux_xiSEXP);
+    Rcpp::traits::input_parameter< const arma::rowvec& >::type u(uSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type prior(priorSEXP);
+    Rcpp::traits::input_parameter< bool >::type sample_s_(sample_s_SEXP);
+    rcpp_result_gen = Rcpp::wrap(svar_ce1_mss(aux_h_n, aux_rho_n, aux_omega_n, aux_sigma2v_n, aux_sigma2_omega_n, aux_s_n, aux_S_n, aux_xi, u, prior, sample_s_));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _bsvarTVPs_svar_ce1_mss(SEXP aux_h_nSEXP, SEXP aux_rho_nSEXP, SEXP aux_omega_nSEXP, SEXP aux_sigma2v_nSEXP, SEXP aux_sigma2_omega_nSEXP, SEXP aux_s_nSEXP, SEXP aux_S_nSEXP, SEXP aux_xiSEXP, SEXP uSEXP, SEXP priorSEXP, SEXP sample_s_SEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_bsvarTVPs_svar_ce1_mss_try(aux_h_nSEXP, aux_rho_nSEXP, aux_omega_nSEXP, aux_sigma2v_nSEXP, aux_sigma2_omega_nSEXP, aux_s_nSEXP, aux_S_nSEXP, aux_xiSEXP, uSEXP, priorSEXP, sample_s_SEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -2318,7 +2406,9 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
         signatures.insert("arma::vec(*backward_algorithm)(const arma::vec&,const arma::vec&,const arma::vec&)");
         signatures.insert("arma::vec(*precision_sampler_ar1)(const arma::vec&,const double&,const arma::vec&)");
         signatures.insert("Rcpp::List(*svar_nc1)(arma::rowvec,double,double,double,double,double,arma::urowvec,const arma::rowvec&,const Rcpp::List&,bool)");
-        signatures.insert("Rcpp::List(*svar_nc1_mss)(arma::rowvec&,double&,arma::rowvec&,double&,double&,arma::urowvec&,const arma::mat&,const arma::rowvec&,const Rcpp::List&,bool)");
+        signatures.insert("Rcpp::List(*svar_nc1_mss)(arma::rowvec&,double&,arma::rowvec&,arma::rowvec&,double&,double&,arma::urowvec&,const arma::mat&,const arma::rowvec&,const Rcpp::List&,bool)");
+        signatures.insert("Rcpp::List(*svar_ce1)(arma::rowvec&,double&,double&,double&,double&,double&,arma::urowvec&,const arma::rowvec&,const Rcpp::List&,bool)");
+        signatures.insert("Rcpp::List(*svar_ce1_mss)(arma::rowvec&,double&,arma::rowvec&,arma::rowvec&,double&,double&,arma::urowvec&,const arma::mat&,const arma::rowvec&,const Rcpp::List&,bool)");
         signatures.insert("arma::mat(*count_regime_transitions)(const arma::mat&)");
         signatures.insert("arma::rowvec(*rDirichlet1)(const arma::rowvec&)");
         signatures.insert("arma::mat(*filtering)(const arma::cube&,const arma::mat&,const arma::vec&)");
@@ -2384,6 +2474,8 @@ RcppExport SEXP _bsvarTVPs_RcppExport_registerCCallable() {
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_precision_sampler_ar1", (DL_FUNC)_bsvarTVPs_precision_sampler_ar1_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_svar_nc1", (DL_FUNC)_bsvarTVPs_svar_nc1_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_svar_nc1_mss", (DL_FUNC)_bsvarTVPs_svar_nc1_mss_try);
+    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_svar_ce1", (DL_FUNC)_bsvarTVPs_svar_ce1_try);
+    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_svar_ce1_mss", (DL_FUNC)_bsvarTVPs_svar_ce1_mss_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_count_regime_transitions", (DL_FUNC)_bsvarTVPs_count_regime_transitions_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_rDirichlet1", (DL_FUNC)_bsvarTVPs_rDirichlet1_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_filtering", (DL_FUNC)_bsvarTVPs_filtering_try);
@@ -2447,7 +2539,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bsvarTVPs_backward_algorithm", (DL_FUNC) &_bsvarTVPs_backward_algorithm, 3},
     {"_bsvarTVPs_precision_sampler_ar1", (DL_FUNC) &_bsvarTVPs_precision_sampler_ar1, 3},
     {"_bsvarTVPs_svar_nc1", (DL_FUNC) &_bsvarTVPs_svar_nc1, 10},
-    {"_bsvarTVPs_svar_nc1_mss", (DL_FUNC) &_bsvarTVPs_svar_nc1_mss, 10},
+    {"_bsvarTVPs_svar_nc1_mss", (DL_FUNC) &_bsvarTVPs_svar_nc1_mss, 11},
+    {"_bsvarTVPs_svar_ce1", (DL_FUNC) &_bsvarTVPs_svar_ce1, 10},
+    {"_bsvarTVPs_svar_ce1_mss", (DL_FUNC) &_bsvarTVPs_svar_ce1_mss, 11},
     {"_bsvarTVPs_count_regime_transitions", (DL_FUNC) &_bsvarTVPs_count_regime_transitions, 1},
     {"_bsvarTVPs_rDirichlet1", (DL_FUNC) &_bsvarTVPs_rDirichlet1, 1},
     {"_bsvarTVPs_filtering", (DL_FUNC) &_bsvarTVPs_filtering, 3},
