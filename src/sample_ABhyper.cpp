@@ -618,6 +618,7 @@ arma::mat sample_A_heterosk1_mss_boost (
   }
   
   for (int n=0; n<N; n++) {
+    Rcout << " AR equation: " << n + 1 << endl;
     mat   A0          = aux_A;
     A0.row(n)         = zerosA;
     vec   zn          = vectorise( aux_B.slice(0) * (YM(0) - A0 * XM(0)) );
