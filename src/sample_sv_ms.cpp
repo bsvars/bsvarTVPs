@@ -815,7 +815,7 @@ arma::mat sample_Markov_process_mss (
     } // END while
     if ( iterations<max_iterations ) aux_xi_out = aux_xi_tmp;
   }
-  Rcout << "   regime occurrences: " << sum(aux_xi_out, 1) << endl;
+  
   return aux_xi_out;
 } // END sample_Markov_process_mss
 

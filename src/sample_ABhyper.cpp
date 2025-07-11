@@ -196,6 +196,7 @@ arma::mat sample_B_heterosk1_boost (
   
   for (int n=0; n<N; n++) {
     
+    Rcout << " structural equation: " << n + 1 << endl;
     // set scale matrix
     mat shocks_sigma        = shocks.each_row() / aux_sigma.row(n);
     mat posterior_SS_inv    = pow(aux_hyper(n, 0), -1) * prior_SS_inv + shocks_sigma * shocks_sigma.t();
@@ -203,10 +204,23 @@ arma::mat sample_B_heterosk1_boost (
     posterior_S_inv         = 0.5*( posterior_S_inv + posterior_S_inv.t() );
     
     // sample B
-    Rcout << " B: inv_sympd " << endl;
-    mat posterior_S         = inv_sympd(posterior_S_inv);
-    Rcout << " B: chol " << endl;
-    mat Un                  = chol(posterior_nu * posterior_S);
+    mat posterior_S(size(posterior_S_inv));
+    mat Un(size(posterior_S_inv));
+    
+    try {
+      posterior_S           = inv_sympd(posterior_S_inv);
+    } catch (std::runtime_error &e) {
+      Rcout << "   B Inversion failure " << endl;
+      continue; 
+    }
+    
+    try {
+      Un                    = chol(posterior_nu * posterior_S);
+    } catch (std::runtime_error &e) {
+      Rcout << "   B Cholesky failure " << endl;
+      continue; 
+    }
+    
     mat B_tmp               = aux_B;
     B_tmp.shed_row(n);
     rowvec w                = trans(orthogonal_complement_matrix_TW(B_tmp.t()));
