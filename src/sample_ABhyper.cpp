@@ -274,6 +274,7 @@ arma::cube sample_B_mss_boost (
         ii++;
       }
     }
+    Rcout << " pow(aux_hyper.col(0).rows(0,19),-1): " << pow(aux_hyper.col(0).rows(0,19),-1) << endl;
     aux_B.slice(m)    = sample_B_heterosk1_boost(aux_B.slice(m), aux_A, aux_hyper, aux_sigma_m, Y_m, X_m, prior, VB);
   }
   
@@ -634,6 +635,7 @@ arma::mat sample_A_heterosk1_mss_boost (
     mat   zn_sigma    = zn / Sn;
     mat   Wn_sigma    = Wn.each_col() / Sn;
     
+    Rcout << " pow(aux_hyper(n, 1), -1): " << pow(aux_hyper(n, 1), -1) << endl;
     mat     precision = pow(aux_hyper(n, 1), -1) * prior_A_V_inv + trans(Wn_sigma) * Wn_sigma;
     precision         = 0.5 * (precision + precision.t());
     rowvec  location  = prior_A_mean.row(n) * pow(aux_hyper(n, 1), -1) * prior_A_V_inv + trans(zn_sigma) * Wn_sigma;
