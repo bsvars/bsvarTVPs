@@ -203,7 +203,10 @@ arma::mat sample_B_heterosk1_boost (
     posterior_S_inv         = 0.5*( posterior_S_inv + posterior_S_inv.t() );
     
     // sample B
-    mat Un                  = chol(posterior_nu * inv_sympd(posterior_S_inv));
+    Rcout << " B: inv_sympd " << endl;
+    mat posterior_S         = inv_sympd(posterior_S_inv);
+    Rcout << " B: chol " << endl;
+    mat Un                  = chol(posterior_nu * posterior_S);
     mat B_tmp               = aux_B;
     B_tmp.shed_row(n);
     rowvec w                = trans(orthogonal_complement_matrix_TW(B_tmp.t()));
@@ -274,7 +277,7 @@ arma::cube sample_B_mss_boost (
         ii++;
       }
     }
-    Rcout << " pow(aux_hyper.col(0).rows(0,19),-1): " << pow(aux_hyper.col(0).rows(0,19),-1) << endl;
+    
     aux_B.slice(m)    = sample_B_heterosk1_boost(aux_B.slice(m), aux_A, aux_hyper, aux_sigma_m, Y_m, X_m, prior, VB);
   }
   
@@ -635,7 +638,7 @@ arma::mat sample_A_heterosk1_mss_boost (
     mat   zn_sigma    = zn / Sn;
     mat   Wn_sigma    = Wn.each_col() / Sn;
     
-    Rcout << " pow(aux_hyper(n, 1), -1): " << pow(aux_hyper(n, 1), -1) << endl;
+    // Rcout << " pow(aux_hyper(n, 1), -1): " << pow(aux_hyper(n, 1), -1) << endl;
     mat     precision = pow(aux_hyper(n, 1), -1) * prior_A_V_inv + trans(Wn_sigma) * Wn_sigma;
     precision         = 0.5 * (precision + precision.t());
     rowvec  location  = prior_A_mean.row(n) * pow(aux_hyper(n, 1), -1) * prior_A_V_inv + trans(zn_sigma) * Wn_sigma;
