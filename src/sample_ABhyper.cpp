@@ -637,7 +637,13 @@ arma::mat sample_A_heterosk1_mss_boost (
     precision         = 0.5 * (precision + precision.t());
     rowvec  location  = prior_A_mean.row(n) * pow(aux_hyper(n, 1), -1) * prior_A_V_inv + trans(zn_sigma) * Wn_sigma;
     
-    mat     precision_chol = trimatu(chol(precision));
+    mat     precision_chol(size(precision));
+    try {
+      precision_chol = trimatu(chol(precision));
+    } catch (std::runtime_error &e) {
+      Rcout << "   Cholesky failure " << endl;
+      continue; 
+    }
     vec     draw      = solve(precision_chol, 
                               solve(trans(precision_chol), trans(location)) + as<vec>(rnorm(K)));
     aux_A.row(n)      = trans(draw);
