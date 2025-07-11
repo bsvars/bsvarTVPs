@@ -781,7 +781,6 @@ arma::mat sample_Markov_process_mss (
     Z.slice(m)    = pow(aux_sigma, -1) % (aux_B.slice(m) * E);
   }
   
-  Rcout << "a" << endl;
   mat filtered    = filtering(Z, aux_PR_TR, aux_pi_0);
   mat smoothed    = smoothing(filtered, aux_PR_TR);
   mat    aj       = eye(M, M);
@@ -790,12 +789,10 @@ arma::mat sample_Markov_process_mss (
   // Rcout << "aux_B: " << aux_B << endl;
   // Rcout << "aux_sigma: " << aux_sigma << endl;
   
-  Rcout << "b" << endl;
   mat xi(M, T);
   int draw        = csample_num1(wrap(seq_len(M)), wrap(smoothed.col(T-1)));
   aux_xi_tmp.col(T-1)     = aj.col(draw-1);
   
-  Rcout << "c" << endl;
   if ( minimum_regime_occurrences==0 ) {
     for (int t=T-2; t>=0; --t) {
       vec xi_Tmj    = (aux_PR_TR * (aux_xi.col(t+1)/(aux_PR_TR.t() * filtered.col(t)))) % filtered.col(t);
@@ -818,7 +815,7 @@ arma::mat sample_Markov_process_mss (
     } // END while
     if ( iterations<max_iterations ) aux_xi_out = aux_xi_tmp;
   }
-  
+  Rcout << "   regime occurrences: " << sum(aux_xi_out, 1) << endl;
   return aux_xi_out;
 } // END sample_Markov_process_mss
 

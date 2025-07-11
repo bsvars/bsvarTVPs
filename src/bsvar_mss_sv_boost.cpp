@@ -102,7 +102,7 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
   
   // Rcout << "befor loop" << endl;
   for (int ss=0; ss<SS; ss++) {
-    
+    Rcout << "ss: " << ss << endl;
     // Increment progress bar
     if (any(prog_rep_points == ss)) p.increment();
     // Check for user interrupts
