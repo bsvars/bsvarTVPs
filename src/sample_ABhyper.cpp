@@ -1030,26 +1030,26 @@ arma::mat sample_hyperparameters_mss_boost (
     int rn            = VB(n).n_rows;
     
     // aux_B - related hyper-parameters 
-    scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 0))) + (1 / aux_hyper(2 * N, 0)));
-    shape_tmp         = prior_hyper_a_B + prior_hyper_nu_B / 2;
-    aux_hyper(N + n, 0) = R::rgamma(shape_tmp, scale_tmp);
-    
-    double BVB        = 0;
-    for (int m=0; m<M; m++) {
-      rowvec  Bnm     = aux_B.subcube(n, 0, m, n, N - 1, m);
-      BVB            += as_scalar(Bnm * prior_B_V_inv * Bnm.t());
-    }
-    scale_tmp         = aux_hyper(N + n, 0) + BVB;
+    // scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 0))) + (1 / aux_hyper(2 * N, 0)));
+    // shape_tmp         = prior_hyper_a_B + prior_hyper_nu_B / 2;
+    // aux_hyper(N + n, 0) = R::rgamma(shape_tmp, scale_tmp);
+    // 
+    // double BVB        = 0;
+    // for (int m=0; m<M; m++) {
+    //   rowvec  Bnm     = aux_B.subcube(n, 0, m, n, N - 1, m);
+    //   BVB            += as_scalar(Bnm * prior_B_V_inv * Bnm.t());
+    // }
+    // scale_tmp         = aux_hyper(N + n, 0) + BVB;
     shape_tmp         = prior_hyper_nu_B + M * rn;
     aux_hyper(n, 0)   = scale_tmp / R::rchisq(shape_tmp);
     
     // aux_A - related hyper-parameters 
-    scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 1))) + (1 / aux_hyper(2 * N, 1)));
-    shape_tmp         = prior_hyper_a_A + prior_hyper_nu_A / 2;
-    aux_hyper(N + n, 1) = R::rgamma(shape_tmp, scale_tmp);
-    
-    scale_tmp         = aux_hyper(N + n, 1) + 
-      as_scalar((aux_A.row(n) - prior_A.row(n)) * prior_A_V_inv * trans(aux_A.row(n) - prior_A.row(n)));
+    // scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 1))) + (1 / aux_hyper(2 * N, 1)));
+    // shape_tmp         = prior_hyper_a_A + prior_hyper_nu_A / 2;
+    // aux_hyper(N + n, 1) = R::rgamma(shape_tmp, scale_tmp);
+    // 
+    // scale_tmp         = aux_hyper(N + n, 1) + 
+    //   as_scalar((aux_A.row(n) - prior_A.row(n)) * prior_A_V_inv * trans(aux_A.row(n) - prior_A.row(n)));
     shape_tmp         = prior_hyper_nu_A + K;
     aux_hyper(n, 1)   = scale_tmp / R::rchisq(shape_tmp);
   }
