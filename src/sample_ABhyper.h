@@ -190,7 +190,8 @@ arma::mat sample_hyperparameter_boost_s4 (
     const arma::mat&        aux_A,
     const arma::field<arma::mat>& VB,
     const arma::ivec&       aux_SL,         // Nx1 row-specific S4 indicators
-    const Rcpp::List&       prior
+    const Rcpp::List&       prior,
+    const bool              hyper_boost = true
 );
 
 
@@ -199,7 +200,8 @@ arma::mat sample_hyperparameters_mss_boost (
     const arma::cube&       aux_B,            // NxNxM
     const arma::mat&        aux_A,
     const arma::field<arma::mat>& VB,
-    const Rcpp::List&       prior
+    const Rcpp::List&       prior,
+    const bool              hyper_boost = true
 );
 
 
@@ -209,7 +211,8 @@ arma::mat sample_hyperparameters_mss_s4_boost (
     const arma::mat&        aux_A,
     const arma::field<arma::mat>& VB,
     const arma::imat&       aux_SL,         // NxM row-specific S4 indicators
-    const Rcpp::List&       prior
+    const Rcpp::List&       prior,
+    const bool              hyper_boost = true
 );
 
 
@@ -219,7 +222,8 @@ arma::mat sample_hyperparameters_mssa_s4_boost (
     const arma::cube&       aux_A,            // NxKxM
     const arma::field<arma::mat>& VB,
     const arma::imat&       aux_SL,         // NxM row-specific S4 indicators
-    const Rcpp::List&       prior
+    const Rcpp::List&       prior,
+    const bool              hyper_boost = true
 );
 
 

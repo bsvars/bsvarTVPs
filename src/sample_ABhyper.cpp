@@ -911,7 +911,8 @@ arma::mat sample_hyperparameter_boost_s4 (
     const arma::mat&        aux_A,
     const arma::field<arma::mat>& VB,
     const arma::ivec&       aux_SL,         // Nx1 row-specific S4 indicators
-    const Rcpp::List&       prior
+    const Rcpp::List&       prior,
+    const bool              hyper_boost = true
 ) {
   // the function draws the value of aux_hyper
   const int N = aux_B.n_rows;
@@ -938,15 +939,19 @@ arma::mat sample_hyperparameter_boost_s4 (
   
   // aux_B - related hyper-parameters 
   vec     ss_tmp      = aux_hyper.submat(N, 0, 2 * N - 1, 0);
-  double  scale_tmp   = prior_hyper_s_BB + 2 * sum(ss_tmp);
-  double  shape_tmp   = prior_hyper_nu_BB + 2 * N * prior_hyper_a_B;
-  aux_hyper(2 * N, 0) = scale_tmp / R::rchisq(shape_tmp);
+  double  BB_scale_tmp   = prior_hyper_s_BB + 2 * sum(ss_tmp);
+  double  BB_shape_tmp   = prior_hyper_nu_BB + 2 * N * prior_hyper_a_B;
+  if ( hyper_boost ) {
+    aux_hyper(2 * N, 0) = BB_scale_tmp / R::rchisq(BB_shape_tmp);
+  }
   
   // aux_A - related hyper-parameters 
   ss_tmp              = aux_hyper.submat(N, 1, 2 * N - 1, 1);
-  scale_tmp           = prior_hyper_s_AA + 2 * sum(ss_tmp);
-  shape_tmp           = prior_hyper_nu_AA + 2 * N * prior_hyper_a_A;
-  aux_hyper(2 * N, 1) = scale_tmp / R::rchisq(shape_tmp);
+  double AA_scale_tmp = prior_hyper_s_AA + 2 * sum(ss_tmp);
+  double AA_shape_tmp           = prior_hyper_nu_AA + 2 * N * prior_hyper_a_A;
+  if ( hyper_boost ) {
+    aux_hyper(2 * N, 1) = AA_scale_tmp / R::rchisq(AA_shape_tmp);
+  }
   
   for (int n=0; n<N; n++) {
     
@@ -958,24 +963,28 @@ arma::mat sample_hyperparameter_boost_s4 (
     rn(n)         = VB(ll).n_rows;
     
     // aux_B - related hyper-parameters 
-    scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 0))) + (1 / aux_hyper(2 * N, 0)));
-    shape_tmp         = prior_hyper_a_B + prior_hyper_nu_B / 2;
-    aux_hyper(N + n, 0) = R::rgamma(shape_tmp, scale_tmp);
+    if ( hyper_boost ) {
+      BB_scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 0))) + (1 / aux_hyper(2 * N, 0)));
+      BB_shape_tmp         = prior_hyper_a_B + prior_hyper_nu_B / 2;
+      aux_hyper(N + n, 0) = R::rgamma(BB_shape_tmp, BB_scale_tmp);
+    }
     
-    scale_tmp         = aux_hyper(N + n, 0) + 
+    BB_scale_tmp         = aux_hyper(N + n, 0) + 
       as_scalar(aux_B.row(n) * prior_B_V_inv * trans(aux_B.row(n)));
-    shape_tmp         = prior_hyper_nu_B + rn(n);
-    aux_hyper(n, 0)   = scale_tmp / R::rchisq(shape_tmp);
+    BB_shape_tmp         = prior_hyper_nu_B + rn(n);
+    aux_hyper(n, 0)   = BB_scale_tmp / R::rchisq(BB_shape_tmp);
     
     // aux_A - related hyper-parameters 
-    scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 1))) + (1 / aux_hyper(2 * N, 1)));
-    shape_tmp         = prior_hyper_a_A + prior_hyper_nu_A / 2;
-    aux_hyper(N + n, 1) = R::rgamma(shape_tmp, scale_tmp);
+    if ( hyper_boost ) {
+      AA_scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 1))) + (1 / aux_hyper(2 * N, 1)));
+      AA_shape_tmp         = prior_hyper_a_A + prior_hyper_nu_A / 2;
+      aux_hyper(N + n, 1) = R::rgamma(AA_shape_tmp, AA_scale_tmp);
+    }
     
-    scale_tmp         = aux_hyper(N + n, 1) + 
+    AA_scale_tmp         = aux_hyper(N + n, 1) + 
       as_scalar((aux_A.row(n) - prior_A.row(n)) * prior_A_V_inv * trans(aux_A.row(n) - prior_A.row(n)));
-    shape_tmp         = prior_hyper_nu_A + K;
-    aux_hyper(n, 1)   = scale_tmp / R::rchisq(shape_tmp);
+    AA_shape_tmp         = prior_hyper_nu_A + K;
+    aux_hyper(n, 1)   = AA_scale_tmp / R::rchisq(AA_shape_tmp);
   }
   
   return aux_hyper;
@@ -990,7 +999,8 @@ arma::mat sample_hyperparameters_mss_boost (
     const arma::cube&       aux_B,            // NxNxM
     const arma::mat&        aux_A,
     const arma::field<arma::mat>& VB,
-    const Rcpp::List&       prior
+    const Rcpp::List&       prior,
+    const bool              hyper_boost = true
 ) {
   // the function returns aux_hyper
   
@@ -1015,14 +1025,18 @@ arma::mat sample_hyperparameters_mss_boost (
   // aux_B - related hyper-parameters 
   vec     ss_tmp      = aux_hyper.submat(N, 0, 2 * N - 1, 0);
   double  BB_scale_tmp   = prior_hyper_s_BB + 2 * sum(ss_tmp);
-  double  shape_tmp   = prior_hyper_nu_BB + 2 * N * prior_hyper_a_B;
-  aux_hyper(2 * N, 0) = BB_scale_tmp / R::rchisq(shape_tmp);
+  double  BB_shape_tmp   = prior_hyper_nu_BB + 2 * N * prior_hyper_a_B;
+  if ( hyper_boost ) {
+    aux_hyper(2 * N, 0) = BB_scale_tmp / R::rchisq(BB_shape_tmp);
+  }
   
   // aux_A - related hyper-parameters 
   ss_tmp              = aux_hyper.submat(N, 1, 2 * N - 1, 1);
   double AA_scale_tmp = prior_hyper_s_AA + 2 * sum(ss_tmp);
-  shape_tmp           = prior_hyper_nu_AA + 2 * N * prior_hyper_a_A;
-  aux_hyper(2 * N, 1) = AA_scale_tmp / R::rchisq(shape_tmp);
+  double AA_shape_tmp = prior_hyper_nu_AA + 2 * N * prior_hyper_a_A;
+  if ( hyper_boost ) {
+    aux_hyper(2 * N, 1) = AA_scale_tmp / R::rchisq(AA_shape_tmp);
+  }
   
   for (int n=0; n<N; n++) {
     
@@ -1030,28 +1044,32 @@ arma::mat sample_hyperparameters_mss_boost (
     int rn            = VB(n).n_rows;
     
     // aux_B - related hyper-parameters 
-    // BB_scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 0))) + (1 / aux_hyper(2 * N, 0)));
-    shape_tmp         = prior_hyper_a_B + prior_hyper_nu_B / 2;
-    // aux_hyper(N + n, 0) = R::rgamma(shape_tmp, BB_scale_tmp);
-    // 
-    // double BVB        = 0;
-    // for (int m=0; m<M; m++) {
-    //   rowvec  Bnm     = aux_B.subcube(n, 0, m, n, N - 1, m);
-    //   BVB            += as_scalar(Bnm * prior_B_V_inv * Bnm.t());
-    // }
-    // BB_scale_tmp         = aux_hyper(N + n, 0) + BVB;
-    shape_tmp         = prior_hyper_nu_B + M * rn;
-    aux_hyper(n, 0)   = BB_scale_tmp / R::rchisq(shape_tmp);
+    if ( hyper_boost ) {
+      BB_scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 0))) + (1 / aux_hyper(2 * N, 0)));
+      BB_shape_tmp         = prior_hyper_a_B + prior_hyper_nu_B / 2;
+      aux_hyper(N + n, 0) = R::rgamma(BB_shape_tmp, BB_scale_tmp);
+    }
+    
+    double BVB        = 0;
+    for (int m=0; m<M; m++) {
+      rowvec  Bnm     = aux_B.subcube(n, 0, m, n, N - 1, m);
+      BVB            += as_scalar(Bnm * prior_B_V_inv * Bnm.t());
+    }
+    BB_scale_tmp         = aux_hyper(N + n, 0) + BVB;
+    BB_shape_tmp         = prior_hyper_nu_B + M * rn;
+    aux_hyper(n, 0)   = BB_scale_tmp / R::rchisq(BB_shape_tmp);
     
     // aux_A - related hyper-parameters 
-    // AA_scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 1))) + (1 / aux_hyper(2 * N, 1)));
-    shape_tmp         = prior_hyper_a_A + prior_hyper_nu_A / 2;
-    // aux_hyper(N + n, 1) = R::rgamma(shape_tmp, AA_scale_tmp);
-    // 
-    // AA_scale_tmp         = aux_hyper(N + n, 1) + 
-    //   as_scalar((aux_A.row(n) - prior_A.row(n)) * prior_A_V_inv * trans(aux_A.row(n) - prior_A.row(n)));
-    shape_tmp         = prior_hyper_nu_A + K;
-    aux_hyper(n, 1)   = AA_scale_tmp / R::rchisq(shape_tmp);
+    if ( hyper_boost ) {
+      AA_scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 1))) + (1 / aux_hyper(2 * N, 1)));
+      AA_shape_tmp         = prior_hyper_a_A + prior_hyper_nu_A / 2;
+      aux_hyper(N + n, 1) = R::rgamma(AA_shape_tmp, AA_scale_tmp);
+    }
+    
+    AA_scale_tmp         = aux_hyper(N + n, 1) +
+      as_scalar((aux_A.row(n) - prior_A.row(n)) * prior_A_V_inv * trans(aux_A.row(n) - prior_A.row(n)));
+    AA_shape_tmp         = prior_hyper_nu_A + K;
+    aux_hyper(n, 1)   = AA_scale_tmp / R::rchisq(AA_shape_tmp);
   }
   
   return aux_hyper;
@@ -1067,7 +1085,8 @@ arma::mat sample_hyperparameters_mss_s4_boost (
     const arma::mat&        aux_A,
     const arma::field<arma::mat>& VB,
     const arma::imat&       aux_SL,         // NxM row-specific S4 indicators
-    const Rcpp::List&       prior
+    const Rcpp::List&       prior,
+    const bool              hyper_boost = true
 ) {
   // the function changes the value of aux_hyper by reference
   const int N = aux_B.n_rows;
@@ -1094,15 +1113,19 @@ arma::mat sample_hyperparameters_mss_s4_boost (
   
   // aux_B - related hyper-parameters 
   vec     ss_tmp      = aux_hyper.submat(N, 0, 2 * N - 1, 0);
-  double  scale_tmp   = prior_hyper_s_BB + 2 * sum(ss_tmp);
-  double  shape_tmp   = prior_hyper_nu_BB + 2 * N * prior_hyper_a_B;
-  aux_hyper(2 * N, 0) = scale_tmp / R::rchisq(shape_tmp);
+  double  BB_scale_tmp   = prior_hyper_s_BB + 2 * sum(ss_tmp);
+  double  BB_shape_tmp   = prior_hyper_nu_BB + 2 * N * prior_hyper_a_B;
+  if ( hyper_boost ) {
+    aux_hyper(2 * N, 0) = BB_scale_tmp / R::rchisq(BB_shape_tmp);
+  }
   
   // aux_A - related hyper-parameters 
   ss_tmp              = aux_hyper.submat(N, 1, 2 * N - 1, 1);
-  scale_tmp           = prior_hyper_s_AA + 2 * sum(ss_tmp);
-  shape_tmp           = prior_hyper_nu_AA + 2 * N * prior_hyper_a_A;
-  aux_hyper(2 * N, 1) = scale_tmp / R::rchisq(shape_tmp);
+  double AA_scale_tmp           = prior_hyper_s_AA + 2 * sum(ss_tmp);
+  double AA_shape_tmp           = prior_hyper_nu_AA + 2 * N * prior_hyper_a_A;
+  if ( hyper_boost ) {
+    aux_hyper(2 * N, 1) = AA_scale_tmp / R::rchisq(AA_shape_tmp);
+  }
   
   for (int n=0; n<N; n++) {
     
@@ -1117,28 +1140,32 @@ arma::mat sample_hyperparameters_mss_s4_boost (
     }
     
     // aux_B - related hyper-parameters 
-    scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 0))) + (1 / aux_hyper(2 * N, 0)));
-    shape_tmp         = prior_hyper_a_B + prior_hyper_nu_B / 2;
-    aux_hyper(N + n, 0) = R::rgamma(shape_tmp, scale_tmp);
+    if ( hyper_boost ) {
+      BB_scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 0))) + (1 / aux_hyper(2 * N, 0)));
+      BB_shape_tmp         = prior_hyper_a_B + prior_hyper_nu_B / 2;
+      aux_hyper(N + n, 0) = R::rgamma(BB_shape_tmp, BB_scale_tmp);
+    }
     
     double BVB        = 0;
     for (int m=0; m<M; m++) {
       rowvec  Bnm     = aux_B.subcube(n, 0, m, n, N - 1, m);
       BVB            += as_scalar(Bnm * prior_B_V_inv * Bnm.t());
     }
-    scale_tmp         = aux_hyper(N + n, 0) + BVB;
-    shape_tmp         = prior_hyper_nu_B + rn;
-    aux_hyper(n, 0)   = scale_tmp / R::rchisq(shape_tmp);
+    BB_scale_tmp         = aux_hyper(N + n, 0) + BVB;
+    BB_shape_tmp         = prior_hyper_nu_B + rn;
+    aux_hyper(n, 0)   = BB_scale_tmp / R::rchisq(BB_shape_tmp);
     
     // aux_A - related hyper-parameters 
-    scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 1))) + (1 / aux_hyper(2 * N, 1)));
-    shape_tmp         = prior_hyper_a_A + prior_hyper_nu_A / 2;
-    aux_hyper(N + n, 1) = R::rgamma(shape_tmp, scale_tmp);
+    if ( hyper_boost ) {
+      AA_scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 1))) + (1 / aux_hyper(2 * N, 1)));
+      AA_shape_tmp         = prior_hyper_a_A + prior_hyper_nu_A / 2;
+      aux_hyper(N + n, 1) = R::rgamma(AA_shape_tmp, AA_scale_tmp);
+    }
     
-    scale_tmp         = aux_hyper(N + n, 1) + 
+    AA_scale_tmp         = aux_hyper(N + n, 1) + 
       as_scalar((aux_A.row(n) - prior_A.row(n)) * prior_A_V_inv * trans(aux_A.row(n) - prior_A.row(n)));
-    shape_tmp         = prior_hyper_nu_A + K;
-    aux_hyper(n, 1)   = scale_tmp / R::rchisq(shape_tmp);
+    AA_shape_tmp         = prior_hyper_nu_A + K;
+    aux_hyper(n, 1)   = AA_scale_tmp / R::rchisq(AA_shape_tmp);
   }
   
   return aux_hyper;
@@ -1154,7 +1181,8 @@ arma::mat sample_hyperparameters_mssa_s4_boost (
     const arma::cube&       aux_A,            // NxKxM
     const arma::field<arma::mat>& VB,
     const arma::imat&       aux_SL,         // NxM row-specific S4 indicators
-    const Rcpp::List&       prior
+    const Rcpp::List&       prior,
+    const bool              hyper_boost = true
 ) {
   // the function changes the value of aux_hyper by reference
   const int N = aux_B.n_rows;
@@ -1182,14 +1210,18 @@ arma::mat sample_hyperparameters_mssa_s4_boost (
   // aux_B - related hyper-parameters 
   vec     ss_tmp      = aux_hyper.submat(N, 0, 2 * N - 1, 0);
   double  BB_scale_tmp  = prior_hyper_s_BB + 2 * sum(ss_tmp);
-  double  shape_tmp   = prior_hyper_nu_BB + 2 * N * prior_hyper_a_B;
-  aux_hyper(2 * N, 0) = BB_scale_tmp / R::rchisq(shape_tmp);
+  double  BB_shape_tmp   = prior_hyper_nu_BB + 2 * N * prior_hyper_a_B;
+  if ( hyper_boost ) {
+    aux_hyper(2 * N, 0) = BB_scale_tmp / R::rchisq(BB_shape_tmp);
+  }
   
   // aux_A - related hyper-parameters 
   ss_tmp              = aux_hyper.submat(N, 1, 2 * N - 1, 1);
   double AA_scale_tmp = prior_hyper_s_AA + 2 * sum(ss_tmp);
-  shape_tmp           = prior_hyper_nu_AA + 2 * N * prior_hyper_a_A;
-  aux_hyper(2 * N, 1) = AA_scale_tmp / R::rchisq(shape_tmp);
+  double AA_shape_tmp = prior_hyper_nu_AA + 2 * N * prior_hyper_a_A;
+  if ( hyper_boost ) {
+    aux_hyper(2 * N, 1) = AA_scale_tmp / R::rchisq(AA_shape_tmp);
+  }
   
   for (int n=0; n<N; n++) {
     
@@ -1204,30 +1236,34 @@ arma::mat sample_hyperparameters_mssa_s4_boost (
     }
     
     // aux_B - related hyper-parameters 
-    // BB_scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 0))) + (1 / aux_hyper(2 * N, 0)));
-    shape_tmp         = prior_hyper_a_B + prior_hyper_nu_B / 2;
-    // aux_hyper(N + n, 0) = R::rgamma(shape_tmp, BB_scale_tmp);
-    // 
-    // double BVB        = 0;
-    // for (int m=0; m<M; m++) {
-    //   rowvec  Bnm     = aux_B.subcube(n, 0, m, n, N - 1, m);
-    //   BVB            += as_scalar(Bnm * prior_B_V_inv * Bnm.t());
-    // }
-    // BB_scale_tmp         = aux_hyper(N + n, 0) + BVB;
-    shape_tmp         = prior_hyper_nu_B + rn;
-    aux_hyper(n, 0)   = BB_scale_tmp / R::rchisq(shape_tmp);
+    if ( hyper_boost ) {
+      BB_scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 0))) + (1 / aux_hyper(2 * N, 0)));
+      BB_shape_tmp         = prior_hyper_a_B + prior_hyper_nu_B / 2;
+      aux_hyper(N + n, 0) = R::rgamma(BB_shape_tmp, BB_scale_tmp);
+    }
+    
+    double BVB        = 0;
+    for (int m=0; m<M; m++) {
+      rowvec  Bnm     = aux_B.subcube(n, 0, m, n, N - 1, m);
+      BVB            += as_scalar(Bnm * prior_B_V_inv * Bnm.t());
+    }
+    BB_scale_tmp         = aux_hyper(N + n, 0) + BVB;
+    BB_shape_tmp         = prior_hyper_nu_B + rn;
+    aux_hyper(n, 0)   = BB_scale_tmp / R::rchisq(BB_shape_tmp);
     
     // aux_A - related hyper-parameters 
-    // AA_scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 1))) + (1 / aux_hyper(2 * N, 1)));
-    shape_tmp         = prior_hyper_a_A + prior_hyper_nu_A / 2;
-    // aux_hyper(N + n, 1) = R::rgamma(shape_tmp, AA_scale_tmp);
-    // 
-    // AA_scale_tmp         = aux_hyper(N + n, 1);
-    // for (int m=0; m<M; m++) {
-    //   AA_scale_tmp      += as_scalar((aux_A.slice(m).row(n) - prior_A.row(n)) * prior_A_V_inv * trans(aux_A.slice(m).row(n) - prior_A.row(n)));
-    // }
-    shape_tmp         = prior_hyper_nu_A + N * K;
-    aux_hyper(n, 1)   = AA_scale_tmp / R::rchisq(shape_tmp);
+    if ( hyper_boost ) {
+      AA_scale_tmp         = 1 / ((1 / (2 * aux_hyper(n, 1))) + (1 / aux_hyper(2 * N, 1)));
+      AA_shape_tmp         = prior_hyper_a_A + prior_hyper_nu_A / 2;
+      aux_hyper(N + n, 1) = R::rgamma(AA_shape_tmp, AA_scale_tmp);
+    }
+    
+    AA_scale_tmp         = aux_hyper(N + n, 1);
+    for (int m=0; m<M; m++) {
+      AA_scale_tmp      += as_scalar((aux_A.slice(m).row(n) - prior_A.row(n)) * prior_A_V_inv * trans(aux_A.slice(m).row(n) - prior_A.row(n)));
+    }
+    AA_shape_tmp         = prior_hyper_nu_A + N * K;
+    aux_hyper(n, 1)   = AA_scale_tmp / R::rchisq(AA_shape_tmp);
   }
   
   return aux_hyper;
