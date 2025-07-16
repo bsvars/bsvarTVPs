@@ -15,7 +15,8 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     const arma::field<arma::mat>& VB,        // restrictions on B0
     const Rcpp::List&             starting_values,
     const int                     thin = 100, // introduce thinning
-    const bool                    centred_sv = false
+    const bool                    centred_sv = false,  // introduce thinning
+    const bool                    hyper_boost = true
 );
 
 #endif  // _BSVAR_MSS_SV_BOOST_H_

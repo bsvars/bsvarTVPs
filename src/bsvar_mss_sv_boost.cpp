@@ -19,7 +19,8 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     const arma::field<arma::mat>& VB,        // restrictions on B0
     const Rcpp::List&             starting_values,
     const int                     thin = 100, // introduce thinning
-    const bool                    centred_sv = false
+    const bool                    centred_sv = false,  // introduce thinning
+    const bool                    hyper_boost = true
 ) {
   // // Progress bar setup
   vec prog_rep_points = arma::round(arma::linspace(0, SS, 50));
@@ -121,7 +122,7 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     
     // sample aux_hyper
     // Rcout << "befor aux_hyper" << endl;
-    aux_hyper         = sample_hyperparameters_mss_boost( aux_hyper, aux_B, aux_A, VB, prior);
+    aux_hyper         = sample_hyperparameters_mss_boost( aux_hyper, aux_B, aux_A, VB, prior, hyper_boost);
     
     // sample aux_B
     // Rcout << "befor aux_B" << endl;
