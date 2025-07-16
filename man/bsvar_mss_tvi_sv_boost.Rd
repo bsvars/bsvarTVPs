@@ -13,7 +13,8 @@ bsvar_mss_tvi_sv_boost(
   VB,
   starting_values,
   thin = 100L,
-  centred_sv = FALSE
+  centred_sv = FALSE,
+  hyper_boost = TRUE
 )
 }
 \arguments{
@@ -33,6 +34,9 @@ bsvar_mss_tvi_sv_boost(
 
 \item{centred_sv}{a logical value indicating whether the SV model should be 
 in its centred form}
+
+\item{hyper_boost}{a logical value indicating whether prior variances and scales 
+beyond level one of the hierarchy are to be estimated}
 }
 \value{
 An object of class \code{PosteriorBSVARSVMSTVI} - a list containing the Bayesian estimation output in two elements:
