@@ -196,7 +196,7 @@ arma::mat sample_B_heterosk1_boost (
   
   for (int n=0; n<N; n++) {
     
-    Rcout << " structural equation: " << n + 1 << endl;
+    // Rcout << " structural equation: " << n + 1 << endl;
     // set scale matrix
     mat shocks_sigma        = shocks.each_row() / aux_sigma.row(n);
     mat posterior_SS_inv    = pow(aux_hyper(n, 0), -1) * prior_SS_inv + shocks_sigma * shocks_sigma.t();
@@ -210,14 +210,14 @@ arma::mat sample_B_heterosk1_boost (
     try {
       posterior_S           = inv_sympd(posterior_S_inv);
     } catch (std::runtime_error &e) {
-      Rcout << "   B Inversion failure " << endl;
+      // Rcout << "   B Inversion failure " << endl;
       continue; 
     }
     
     try {
       Un                    = chol(posterior_nu * posterior_S);
     } catch (std::runtime_error &e) {
-      Rcout << "   B Cholesky failure " << endl;
+      // Rcout << "   B Cholesky failure " << endl;
       continue; 
     }
     
@@ -636,7 +636,7 @@ arma::mat sample_A_heterosk1_mss_boost (
   }
   
   for (int n=0; n<N; n++) {
-    Rcout << " AR equation: " << n + 1 << endl;
+    // Rcout << " AR equation: " << n + 1 << endl;
     mat   A0          = aux_A;
     A0.row(n)         = zerosA;
     vec   zn          = vectorise( aux_B.slice(0) * (YM(0) - A0 * XM(0)) );
@@ -661,7 +661,7 @@ arma::mat sample_A_heterosk1_mss_boost (
     try {
       precision_chol = trimatu(chol(precision));
     } catch (std::runtime_error &e) {
-      Rcout << "   Cholesky failure " << endl;
+      // Rcout << "   Cholesky failure " << endl;
       continue; 
     }
     vec     draw      = solve(precision_chol, 
