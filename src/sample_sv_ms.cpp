@@ -576,7 +576,7 @@ Rcpp::List svar_ce1_mss (
   // sample auxiliary mixture states aux_S
   const vec   mixprob   = find_mixture_indicator_cdf(trans(U - aux_h_n));
   aux_S_n               = trans(inverse_transform_sampling(mixprob, T));
-  Rcout << "aux_S_n: " << aux_xi << endl;
+  // Rcout << "aux_S_n: " << aux_S_n << endl;
   
   rowvec    alpha_S(T);
   rowvec    sigma_S_inv(T);
@@ -589,11 +589,11 @@ Rcpp::List svar_ce1_mss (
   if ( sample_s_ ) {
     aux_s_n               = (prior_sv_s_ + 2 * aux_sigma2_omega_n)/R::rchisq(3 + 2 * prior_sv_a_);
   }
-  Rcout << "aux_s_n: " << aux_s_n << endl;
+  // Rcout << "aux_s_n: " << aux_s_n << endl;
   
   // sample aux_sigma2_omega
   aux_sigma2_omega_n    = randg( distr_param(1 + 0.5 * prior_sv_a_, pow(pow(prior_sv_s_,-1) + accu(pow(2 * aux_sigma2v_n,-1)), -1)  ) );
-  Rcout << "aux_sigma2_omega_n: " << aux_sigma2_omega_n << endl;
+  // Rcout << "aux_sigma2_omega_n: " << aux_sigma2_omega_n << endl;
   
   // sample aux_rho
   rowvec    hm1         = aux_h_n.cols(0,T-2);
@@ -601,7 +601,7 @@ Rcpp::List svar_ce1_mss (
   double    aux_rho_var = as_scalar(pow( hm1 * sigma_v2_inv_diag * hm1.t(), -1));
   double    aux_rho_mean = as_scalar(aux_rho_var * (hm1 * sigma_v2_inv_diag * aux_h_n.cols(1,T-1).t() ) );
   aux_rho_n             = RcppTN::rtn1(aux_rho_mean, pow(aux_rho_var, 0.5),-1,1);
-  Rcout << "aux_rho_n: " << aux_rho_n << endl;
+  // Rcout << "aux_rho_n: " << aux_rho_n << endl;
   
   mat       H_rho_new(T, T, fill::eye);
   H_rho_new.diag(-1)   -= aux_rho_n;
@@ -622,7 +622,7 @@ Rcpp::List svar_ce1_mss (
     
     aux_sigma2v_n(m)      = (aux_sigma2_omega_n + as_scalar(aux_h_n_m * HH_rho.submat(0,0,Tm(m)-1,Tm(m)-1) * aux_h_n_m.t())) / chi2rnd( 3 + Tm(m) );
   } // END m loop
-  Rcout << "aux_sigma2v_n: " << aux_sigma2v_n << endl;
+  // Rcout << "aux_sigma2v_n: " << aux_sigma2v_n << endl;
   
   aux_omega_n        = pow(aux_sigma2v_n, 0.5);
   for (int t=0; t<T; t++) {
@@ -633,7 +633,7 @@ Rcpp::List svar_ce1_mss (
   mat       V_h         = diagmat(sigma_S_inv) + (H_rho_new.t() * diagmat(sigma2v_T_inv) * H_rho_new);
   vec       h_bar       = diagmat(sigma_S_inv) * (U - alpha_S).t();
   aux_h_n               = trans(precision_sampler_ar1( V_h.diag(), V_h(1, 0), h_bar));
-  Rcout << "aux_h_n: " << aux_h_n << endl;
+  // Rcout << "aux_h_n: " << aux_h_n << endl;
   
   return List::create(
     _["aux_h_n"]              = aux_h_n,
