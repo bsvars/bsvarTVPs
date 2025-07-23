@@ -345,6 +345,49 @@ compute_TVI_component_density.PosteriorBSVARSVMSTVI <- function(posterior, VB) {
 }
 
 
+
+#' @inherit compute_TVI_component_density
+#' @method compute_TVI_component_density PosteriorBSVARSVMSATVI
+#' @inheritParams compute_TVI_component_density
+#' 
+#' @export
+compute_TVI_component_density.PosteriorBSVARSVMSATVI <- function(posterior, VB) {
+  
+  TVI_posterior  = posterior$posterior$S4_indicator
+  
+  M           = dim(TVI_posterior)[2]
+  S           = dim(TVI_posterior)[3]
+  N           = dim(TVI_posterior)[1]
+  comp        = VB[length(VB)][[1]]
+  TVI_ind      = which(comp > 1)
+  comp        = comp[TVI_ind]
+  TVI_length   = length(TVI_ind)
+  
+  TVI_density        = vector("list", TVI_length)
+  names(TVI_density) = paste0(rep("equation", TVI_length), TVI_ind)
+  
+  for (eq in 1:TVI_length) {
+    TVI_density[[eq]]            = matrix(NA, M, comp[eq])
+    rownames(TVI_density[[eq]])  = paste0(rep("regime", M), 1:M)
+    colnames(TVI_density[[eq]])  = paste0(rep("component", comp[eq]), 1:comp[eq])
+    
+    for (m in 1:M) {
+      for (component in 1:comp[eq]) {
+        draws_count                   = TVI_posterior[TVI_ind[eq], m, ] == component
+        TVI_density[[eq]][m,component] = mean(draws_count)
+      } # END component loop
+    } # END m loop
+  } # END eq loop
+  
+  class(TVI_density)     = "TVIdensity"
+  
+  return(TVI_density)
+}
+
+
+
+
+
 #' @inherit compute_TVI_component_density
 #' @method compute_TVI_component_density PosteriorBSVARSVTVI
 #' @inheritParams compute_TVI_component_density
