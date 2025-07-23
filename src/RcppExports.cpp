@@ -90,6 +90,44 @@ RcppExport SEXP _bsvarTVPs_bsvarTVPs_ir_ms(SEXP posterior_BSEXP, SEXP posterior_
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// bsvarTVPs_ir_mssa
+arma::field<arma::cube> bsvarTVPs_ir_mssa(arma::field<arma::cube>& posterior_B, arma::field<arma::cube>& posterior_A, const int horizon, const int p, const bool standardise);
+static SEXP _bsvarTVPs_bsvarTVPs_ir_mssa_try(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP horizonSEXP, SEXP pSEXP, SEXP standardiseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< arma::field<arma::cube>& >::type posterior_B(posterior_BSEXP);
+    Rcpp::traits::input_parameter< arma::field<arma::cube>& >::type posterior_A(posterior_ASEXP);
+    Rcpp::traits::input_parameter< const int >::type horizon(horizonSEXP);
+    Rcpp::traits::input_parameter< const int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< const bool >::type standardise(standardiseSEXP);
+    rcpp_result_gen = Rcpp::wrap(bsvarTVPs_ir_mssa(posterior_B, posterior_A, horizon, p, standardise));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _bsvarTVPs_bsvarTVPs_ir_mssa(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP horizonSEXP, SEXP pSEXP, SEXP standardiseSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvarTVPs_ir_mssa_try(posterior_BSEXP, posterior_ASEXP, horizonSEXP, pSEXP, standardiseSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 // bsvarTVPs_ir
 arma::field<arma::cube> bsvarTVPs_ir(arma::cube& posterior_B, arma::cube& posterior_A, const int horizon, const int p, const bool standardise);
 static SEXP _bsvarTVPs_bsvarTVPs_ir_try(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP horizonSEXP, SEXP pSEXP, SEXP standardiseSEXP) {
@@ -2375,6 +2413,7 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
     if (signatures.empty()) {
         signatures.insert("arma::cube(*bsvars_ir1)(arma::mat&,arma::mat&,const int,const int,const bool)");
         signatures.insert("arma::field<arma::cube>(*bsvarTVPs_ir_ms)(arma::field<arma::cube>&,arma::cube&,const int,const int,const bool)");
+        signatures.insert("arma::field<arma::cube>(*bsvarTVPs_ir_mssa)(arma::field<arma::cube>&,arma::field<arma::cube>&,const int,const int,const bool)");
         signatures.insert("arma::field<arma::cube>(*bsvarTVPs_ir)(arma::cube&,arma::cube&,const int,const int,const bool)");
         signatures.insert("arma::cube(*bsvarTVPs_filter_forecast_smooth)(Rcpp::List&,const arma::mat&,const arma::mat&,const bool,const bool)");
         signatures.insert("arma::cube(*bsvarTVPs_fitted_values)(arma::cube&,arma::mat&)");
@@ -2442,6 +2481,7 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
 RcppExport SEXP _bsvarTVPs_RcppExport_registerCCallable() { 
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvars_ir1", (DL_FUNC)_bsvarTVPs_bsvars_ir1_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_ir_ms", (DL_FUNC)_bsvarTVPs_bsvarTVPs_ir_ms_try);
+    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_ir_mssa", (DL_FUNC)_bsvarTVPs_bsvarTVPs_ir_mssa_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_ir", (DL_FUNC)_bsvarTVPs_bsvarTVPs_ir_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_filter_forecast_smooth", (DL_FUNC)_bsvarTVPs_bsvarTVPs_filter_forecast_smooth_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_fitted_values", (DL_FUNC)_bsvarTVPs_bsvarTVPs_fitted_values_try);
@@ -2508,6 +2548,7 @@ RcppExport SEXP _bsvarTVPs_RcppExport_registerCCallable() {
 static const R_CallMethodDef CallEntries[] = {
     {"_bsvarTVPs_bsvars_ir1", (DL_FUNC) &_bsvarTVPs_bsvars_ir1, 5},
     {"_bsvarTVPs_bsvarTVPs_ir_ms", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_ir_ms, 5},
+    {"_bsvarTVPs_bsvarTVPs_ir_mssa", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_ir_mssa, 5},
     {"_bsvarTVPs_bsvarTVPs_ir", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_ir, 5},
     {"_bsvarTVPs_bsvarTVPs_filter_forecast_smooth", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_filter_forecast_smooth, 5},
     {"_bsvarTVPs_bsvarTVPs_fitted_values", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_fitted_values, 2},
