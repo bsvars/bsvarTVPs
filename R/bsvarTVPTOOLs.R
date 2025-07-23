@@ -50,6 +50,42 @@ compute_impulse_responses.PosteriorBSVARSVMSTVI <- function(posterior, horizon, 
 }
 
 
+
+
+#' @inherit compute_impulse_responses.PosteriorBSVARSVMSTVI
+#' @method compute_impulse_responses PosteriorBSVARSVMSATVI
+#' 
+#' @export
+compute_impulse_responses.PosteriorBSVARSVMSATVI <- function(posterior, horizon, standardise = FALSE) {
+  
+  posterior_B = posterior$posterior$B
+  posterior_A = posterior$posterior$A
+  N           = dim(posterior_B[1,1][[1]])[1]
+  p           = (dim(posterior_A[1,1][[1]])[2] - 1) / N
+  S           = dim(posterior_B)[1]
+  M           = dim(posterior_B[1,1][[1]])[3]
+  
+  # compute IRFs
+  irfs          = .Call(`_bsvarTVPs_bsvarTVPs_ir_mssa`, posterior_B, posterior_A, horizon, p, standardise)
+  
+  # transform the output to an array and return
+  ir_posterior    = array(NA, c(N, N, horizon + 1, M, S))
+  for (s in 1:S) {
+    for (m in 1:M) {
+      ir_posterior[,,,m,s]  = irfs[s,m][[1]]
+    }
+  }
+  class(ir_posterior) = "PosteriorIR"
+  
+  return(ir_posterior)
+}
+
+
+
+
+
+
+
 #' @inherit compute_impulse_responses.PosteriorBSVARSVMSTVI
 #' @method compute_impulse_responses PosteriorBSVARSVMS
 #' 
