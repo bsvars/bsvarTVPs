@@ -299,7 +299,10 @@ compute_structural_shocks.PosteriorBSVARSVTVI <- function(posterior) {
 #' @export
 compute_TVI_component_density <- function(posterior, VB) {
   
-  stopifnot("Argument posterior must contain estimation output of class PosteriorBSVARSVMSTVI or PosteriorBSVARSVTVI." = any(class(posterior)[1] == c("PosteriorBSVARSVMSTVI","PosteriorBSVARSVTVI")))
+  stopifnot(
+    "Argument posterior must contain estimation output of class PosteriorBSVARSVMSTVI, PosteriorBSVARSVTVI, or PosteriorBSVARSVMSATVI." 
+    = any(class(posterior)[1] == c("PosteriorBSVARSVMSTVI","PosteriorBSVARSVTVI","PosteriorBSVARSVMSATVI"))
+  )
   
   UseMethod("compute_TVI_component_density", posterior)
 }
