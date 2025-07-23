@@ -1,8 +1,28 @@
 
 
-#' @inherit compute_impulse_responses
+#' @title Computes posterior draws of impulse responses 
+#'
+#' @description Each of the draws from the posterior estimation of models from 
+#' packages \pkg{bsvars} or \pkg{bsvarSIGNs} is transformed into
+#' a draw from the posterior distribution of the impulse responses. 
+#' 
+#' @param posterior posterior estimation outcome obtained by running the \code{estimate} function. 
+#' The interpretation depends on the normalisation of the shocks
+#' using function \code{normalise_posterior()}. Verify if the default settings are appropriate.
+#' @param horizon a positive integer number denoting the forecast horizon for the impulse responses computations.
+#' @param standardise a logical value. If \code{TRUE}, the impulse responses are standardised 
+#' so that the variables' own shocks at horizon 0 are equal to 1. Otherwise, the parameter estimates 
+#' determine this magnitude.
+#' 
+#' @return An object of class PosteriorIR, that is, an \code{NxNx(horizon+1)xS} array with attribute PosteriorIR 
+#' containing \code{S} draws of the impulse responses.
+#'
+#' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
+#' 
+#' @references 
+#' Kilian, L., & Lütkepohl, H. (2017). Structural VAR Tools, Chapter 4, In: Structural vector autoregressive analysis. Cambridge University Press.
+#' 
 #' @method compute_impulse_responses PosteriorBSVARSVMSTVI
-#' @inheritParams compute_impulse_responses
 #' 
 #' @export
 compute_impulse_responses.PosteriorBSVARSVMSTVI <- function(posterior, horizon, standardise = FALSE) {
@@ -30,9 +50,8 @@ compute_impulse_responses.PosteriorBSVARSVMSTVI <- function(posterior, horizon, 
 }
 
 
-#' @inherit compute_impulse_responses
+#' @inherit compute_impulse_responses.PosteriorBSVARSVMSTVI
 #' @method compute_impulse_responses PosteriorBSVARSVMS
-#' @inheritParams compute_impulse_responses
 #' 
 #' @export
 compute_impulse_responses.PosteriorBSVARSVMS <- function(posterior, horizon, standardise = FALSE) {
@@ -60,9 +79,8 @@ compute_impulse_responses.PosteriorBSVARSVMS <- function(posterior, horizon, sta
 }
 
 
-#' @inherit compute_impulse_responses
+#' @inherit compute_impulse_responses.PosteriorBSVARSVMSTVI
 #' @method compute_impulse_responses PosteriorBSVARSVTVI
-#' @inheritParams compute_impulse_responses
 #' 
 #' @export
 compute_impulse_responses.PosteriorBSVARSVTVI <- function(posterior, horizon, standardise = FALSE) {
@@ -154,9 +172,22 @@ compute_impulse_responses_by_components <- function(ir_posterior, TVI_posterior,
 
 
 
-#' @inherit compute_structural_shocks
+#' @title Computes posterior draws of structural shocks
+#'
+#' @description Each of the draws from the posterior estimation of models from
+#' packages \pkg{bsvars} or \pkg{bsvarSIGNs} is transformed into
+#' a draw from the posterior distribution of the structural shocks. 
+#' 
+#' @param posterior posterior estimation outcome obtained by running the \code{estimate} function. 
+#' The interpretation depends on the normalisation of the shocks
+#' using function \code{normalise_posterior()}. Verify if the default settings are appropriate.
+#' 
+#' @return An object of class PosteriorShocks, that is, an \code{NxTxS} array with attribute PosteriorShocks 
+#' containing \code{S} draws of the structural shocks.
+#'
+#' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
+#' 
 #' @method compute_structural_shocks PosteriorBSVARSVMSTVI
-#' @inheritParams compute_structural_shocks
 #' 
 #' @export
 compute_structural_shocks.PosteriorBSVARSVMSTVI <- function(posterior) {
@@ -174,9 +205,8 @@ compute_structural_shocks.PosteriorBSVARSVMSTVI <- function(posterior) {
 }
 
 
-#' @inherit compute_structural_shocks
+#' @inherit compute_structural_shocks.PosteriorBSVARSVMSTVI
 #' @method compute_structural_shocks PosteriorBSVARSVMS
-#' @inheritParams compute_structural_shocks
 #' 
 #' @export
 compute_structural_shocks.PosteriorBSVARSVMS <- function(posterior) {
@@ -194,9 +224,8 @@ compute_structural_shocks.PosteriorBSVARSVMS <- function(posterior) {
 }
 
 
-#' @inherit compute_structural_shocks
+#' @inherit compute_structural_shocks.PosteriorBSVARSVMSTVI
 #' @method compute_structural_shocks PosteriorBSVARSVTVI
-#' @inheritParams compute_structural_shocks
 #' 
 #' @export
 compute_structural_shocks.PosteriorBSVARSVTVI <- function(posterior) {
