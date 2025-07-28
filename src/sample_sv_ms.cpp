@@ -627,11 +627,10 @@ Rcpp::List svar_ce1_mss (
   // sample aux_h
   mat       V_h         = diagmat(sigma_S_inv) + (H_rho_new.t() * diagmat(sigma2v_T_inv) * H_rho_new);
   vec       h_bar       = diagmat(sigma_S_inv) * (U - alpha_S).t();
-  rowvec aux_h_n_tmp    = trans(precision_sampler_ar1( V_h.diag(), V_h(1, 0), h_bar));
+  vec aux_h_n_tmp       = precision_sampler_ar1( V_h.diag(), V_h(1, 0), h_bar);
   
-  if ( !aux_h_n_tmp.has_nan() ) {
-    aux_h_n             = aux_h_n_tmp;
-  }
+  if (aux_h_n_tmp.has_nan()) throw std::runtime_error("Error: aux_h_n_tmp contains missing observations, nan.");
+  aux_h_n               = aux_h_n_tmp.t();
   
   return List::create(
     _["aux_h_n"]              = aux_h_n,
