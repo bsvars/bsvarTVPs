@@ -316,7 +316,7 @@ Rcpp::List svar_nc1_mss (
   const NumericVector alpha_s = NumericVector::create(1.92677,1.34744,0.73504,0.02266,0-0.85173,-1.97278,-3.46788,-5.55246,-8.68384,-14.65000);
   const NumericVector sigma_s = NumericVector::create(0.11265,0.17788,0.26768,0.40611,0.62699,0.98583,1.57469,2.54498,4.16591,7.33342);
   const NumericVector pr_s    = NumericVector::create(0.00609,0.04775,0.13057,0.20674,0.22715,0.18842,0.12047,0.05591,0.01575,0.00115);
-  const double        ccc     = 0.000000001;      // a constant to make log((u+ccc)^2) feasible
+  const double        ccc     = 0.000001;      // a constant to make log((u+ccc)^2) feasible
   
   // sample h and omega of the non-centered SV including ASIS step
   const int     T = u.n_cols;
@@ -553,7 +553,7 @@ Rcpp::List svar_ce1_mss (
   const NumericVector alpha_s = NumericVector::create(1.92677,1.34744,0.73504,0.02266,0-0.85173,-1.97278,-3.46788,-5.55246,-8.68384,-14.65000);
   const NumericVector sigma_s = NumericVector::create(0.11265,0.17788,0.26768,0.40611,0.62699,0.98583,1.57469,2.54498,4.16591,7.33342);
   const NumericVector pr_s    = NumericVector::create(0.00609,0.04775,0.13057,0.20674,0.22715,0.18842,0.12047,0.05591,0.01575,0.00115);
-  const double        ccc     = 0.000000001;      // a constant to make log((u+ccc)^2) feasible
+  const double        ccc     = 0.000001;      // a constant to make log((u+ccc)^2) feasible
   
   // sample h and omega of the non-centered SV including ASIS step
   const int     T = u.n_cols;
