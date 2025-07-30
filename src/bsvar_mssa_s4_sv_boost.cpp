@@ -114,23 +114,43 @@ Rcpp::List bsvar_mssa_s4_sv_boost_cpp (
     if (ss % 200 == 0) checkUserInterrupt();
     
     // sample aux_xi
-    aux_xi            = sample_Markov_process_mssa(aux_xi, aux_B, aux_A, Y, X, aux_sigma, aux_PR_TR, aux_pi_0);
+    try {
+      aux_xi            = sample_Markov_process_mssa(aux_xi, aux_B, aux_A, Y, X, aux_sigma, aux_PR_TR, aux_pi_0);
+    } catch (std::runtime_error &e) {
+      Rcout << "   sample_Markov_process_mssa failure " << endl;
+    }
     
     // sample aux_PR_TR and aux_pi_0
-    PR_TR_tmp         = sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
-    aux_PR_TR         = as<mat>(PR_TR_tmp["aux_PR_TR"]);
-    aux_pi_0          = as<vec>(PR_TR_tmp["aux_pi_0"]);
+    try {
+      PR_TR_tmp         = sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
+      aux_PR_TR         = as<mat>(PR_TR_tmp["aux_PR_TR"]);
+      aux_pi_0          = as<vec>(PR_TR_tmp["aux_pi_0"]);
+    } catch (std::runtime_error &e) {
+      Rcout << "   sample_transition_probabilities failure " << endl;
+    }
     
     // sample aux_hyper
-    aux_hyper         = sample_hyperparameters_mssa_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, hyper_boost);
+    try {
+      aux_hyper         = sample_hyperparameters_mssa_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, hyper_boost);
+    } catch (std::runtime_error &e) {
+      Rcout << "  sample_hyperparameters_mssa_s4_boost failure " << endl;
+    }
     
     // sample aux_B
-    BSL               = sample_B_mssa_s4_boost(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, aux_xi, Y, X, prior, VB);
-    aux_B             = as<cube>(BSL["aux_B"]);
-    aux_SL            = as<imat>(BSL["aux_SL"]);
+    try {
+      BSL               = sample_B_mssa_s4_boost(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, aux_xi, Y, X, prior, VB);
+      aux_B             = as<cube>(BSL["aux_B"]);
+      aux_SL            = as<imat>(BSL["aux_SL"]);
+    } catch (std::runtime_error &e) {
+      Rcout << "  sample_B_mssa_s4_boost failure " << endl;
+    }
     
     // sample aux_A
-    aux_A             = sample_A_heterosk1_mssa_boost(aux_A, aux_B, aux_xi, aux_hyper, aux_sigma, Y, X, prior);
+    try {
+      aux_A             = sample_A_heterosk1_mssa_boost(aux_A, aux_B, aux_xi, aux_hyper, aux_sigma, Y, X, prior);
+    } catch (std::runtime_error &e) {
+      Rcout << "  sample_A_heterosk1_mssa_boost failure " << endl;
+    }
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
     mat U(N, T);
@@ -153,9 +173,21 @@ Rcpp::List bsvar_mssa_s4_sv_boost_cpp (
       double  s_n       = aux_s_(n);
       
       if ( centred_sv ) {
-        sv_n              = svar_ce1_mss( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior, true);
+        try {
+          sv_n              = svar_ce1_mss( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior, true);
+        } catch (std::runtime_error &e) {
+          Rcout << "  svar_ce1_mss failure " << endl;
+          continue;
+        }
+        
       } else {
-        sv_n              = svar_nc1_mss( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior, true);
+        try {
+          sv_n              = svar_nc1_mss( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior, true);
+        } catch (std::runtime_error &e) {
+          Rcout << "  svar_nc1_mss failure " << endl;
+          continue;
+        }
+        
       }
       
       aux_h.row(n)      = as<rowvec>(sv_n["aux_h_n"]);
