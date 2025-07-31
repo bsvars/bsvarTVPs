@@ -158,8 +158,8 @@ Rcpp::List forecast_mss_sv (
     vec       XT      = X_T;
     vec       PR_ST   = posterior_xi_T.col(s);
     vec       HT      = posterior_h_T.col(s);  
-    vec       sigma2T(N);
-    mat       BT_inv(N, N);
+    vec       sigmaT(N);
+    mat       BT_inv_sigma(N, N);
     cube      SigmaT(N, N, horizon);
     
     for (int h=0; h<horizon; h++) {
@@ -167,12 +167,13 @@ Rcpp::List forecast_mss_sv (
       PR_ST       = trans(posterior_PR_TR.slice(s)) * PR_ST;
       ST          = csample_num1(zeroM, wrap(PR_ST));
       HT          = posterior_omega.slice(s).col(ST) % HT + randn(N);
-      sigma2T     = exp(posterior_omega.slice(s).col(ST) % HT); 
-      BT_inv      = inv(posterior_B(s).slice(ST));
-      mat Sigma_tmp = BT_inv * diagmat(sigma2T) * BT_inv.t();
-      SigmaT.slice(h) = 0.5 * (Sigma_tmp + Sigma_tmp.t());
+      sigmaT      = exp(0.5 * posterior_omega.slice(s).col(ST) % HT); 
+      BT_inv_sigma  = solve(posterior_B(s).slice(ST), diagmat(sigmaT));
+      mat Sigma_tmp = BT_inv_sigma * BT_inv_sigma.t();
+      Sigma_tmp   = 0.5 * (Sigma_tmp + Sigma_tmp.t());
+      SigmaT.slice(h) = Sigma_tmp;
       out_forecast_mean.slice(ss).col(h) = posterior_A.slice(s) * XT;
-      vec draw    = mvnrnd( out_forecast_mean.slice(ss).col(h), SigmaT.slice(h) );
+      vec draw    = mvnrnd( out_forecast_mean.slice(ss).col(h), Sigma_tmp );
       out_forecast.slice(ss).col(h) = draw;
       
       if ( h != horizon - 1 ) {
