@@ -865,6 +865,47 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::mat >(rcpp_result_gen);
     }
 
+    inline double rig1(double alpha, double beta) {
+        typedef SEXP(*Ptr_rig1)(SEXP,SEXP);
+        static Ptr_rig1 p_rig1 = NULL;
+        if (p_rig1 == NULL) {
+            validateSignature("double(*rig1)(double,double)");
+            p_rig1 = (Ptr_rig1)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_rig1");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_rig1(Shield<SEXP>(Rcpp::wrap(alpha)), Shield<SEXP>(Rcpp::wrap(beta)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<double >(rcpp_result_gen);
+    }
+
+    inline void sample_hyperparameter_horseshoe(arma::mat& aux_hyper_gammaB, arma::mat& aux_hyper_gB, arma::mat& aux_hyper_gammaA, arma::mat& aux_hyper_gA, arma::vec& aux_hyper_deltaBA, arma::vec& aux_hyper_dBA, const arma::mat& aux_B, const arma::mat& aux_A, const arma::field<arma::mat>& VB, const arma::ivec& aux_SL, const Rcpp::List& prior) {
+        typedef SEXP(*Ptr_sample_hyperparameter_horseshoe)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+        static Ptr_sample_hyperparameter_horseshoe p_sample_hyperparameter_horseshoe = NULL;
+        if (p_sample_hyperparameter_horseshoe == NULL) {
+            validateSignature("void(*sample_hyperparameter_horseshoe)(arma::mat&,arma::mat&,arma::mat&,arma::mat&,arma::vec&,arma::vec&,const arma::mat&,const arma::mat&,const arma::field<arma::mat>&,const arma::ivec&,const Rcpp::List&)");
+            p_sample_hyperparameter_horseshoe = (Ptr_sample_hyperparameter_horseshoe)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_hyperparameter_horseshoe");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_sample_hyperparameter_horseshoe(Shield<SEXP>(Rcpp::wrap(aux_hyper_gammaB)), Shield<SEXP>(Rcpp::wrap(aux_hyper_gB)), Shield<SEXP>(Rcpp::wrap(aux_hyper_gammaA)), Shield<SEXP>(Rcpp::wrap(aux_hyper_gA)), Shield<SEXP>(Rcpp::wrap(aux_hyper_deltaBA)), Shield<SEXP>(Rcpp::wrap(aux_hyper_dBA)), Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(aux_A)), Shield<SEXP>(Rcpp::wrap(VB)), Shield<SEXP>(Rcpp::wrap(aux_SL)), Shield<SEXP>(Rcpp::wrap(prior)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+    }
+
     inline int csample_num1(Rcpp::NumericVector x, Rcpp::NumericVector prob = NumericVector::create()) {
         typedef SEXP(*Ptr_csample_num1)(SEXP,SEXP);
         static Ptr_csample_num1 p_csample_num1 = NULL;
