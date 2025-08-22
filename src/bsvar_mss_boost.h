@@ -14,7 +14,8 @@ Rcpp::List bsvar_mss_boost_cpp (
     const Rcpp::List&             prior,      // a list of priors - original dimensions
     const arma::field<arma::mat>& VB,        // restrictions on B0
     const Rcpp::List&             starting_values,
-    const int                     thin = 100  // introduce thinning
+    const int                     thin = 100,  // introduce thinning
+    const bool                    hyper_boost = true
 );
 
 #endif  // _BSVAR_MSS_BOOST_H_

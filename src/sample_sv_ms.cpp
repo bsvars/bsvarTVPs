@@ -303,6 +303,7 @@ Rcpp::List svar_nc1_mss (
     arma::rowvec&         aux_h_n,            // 1xT
     double&               aux_rho_n,
     arma::rowvec&         aux_omega_n,        // 1xM nth equation regime-dependent omegas
+    arma::rowvec&         aux_sigma2v_n,      // 1xM nth equation regime-dependent omegas^2
     double&               aux_sigma2_omega_n, // omega prior hyper-parameter 
     double&               aux_s_n,            // scale of IG2 prior for aux_sigma2_omega_n
     arma::urowvec&        aux_S_n,            // 1xT
@@ -414,6 +415,7 @@ Rcpp::List svar_nc1_mss (
     int     ss = 1;
     if (R::runif(0,1)<0.5) ss *= -1;
     aux_omega_n(m)      = ss * sqrt(sigma2_aux);
+    aux_sigma2v_n(m)    = sigma2_aux;
   } // END m loop
   
   for (int t=0; t<T; t++) {
@@ -433,11 +435,213 @@ Rcpp::List svar_nc1_mss (
     _["aux_h_n"]              = aux_h_n,
     _["aux_rho_n"]            = aux_rho_n,
     _["aux_omega_n"]          = aux_omega_n,
+    _["aux_sigma2v_n"]        = aux_sigma2v_n,
     _["aux_sigma2_omega_n"]   = aux_sigma2_omega_n,
     _["aux_s_n"]              = aux_s_n,
     _["aux_S_n"]              = aux_S_n
   );
 } // END sv_nc1
+
+
+
+
+/*______________________function svar_ce1______________________
+ * This function has been copied from the R package bsvars on 2025-05-05 and modified subsequently.*/
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+Rcpp::List svar_ce1 (
+    arma::rowvec&       aux_h_n,            // 1xT
+    double&             aux_rho_n,
+    double&             aux_omega_n,
+    double&             aux_sigma2v_n,
+    double&             aux_sigma2_omega_n, // omega prior hyper-parameter 
+    double&             aux_s_n,             // scale of IG2 prior for aux_sigma2_omega_n
+    arma::urowvec&      aux_S_n,            // 1xT
+    const arma::rowvec& u,                  // 1xT
+    const Rcpp::List&   prior,
+    bool                sample_s_ = true
+) {
+  // sampler for the centred parameterisation of the SV process
+  
+  // fixed values for auxiliary mixture
+  const NumericVector alpha_s = NumericVector::create(1.92677,1.34744,0.73504,0.02266,0-0.85173,-1.97278,-3.46788,-5.55246,-8.68384,-14.65000);
+  const NumericVector sigma_s = NumericVector::create(0.11265,0.17788,0.26768,0.40611,0.62699,0.98583,1.57469,2.54498,4.16591,7.33342);
+  const NumericVector pr_s    = NumericVector::create(0.00609,0.04775,0.13057,0.20674,0.22715,0.18842,0.12047,0.05591,0.01575,0.00115);
+  const double        ccc     = 0.000000001;      // a constant to make log((u+ccc)^2) feasible
+  
+  // sample h and omega of the non-centered SV including ASIS step
+  const int     T = u.n_cols;
+  const rowvec  U = log(pow(u + ccc, 2));
+  
+  const double  prior_sv_a_ = prior["sv_a_"];
+  const double  prior_sv_s_ = prior["sv_s_"];
+  
+  mat           H_rho(T, T, fill::eye);
+  H_rho.diag(-1)       -= aux_rho_n;
+  mat           HH_rho  = H_rho.t() * H_rho;
+  
+  // sample auxiliary mixture states aux_S
+  const vec   mixprob   = find_mixture_indicator_cdf(trans(U - aux_h_n));
+  aux_S_n               = trans(inverse_transform_sampling(mixprob, T));
+  
+  rowvec    alpha_S(T);
+  rowvec    sigma_S_inv(T);
+  for (int t=0; t<T; t++) {
+    alpha_S.col(t)      = alpha_s(aux_S_n(t));
+    sigma_S_inv.col(t)  = 1/sigma_s(aux_S_n(t));
+  }
+  
+  // sample aux_s_n
+  if ( sample_s_ ) {
+    aux_s_n               = (1 + 2 * aux_sigma2_omega_n) / chi2rnd(3 + 2 * prior_sv_a_);
+  }
+  
+  // sample aux_sigma2_omega
+  aux_sigma2_omega_n    = randg( distr_param(1 + 0.5 * prior_sv_a_, pow(pow(prior_sv_s_,-1) + pow(2 * aux_sigma2v_n,-1), -1)  ) );
+  
+  // sample aux_rho
+  rowvec    hm1         = aux_h_n.cols(0,T-2);
+  double    aux_rho_var = as_scalar(pow( hm1 * hm1.t() / aux_sigma2v_n, -1));
+  double    aux_rho_mean = as_scalar(aux_rho_var * (hm1 * aux_h_n.cols(1,T-1).t() / aux_sigma2v_n) );
+  aux_rho_n             = RcppTN::rtn1(aux_rho_mean, pow(aux_rho_var, 0.5),-1,1);
+  
+  mat       H_rho_new(T, T, fill::eye);
+  H_rho_new.diag(-1)   -= aux_rho_n;
+  H_rho                 = H_rho_new;
+  HH_rho                = H_rho_new.t() * H_rho_new;
+  
+  // sample aux_sigma2v
+  aux_sigma2v_n         = (aux_sigma2_omega_n + as_scalar(aux_h_n * HH_rho * aux_h_n.t())) / chi2rnd( 3 + T );
+  aux_omega_n           = pow(aux_sigma2v_n, 0.5);
+  
+  // sample aux_h
+  mat       V_h         = diagmat(sigma_S_inv) + (HH_rho / aux_sigma2v_n);
+  vec       h_bar       = diagmat(sigma_S_inv) * (U - alpha_S).t();
+  aux_h_n               = trans(precision_sampler_ar1( V_h.diag(), V_h(1, 0), h_bar));
+  
+  return List::create(
+    _["aux_h_n"]              = aux_h_n,
+    _["aux_rho_n"]            = aux_rho_n,
+    _["aux_omega_n"]          = aux_omega_n,
+    _["aux_sigma2v_n"]        = aux_sigma2v_n,
+    _["aux_sigma2_omega_n"]   = aux_sigma2_omega_n,
+    _["aux_s_n"]              = aux_s_n,
+    _["aux_S_n"]              = aux_S_n
+  );
+} // END svar_ce1
+
+
+
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+Rcpp::List svar_ce1_mss (
+    arma::rowvec&       aux_h_n,            // 1xT
+    double&             aux_rho_n,
+    arma::rowvec&       aux_omega_n,        // 1xM nth equation regime-dependent omegas
+    arma::rowvec&       aux_sigma2v_n,      // 1xM nth equation regime-dependent omegas^2
+    double&             aux_sigma2_omega_n, // omega prior hyper-parameter 
+    double&             aux_s_n,             // scale of IG2 prior for aux_sigma2_omega_n
+    arma::urowvec&      aux_S_n,            // 1xT
+    const arma::mat&    aux_xi,             // MxT
+    const arma::rowvec& u,                  // 1xT
+    const Rcpp::List&   prior,
+    bool                sample_s_ = true
+) {
+  // sampler for the centred parameterisation of the SV process
+  
+  // fixed values for auxiliary mixture
+  const NumericVector alpha_s = NumericVector::create(1.92677,1.34744,0.73504,0.02266,0-0.85173,-1.97278,-3.46788,-5.55246,-8.68384,-14.65000);
+  const NumericVector sigma_s = NumericVector::create(0.11265,0.17788,0.26768,0.40611,0.62699,0.98583,1.57469,2.54498,4.16591,7.33342);
+  const NumericVector pr_s    = NumericVector::create(0.00609,0.04775,0.13057,0.20674,0.22715,0.18842,0.12047,0.05591,0.01575,0.00115);
+  const double        ccc     = 0.000000001;      // a constant to make log((u+ccc)^2) feasible
+  
+  // sample h and omega of the non-centered SV including ASIS step
+  const int     T = u.n_cols;
+  const rowvec  U = log(pow(u + ccc, 2));
+  const int     M = aux_xi.n_rows;
+  const vec    Tm = sum(aux_xi, 1);
+  
+  const double  prior_sv_a_ = prior["sv_a_"];
+  const double  prior_sv_s_ = prior["sv_s_"];
+  
+  mat           H_rho(T, T, fill::eye);
+  H_rho.diag(-1)       -= aux_rho_n;
+  mat           HH_rho  = H_rho.t() * H_rho;
+  
+  rowvec        sigma2v_T_inv(T);
+  for (int t=0; t<T; t++) {
+    sigma2v_T_inv(t)          = pow( aux_sigma2v_n(aux_xi.col(t).index_max()), -1);
+  }
+  
+  // sample auxiliary mixture states aux_S
+  const vec   mixprob   = find_mixture_indicator_cdf(trans(U - aux_h_n));
+  aux_S_n               = trans(inverse_transform_sampling(mixprob, T));
+  
+  rowvec    alpha_S(T);
+  rowvec    sigma_S_inv(T);
+  for (int t=0; t<T; t++) {
+    alpha_S.col(t)      = alpha_s(aux_S_n(t));
+    sigma_S_inv.col(t)  = 1/sigma_s(aux_S_n(t));
+  }
+  
+  // sample aux_s_n
+  if ( sample_s_ ) {
+    aux_s_n               = (prior_sv_s_ + 2 * aux_sigma2_omega_n)/R::rchisq(3 + 2 * prior_sv_a_);
+  }
+  
+  // sample aux_sigma2_omega
+  aux_sigma2_omega_n    = randg( distr_param(1 + 0.5 * prior_sv_a_, pow(pow(prior_sv_s_,-1) + accu(pow(2 * aux_sigma2v_n,-1)), -1)  ) );
+  
+  // sample aux_rho
+  rowvec    hm1         = aux_h_n.cols(0,T-2);
+  mat       sigma_v2_inv_diag = diagmat(sigma2v_T_inv.cols(0,T-2));
+  double    aux_rho_var = as_scalar(pow( hm1 * sigma_v2_inv_diag * hm1.t(), -1));
+  double    aux_rho_mean = as_scalar(aux_rho_var * (hm1 * sigma_v2_inv_diag * aux_h_n.cols(1,T-1).t() ) );
+  aux_rho_n             = RcppTN::rtn1(aux_rho_mean, pow(aux_rho_var, 0.5),-1,1);
+  
+  mat       H_rho_new(T, T, fill::eye);
+  H_rho_new.diag(-1)   -= aux_rho_n;
+  H_rho                 = H_rho_new;
+  HH_rho                = H_rho_new.t() * H_rho_new;
+  
+  // sample aux_sigma2v
+  for (int m=0; m<M; m++) {
+    rowvec  aux_h_n_m(Tm(m));
+    
+    int ii = 0;
+    for (int t=0; t<T; t++) {
+      if (aux_xi(m,t)==1) {
+        aux_h_n_m(ii)   = aux_h_n(t);
+        ii++;
+      }
+    }
+    
+    aux_sigma2v_n(m)      = (aux_sigma2_omega_n + as_scalar(aux_h_n_m * HH_rho.submat(0,0,Tm(m)-1,Tm(m)-1) * aux_h_n_m.t())) / chi2rnd( 3 + Tm(m) );
+  } // END m loop
+  
+  aux_omega_n        = pow(aux_sigma2v_n, 0.5);
+  for (int t=0; t<T; t++) {
+    sigma2v_T_inv(t)          = pow( aux_sigma2v_n(aux_xi.col(t).index_max()), -1);
+  }
+  
+  // sample aux_h
+  mat       V_h         = diagmat(sigma_S_inv) + (H_rho_new.t() * diagmat(sigma2v_T_inv) * H_rho_new);
+  vec       h_bar       = diagmat(sigma_S_inv) * (U - alpha_S).t();
+  vec aux_h_n_tmp       = precision_sampler_ar1( V_h.diag(), V_h(1, 0), h_bar);
+  
+  if (aux_h_n_tmp.has_nan()) throw std::runtime_error("Error: aux_h_n_tmp contains missing observations, nan.");
+  aux_h_n               = aux_h_n_tmp.t();
+  
+  return List::create(
+    _["aux_h_n"]              = aux_h_n,
+    _["aux_rho_n"]            = aux_rho_n,
+    _["aux_omega_n"]          = aux_omega_n,
+    _["aux_sigma2v_n"]        = aux_sigma2v_n,
+    _["aux_sigma2_omega_n"]   = aux_sigma2_omega_n,
+    _["aux_s_n"]              = aux_s_n,
+    _["aux_S_n"]              = aux_S_n
+  );
+} // END svar_ce1_mss
 
 
 
@@ -578,6 +782,10 @@ arma::mat sample_Markov_process_mss (
   mat smoothed    = smoothing(filtered, aux_PR_TR);
   mat    aj       = eye(M, M);
   
+  // Rcout << "aux_xi: " << aux_xi << endl;
+  // Rcout << "aux_B: " << aux_B << endl;
+  // Rcout << " smoothed.col(T-1): " << smoothed.col(T-1) << endl;
+  
   mat xi(M, T);
   int draw        = csample_num1(wrap(seq_len(M)), wrap(smoothed.col(T-1)));
   aux_xi_tmp.col(T-1)     = aj.col(draw-1);
@@ -607,6 +815,94 @@ arma::mat sample_Markov_process_mss (
   
   return aux_xi_out;
 } // END sample_Markov_process_mss
+
+
+
+
+
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+arma::mat sample_Markov_process_mssa (
+    arma::mat         aux_xi,             // MxT
+    const arma::cube& aux_B,              // NxNxM
+    const arma::cube& aux_A,              // NxKxM
+    const arma::mat&  Y,
+    const arma::mat&  X,
+    const arma::mat&  aux_sigma,          // NxM
+    const arma::mat&  aux_PR_TR,          // MxM
+    const arma::vec&  aux_pi_0,           // Mx1
+    const bool        finiteM = true
+) {
+  
+  int minimum_regime_occurrences = 10;
+  int max_iterations = 50;
+  if ( finiteM ) {
+    minimum_regime_occurrences = 10;
+    max_iterations = 50;
+  }
+  
+  const int   T   = Y.n_cols;
+  const int   N   = Y.n_rows;
+  const int   M   = aux_PR_TR.n_rows;
+  mat aux_xi_tmp = aux_xi;
+  mat aux_xi_out = aux_xi;
+  
+  cube  Z(N, T, M);
+  for (int m=0; m<M; m++) {
+    Z.slice(m)    = pow(aux_sigma, -1) % (aux_B.slice(m) * (Y - aux_A.slice(m) * X));
+  }
+  
+  mat filtered    = filtering(Z, aux_PR_TR, aux_pi_0);
+  mat smoothed    = smoothing(filtered, aux_PR_TR);
+  mat    aj       = eye(M, M);
+  
+  mat xi(M, T);
+  int draw        = csample_num1(wrap(seq_len(M)), wrap(smoothed.col(T-1)));
+  aux_xi_tmp.col(T-1)     = aj.col(draw-1);
+  
+  if ( minimum_regime_occurrences==0 ) {
+    for (int t=T-2; t>=0; --t) {
+      vec xi_Tmj    = (aux_PR_TR * (aux_xi.col(t+1)/(aux_PR_TR.t() * filtered.col(t)))) % filtered.col(t);
+      draw          = csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
+      aux_xi_tmp.col(t)   = aj.col(draw-1);
+    }
+    aux_xi_out = aux_xi_tmp;
+  } else {
+    int regime_occurrences  = 1;
+    int iterations  = 1;
+    while ( (regime_occurrences<minimum_regime_occurrences) & (iterations<max_iterations) ) {
+      for (int t=T-2; t>=0; --t) {
+        vec xi_Tmj    = (aux_PR_TR * (aux_xi.col(t+1)/(aux_PR_TR.t() * filtered.col(t)))) % filtered.col(t);
+        draw          = csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
+        aux_xi_tmp.col(t)   = aj.col(draw-1);
+      }
+      mat transitions       = count_regime_transitions(aux_xi_tmp);
+      regime_occurrences    = min(transitions.diag());
+      iterations++;
+    } // END while
+    if ( iterations<max_iterations ) aux_xi_out = aux_xi_tmp;
+  }
+  
+  return aux_xi_out;
+} // END sample_Markov_process_mssa
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -4,22 +4,20 @@
 \alias{compute_structural_shocks.PosteriorBSVARSVTVI}
 \title{Computes posterior draws of structural shocks}
 \usage{
-\method{compute_structural_shocks}{PosteriorBSVARSVTVI}(posterior, Y, X)
+\method{compute_structural_shocks}{PosteriorBSVARSVTVI}(posterior)
 }
 \arguments{
-\item{posterior}{posterior estimation outcome - an object of either of the classes: 
-PosteriorBSVARSVMSTVI, PosteriorBSVARSVMS, or PosteriorBSVARSVTVI.}
-
-\item{Y}{a \code{N x T} matrix od dependent variables}
-
-\item{X}{a \code{K x T} matrix of vector autoregressive regressors.}
+\item{posterior}{posterior estimation outcome obtained by running the \code{estimate} function. 
+The interpretation depends on the normalisation of the shocks
+using function \code{normalise_posterior()}. Verify if the default settings are appropriate.}
 }
 \value{
 An object of class PosteriorShocks, that is, an \code{NxTxS} array with attribute PosteriorShocks 
 containing \code{S} draws of the structural shocks.
 }
 \description{
-Each of the draws from the posterior estimation of a model is transformed into
+Each of the draws from the posterior estimation of models from
+packages \pkg{bsvars} or \pkg{bsvarSIGNs} is transformed into
 a draw from the posterior distribution of the structural shocks.
 }
 \author{

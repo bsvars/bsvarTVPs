@@ -2,33 +2,32 @@
 % Please edit documentation in R/bsvarTVPTOOLs.R
 \name{compute_impulse_responses.PosteriorBSVARSVMS}
 \alias{compute_impulse_responses.PosteriorBSVARSVMS}
-\title{Computes regime-specific impulse response functions of the dependent variables 
-to the structural shocks}
+\title{Computes posterior draws of impulse responses}
 \usage{
 \method{compute_impulse_responses}{PosteriorBSVARSVMS}(posterior, horizon, standardise = FALSE)
 }
 \arguments{
-\item{posterior}{an object of class of class PosteriorBSVARSVMSTVI, 
-PosteriorBSVARSVMS, or PosteriorBSVARSVTVI with random draws from the posterior 
-distribution of the Structural model with Markov-switching structural matrix}
+\item{posterior}{posterior estimation outcome obtained by running the \code{estimate} function. 
+The interpretation depends on the normalisation of the shocks
+using function \code{normalise_posterior()}. Verify if the default settings are appropriate.}
 
-\item{horizon}{a positive integer specifying the forecasting horizon for the impulse responses}
+\item{horizon}{a positive integer number denoting the forecast horizon for the impulse responses computations.}
 
 \item{standardise}{a logical value. If \code{TRUE}, the impulse responses are standardised 
 so that the variables' own shocks at horizon 0 are equal to 1. Otherwise, the parameter estimates 
 determine this magnitude.}
 }
 \value{
-An \code{N x N x horizon x M x S} array containing the posterior draws 
-of the impulse responses
+An object of class PosteriorIR, that is, an \code{NxNx(horizon+1)xS} array with attribute PosteriorIR 
+containing \code{S} draws of the impulse responses.
 }
 \description{
-Computes regime-specific impulse response functions of the dependent variables 
-to the structural shocks for SVAR models with Markov-switching structural matrix with \code{M} regimes
+Each of the draws from the posterior estimation of models from 
+packages \pkg{bsvars} or \pkg{bsvarSIGNs} is transformed into
+a draw from the posterior distribution of the impulse responses.
 }
 \references{
-Camehl, A. & Woźniak, T. (2022) What do Data Say About Time-Variation in 
-Monetary Policy Shock Identification?
+Kilian, L., & Lütkepohl, H. (2017). Structural VAR Tools, Chapter 4, In: Structural vector autoregressive analysis. Cambridge University Press.
 }
 \author{
 Tomasz Woźniak \email{wozniak.tom@pm.me}

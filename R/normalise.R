@@ -31,7 +31,7 @@
 normalise <- function(posterior, VB) {
   
   # check the args
-  stopifnot("Argument posterior must contain estimation output from the estimate function." = any(class(posterior)[1] == c("PosteriorBSVARSVMSTVI", "PosteriorBSVARSVMS", "PosteriorBSVARSVTVI", "PosteriorBSVARMSTVI", "PosteriorBSVARMS", "PosteriorBSVARTVI")))
+  # stopifnot("Argument posterior must contain estimation output from the estimate function." = any(class(posterior)[1] == c("PosteriorBSVARSVMSTVI", "PosteriorBSVARSVMS", "PosteriorBSVARSVTVI", "PosteriorBSVARMSTVI", "PosteriorBSVARMS", "PosteriorBSVARTVI")))
   stopifnot("Argument VB must be a list." = is.list(VB))
   
   # call method
@@ -134,6 +134,56 @@ normalise.PosteriorBSVARSVMSTVI <- function(posterior, VB) {
   
   M             = dim(posterior$posterior$xi)[1]
   N             = dim(posterior$posterior$A)[1]
+  comp          = VB[length(VB)][[1]]
+  TVI_indicator  = posterior$posterior$S4_indicator
+  B_hat         = array(NA, c(N, N, M, comp[TVI_equation]))
+  
+  for (m in 1:M) {
+    for (component in 1:comp[TVI_equation]) {
+      
+      TVI_indices    = which(TVI_indicator[TVI_equation, m, ] == component) #
+      if ( length(TVI_indices) == 0 ) next
+      
+      B_hat_tmp               = posterior$posterior$B[utils::tail(TVI_indices,1),1][[1]][,,m] #
+      B_hat[,,m,component]    = diag(sign(diag(B_hat_tmp))) %*% B_hat_tmp
+      
+      B_to_normalise = array(NA, c(N, N, length(TVI_indices)))
+      for (i in 1:length(TVI_indices)) {
+        B_to_normalise[,,i]   = posterior$posterior$B[TVI_indices[i],1][[1]][,,m] # this is ridiculus!
+      }
+      
+      B_to_normalise          = .Call(`_bsvarTVPs_bsvars_normalisation_wz2003`, B_to_normalise, B_hat[,,m,component])
+      
+      for (i in 1:length(TVI_indices)) {
+        posterior$posterior$B[TVI_indices[i],1][[1]][,,m] = B_to_normalise[,,i]
+      }
+      
+      # last_draw
+      if ( component == posterior$last_draw$S4_indicator[TVI_equation,m] ) {
+        posterior$last_draw$B[,,m]    = .Call(`_bsvarTVPs_bsvars_normalisation_wz20031`, posterior$last_draw$B[,,m], B_hat[,,m,component])
+      }
+      
+    } # END component loop
+  } # END m loop
+  
+  return(posterior)
+}
+
+
+
+
+#' @inherit normalise
+#' @inheritParams normalise
+#' 
+#' @method normalise PosteriorBSVARSVMSATVI
+#' 
+#' @export
+normalise.PosteriorBSVARSVMSATVI <- function(posterior, VB) {
+  
+  TVI_equation = 3
+  
+  M             = dim(posterior$posterior$xi)[1]
+  N             = dim(posterior$posterior$sigma)[1]
   comp          = VB[length(VB)][[1]]
   TVI_indicator  = posterior$posterior$S4_indicator
   B_hat         = array(NA, c(N, N, M, comp[TVI_equation]))

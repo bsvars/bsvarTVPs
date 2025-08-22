@@ -18,7 +18,9 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
     const Rcpp::List&             prior,      // a list of priors - original dimensions
     const arma::field<arma::mat>& VB,        // restrictions on B0
     const Rcpp::List&             starting_values,
-    const int                     thin = 100  // introduce thinning
+    const int                     thin = 100, // introduce thinning
+    const bool                    centred_sv = false,
+    const bool                    hyper_boost = true
 ) {
   // Progress bar setup
   vec prog_rep_points = arma::round(arma::linspace(0, SS, 50));
@@ -47,14 +49,21 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
   mat   aux_h       = as<mat>(starting_values["h"]);
   vec   aux_rho     = as<vec>(starting_values["rho"]);
   vec   aux_omega   = as<vec>(starting_values["omega"]);
+  vec   aux_sigma2v = as<vec>(starting_values["sigma2v"]);
   umat  aux_S       = as<umat>(starting_values["S"]);
   vec   aux_sigma2_omega = as<vec>(starting_values["sigma2_omega"]);
   vec   aux_s_      = as<vec>(starting_values["s_"]);
   ivec  aux_SL      = as<ivec>(starting_values["S4_indicator"]) - 1;      // S4 indicator vector
   mat   aux_sigma(N, T);
   
-  for (int n=0; n<N; n++) {
-    aux_sigma.row(n) = exp(0.5 * aux_omega(n) * aux_h.row(n));
+  if ( centred_sv ) {
+    for (int n=0; n<N; n++) {
+      aux_sigma.row(n) = exp(0.5 * aux_h.row(n));
+    }
+  } else {
+    for (int n=0; n<N; n++) {
+      aux_sigma.row(n) = exp(0.5 * aux_omega(n) * aux_h.row(n));
+    }
   }
   
   const int   S     = floor(SS / thin);
@@ -65,6 +74,7 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
   cube  posterior_h(N, T, S);
   mat   posterior_rho(N, S);
   mat   posterior_omega(N, S);
+  mat   posterior_sigma2v(N, S);
   ucube posterior_S(N, T, S);
   mat   posterior_sigma2_omega(N, S);
   mat   posterior_s_(N, S);
@@ -72,12 +82,8 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
   cube  posterior_sigma(N, T, S);
   
   vec   acceptance_count(3+N);
-  mat   aux_hyper_tmp       = aux_hyper;
-  mat   aux_B_tmp           = aux_B;
-  ivec  aux_SL_tmp          = aux_SL;
   List  BSL;
-  mat   aux_A_tmp           = aux_A;
-  List  sv_n_tmp;
+  List  sv_n;
   
   int   s = 0;
   
@@ -89,35 +95,15 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
     if (ss % 200 == 0) checkUserInterrupt();
     
     // sample aux_hyper
-    aux_hyper_tmp       = aux_hyper;
-    try {
-      aux_hyper_tmp     = sample_hyperparameter_boost_s4( aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
-    } catch (...) {
-      acceptance_count(0)++;
-    }
-    aux_hyper           = aux_hyper_tmp;
+    aux_hyper           = sample_hyperparameter_boost_s4( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, hyper_boost);
     
     // sample aux_B
-    BSL     = List::create(
-      _["aux_B"]      = aux_B,
-      _["aux_SL"]     = aux_SL
-    );
-    try {
-      BSL               = sample_B_heterosk1_s4_boost(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, Y, X, prior, VB);
-    } catch (...) {
-      acceptance_count(1)++;
-    }
+    BSL                 = sample_B_heterosk1_s4_boost(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, Y, X, prior, VB);
     aux_B               = as<mat>(BSL["aux_B"]);
     aux_SL              = as<ivec>(BSL["aux_SL"]);
     
     // sample aux_A
-    aux_A_tmp           = aux_A;
-    try {
-      aux_A_tmp         = sample_A_heterosk1_boost(aux_A, aux_B, aux_hyper, aux_sigma, Y, X, prior);
-    } catch (...) {
-      acceptance_count(2)++;
-    }
-    aux_A               = aux_A_tmp;
+    aux_A               = sample_A_heterosk1_boost(aux_A, aux_B, aux_hyper, aux_sigma, Y, X, prior);
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
     mat U = aux_B * (Y - aux_A * X);
@@ -131,32 +117,26 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
       rowvec  U_tmp     = U.row(n);
       double  s2o_tmp   = aux_sigma2_omega(n);
       double  s_n       = aux_s_(n);
-      
-      sv_n_tmp          = List::create(
-        _["aux_h_n"]              = h_tmp,
-        _["aux_rho_n"]            = rho_tmp,
-        _["aux_omega_n"]          = omega_tmp,
-        _["aux_sigma2v_n"]        = sigma2v_tmp,
-        _["aux_sigma2_omega_n"]   = s2o_tmp,
-        _["aux_s_n"]              = s_n,
-        _["aux_S_n"]              = S_tmp
-      );
-      
-      try {
-        sv_n_tmp        = svar_nc1( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, U_tmp, prior, true );
-      } catch (...) {
-        acceptance_count(3 + n)++;
+
+      if ( centred_sv ) {
+        sv_n            = svar_ce1( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, U_tmp, prior, true );
+      } else {
+        sv_n            = svar_nc1( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, U_tmp, prior, true );
       }
       
-      List sv_n         = sv_n_tmp;
       aux_h.row(n)      = as<rowvec>(sv_n["aux_h_n"]);
       aux_rho(n)        = as<double>(sv_n["aux_rho_n"]);
       aux_omega(n)      = as<double>(sv_n["aux_omega_n"]);
+      aux_sigma2v(n)    = as<double>(sv_n["aux_sigma2v_n"]);
       aux_S.row(n)      = as<urowvec>(sv_n["aux_S_n"]);
       aux_sigma2_omega(n)         = as<double>(sv_n["aux_sigma2_omega_n"]);
       aux_s_(n)         = as<double>(sv_n["aux_s_n"]);
       
-      aux_sigma.row(n)  = exp(0.5 * aux_omega(n) * aux_h.row(n));
+      if ( centred_sv ) {
+        aux_sigma.row(n)  = exp(0.5 * aux_h.row(n));
+      } else {
+        aux_sigma.row(n)  = exp(0.5 * aux_omega(n) * aux_h.row(n));
+      }
     }
     
     if (ss % thin == 0) {
@@ -166,6 +146,7 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
       posterior_h.slice(s)          = aux_h;
       posterior_rho.col(s)          = aux_rho;
       posterior_omega.col(s)        = aux_omega;
+      posterior_sigma2v.col(ss)       = aux_sigma2v;
       posterior_S.slice(s)          = aux_S;
       posterior_sigma2_omega.col(s) = aux_sigma2_omega;
       posterior_s_.col(s)           = aux_s_;
@@ -183,6 +164,7 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
       _["h"]        = aux_h,
       _["rho"]      = aux_rho,
       _["omega"]    = aux_omega,
+      _["sigma2v"]  = aux_sigma2v,
       _["S"]        = aux_S,
       _["sigma2_omega"] = aux_sigma2_omega,
       _["s_"]       = aux_s_,
@@ -196,6 +178,7 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
       _["h"]        = posterior_h,
       _["rho"]      = posterior_rho,
       _["omega"]    = posterior_omega,
+      _["sigma2v"]  = posterior_sigma2v,
       _["S"]        = posterior_S,
       _["sigma2_omega"] = posterior_sigma2_omega,
       _["s_"]        = posterior_s_,
