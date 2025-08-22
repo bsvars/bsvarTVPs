@@ -148,4 +148,25 @@ arma::mat sample_hyperparameters_mssa_s4_boost (
 );
 
 
+double rig1 (
+    double alpha,
+    double beta
+);
+
+
+void sample_hyperparameter_horseshoe (
+    arma::mat&              aux_hyper_gammaB,     // (N, N)
+    arma::mat&              aux_hyper_gB,         // (N, N)
+    arma::mat&              aux_hyper_gammaA,     // (N, K)
+    arma::mat&              aux_hyper_gA,         // (N, K)
+    arma::vec&              aux_hyper_deltaBA,    // (2)
+    arma::vec&              aux_hyper_dBA,        // (2)
+    const arma::mat&        aux_B,                // (N, N)
+    const arma::mat&        aux_A,                // (N, K)     
+    const arma::field<arma::mat>& VB,             // (N)
+    const arma::ivec&       aux_SL,               // Nx1 row-specific S4 indicators
+    const Rcpp::List&       prior
+);
+
+
 #endif  // _SAMPLE_ABHYPER_TVP_H_
