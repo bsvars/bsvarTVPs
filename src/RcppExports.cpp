@@ -1197,48 +1197,6 @@ RcppExport SEXP _bsvarTVPs_sample_B_heterosk1_boost(SEXP aux_BSEXP, SEXP aux_ASE
     UNPROTECT(1);
     return rcpp_result_gen;
 }
-// sample_B_heterosk1_s4
-Rcpp::List sample_B_heterosk1_s4(arma::mat aux_B, arma::ivec aux_SL, const arma::mat& aux_A, const arma::vec& aux_hyper, const arma::mat& aux_sigma, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VBL);
-static SEXP _bsvarTVPs_sample_B_heterosk1_s4_try(SEXP aux_BSEXP, SEXP aux_SLSEXP, SEXP aux_ASEXP, SEXP aux_hyperSEXP, SEXP aux_sigmaSEXP, SEXP YSEXP, SEXP XSEXP, SEXP priorSEXP, SEXP VBLSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type aux_B(aux_BSEXP);
-    Rcpp::traits::input_parameter< arma::ivec >::type aux_SL(aux_SLSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type aux_A(aux_ASEXP);
-    Rcpp::traits::input_parameter< const arma::vec& >::type aux_hyper(aux_hyperSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type aux_sigma(aux_sigmaSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type Y(YSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type X(XSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::List& >::type prior(priorSEXP);
-    Rcpp::traits::input_parameter< const arma::field<arma::mat>& >::type VBL(VBLSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_B_heterosk1_s4(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, Y, X, prior, VBL));
-    return rcpp_result_gen;
-END_RCPP_RETURN_ERROR
-}
-RcppExport SEXP _bsvarTVPs_sample_B_heterosk1_s4(SEXP aux_BSEXP, SEXP aux_SLSEXP, SEXP aux_ASEXP, SEXP aux_hyperSEXP, SEXP aux_sigmaSEXP, SEXP YSEXP, SEXP XSEXP, SEXP priorSEXP, SEXP VBLSEXP) {
-    SEXP rcpp_result_gen;
-    {
-        Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_sample_B_heterosk1_s4_try(aux_BSEXP, aux_SLSEXP, aux_ASEXP, aux_hyperSEXP, aux_sigmaSEXP, YSEXP, XSEXP, priorSEXP, VBLSEXP));
-    }
-    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
-    if (rcpp_isInterrupt_gen) {
-        UNPROTECT(1);
-        Rf_onintr();
-    }
-    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
-    if (rcpp_isLongjump_gen) {
-        Rcpp::internal::resumeJump(rcpp_result_gen);
-    }
-    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
-    if (rcpp_isError_gen) {
-        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
-        UNPROTECT(1);
-        Rf_error("%s", CHAR(rcpp_msgSEXP_gen));
-    }
-    UNPROTECT(1);
-    return rcpp_result_gen;
-}
 // sample_B_heterosk1_s4_boost
 Rcpp::List sample_B_heterosk1_s4_boost(arma::mat aux_B, arma::ivec aux_SL, const arma::mat& aux_A, const arma::mat& aux_hyper, const arma::mat& aux_sigma, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VBL);
 static SEXP _bsvarTVPs_sample_B_heterosk1_s4_boost_try(SEXP aux_BSEXP, SEXP aux_SLSEXP, SEXP aux_ASEXP, SEXP aux_hyperSEXP, SEXP aux_sigmaSEXP, SEXP YSEXP, SEXP XSEXP, SEXP priorSEXP, SEXP VBLSEXP) {
@@ -2660,7 +2618,6 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
         signatures.insert("Rcpp::List(*forecast_sv)(arma::cube&,arma::cube&,arma::mat&,arma::mat&,arma::mat&,arma::vec&,const int&,const bool)");
         signatures.insert("arma::mat(*orthogonal_complement_matrix_TW)(const arma::mat&)");
         signatures.insert("arma::mat(*sample_B_heterosk1_boost)(arma::mat,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
-        signatures.insert("Rcpp::List(*sample_B_heterosk1_s4)(arma::mat,arma::ivec,const arma::mat&,const arma::vec&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
         signatures.insert("Rcpp::List(*sample_B_heterosk1_s4_boost)(arma::mat,arma::ivec,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
         signatures.insert("arma::cube(*sample_B_mss_boost)(arma::cube,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
         signatures.insert("Rcpp::List(*sample_B_mss_s4_boost)(arma::cube,arma::imat,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
@@ -2733,7 +2690,6 @@ RcppExport SEXP _bsvarTVPs_RcppExport_registerCCallable() {
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_forecast_sv", (DL_FUNC)_bsvarTVPs_forecast_sv_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_orthogonal_complement_matrix_TW", (DL_FUNC)_bsvarTVPs_orthogonal_complement_matrix_TW_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_sample_B_heterosk1_boost", (DL_FUNC)_bsvarTVPs_sample_B_heterosk1_boost_try);
-    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_sample_B_heterosk1_s4", (DL_FUNC)_bsvarTVPs_sample_B_heterosk1_s4_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_sample_B_heterosk1_s4_boost", (DL_FUNC)_bsvarTVPs_sample_B_heterosk1_s4_boost_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_sample_B_mss_boost", (DL_FUNC)_bsvarTVPs_sample_B_mss_boost_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_sample_B_mss_s4_boost", (DL_FUNC)_bsvarTVPs_sample_B_mss_s4_boost_try);
@@ -2805,7 +2761,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bsvarTVPs_forecast_sv", (DL_FUNC) &_bsvarTVPs_forecast_sv, 8},
     {"_bsvarTVPs_orthogonal_complement_matrix_TW", (DL_FUNC) &_bsvarTVPs_orthogonal_complement_matrix_TW, 1},
     {"_bsvarTVPs_sample_B_heterosk1_boost", (DL_FUNC) &_bsvarTVPs_sample_B_heterosk1_boost, 8},
-    {"_bsvarTVPs_sample_B_heterosk1_s4", (DL_FUNC) &_bsvarTVPs_sample_B_heterosk1_s4, 9},
     {"_bsvarTVPs_sample_B_heterosk1_s4_boost", (DL_FUNC) &_bsvarTVPs_sample_B_heterosk1_s4_boost, 9},
     {"_bsvarTVPs_sample_B_mss_boost", (DL_FUNC) &_bsvarTVPs_sample_B_mss_boost, 9},
     {"_bsvarTVPs_sample_B_mss_s4_boost", (DL_FUNC) &_bsvarTVPs_sample_B_mss_s4_boost, 10},
