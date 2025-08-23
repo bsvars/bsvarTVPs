@@ -1490,26 +1490,26 @@ RcppExport SEXP _bsvarTVPs_sample_A_heterosk1_mssa(SEXP aux_ASEXP, SEXP aux_BSEX
     return rcpp_result_gen;
 }
 // sample_hyperparameter_boost_s4
-arma::mat sample_hyperparameter_boost_s4(arma::mat aux_hyper, const arma::mat& aux_B, const arma::mat& aux_A, const arma::field<arma::mat>& VB, const arma::ivec& aux_SL, const Rcpp::List& prior, const bool hyper_boost);
-static SEXP _bsvarTVPs_sample_hyperparameter_boost_s4_try(SEXP aux_hyperSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP aux_SLSEXP, SEXP priorSEXP, SEXP hyper_boostSEXP) {
+Rcpp::List sample_hyperparameter_boost_s4(Rcpp::List& aux_hyper_list, const arma::mat& aux_B, const arma::mat& aux_A, const arma::field<arma::mat>& VB, const arma::ivec& aux_SL, const Rcpp::List& prior, const bool hyper_boost);
+static SEXP _bsvarTVPs_sample_hyperparameter_boost_s4_try(SEXP aux_hyper_listSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP aux_SLSEXP, SEXP priorSEXP, SEXP hyper_boostSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type aux_hyper(aux_hyperSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List& >::type aux_hyper_list(aux_hyper_listSEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type aux_B(aux_BSEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type aux_A(aux_ASEXP);
     Rcpp::traits::input_parameter< const arma::field<arma::mat>& >::type VB(VBSEXP);
     Rcpp::traits::input_parameter< const arma::ivec& >::type aux_SL(aux_SLSEXP);
     Rcpp::traits::input_parameter< const Rcpp::List& >::type prior(priorSEXP);
     Rcpp::traits::input_parameter< const bool >::type hyper_boost(hyper_boostSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_hyperparameter_boost_s4(aux_hyper, aux_B, aux_A, VB, aux_SL, prior, hyper_boost));
+    rcpp_result_gen = Rcpp::wrap(sample_hyperparameter_boost_s4(aux_hyper_list, aux_B, aux_A, VB, aux_SL, prior, hyper_boost));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _bsvarTVPs_sample_hyperparameter_boost_s4(SEXP aux_hyperSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP aux_SLSEXP, SEXP priorSEXP, SEXP hyper_boostSEXP) {
+RcppExport SEXP _bsvarTVPs_sample_hyperparameter_boost_s4(SEXP aux_hyper_listSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP aux_SLSEXP, SEXP priorSEXP, SEXP hyper_boostSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_sample_hyperparameter_boost_s4_try(aux_hyperSEXP, aux_BSEXP, aux_ASEXP, VBSEXP, aux_SLSEXP, priorSEXP, hyper_boostSEXP));
+        rcpp_result_gen = PROTECT(_bsvarTVPs_sample_hyperparameter_boost_s4_try(aux_hyper_listSEXP, aux_BSEXP, aux_ASEXP, VBSEXP, aux_SLSEXP, priorSEXP, hyper_boostSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -1530,25 +1530,25 @@ RcppExport SEXP _bsvarTVPs_sample_hyperparameter_boost_s4(SEXP aux_hyperSEXP, SE
     return rcpp_result_gen;
 }
 // sample_hyperparameters_mss_boost
-arma::mat sample_hyperparameters_mss_boost(arma::mat aux_hyper, const arma::cube& aux_B, const arma::mat& aux_A, const arma::field<arma::mat>& VB, const Rcpp::List& prior, const bool hyper_boost);
-static SEXP _bsvarTVPs_sample_hyperparameters_mss_boost_try(SEXP aux_hyperSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP priorSEXP, SEXP hyper_boostSEXP) {
+Rcpp::List sample_hyperparameters_mss_boost(Rcpp::List& aux_hyper_list, const arma::cube& aux_B, const arma::mat& aux_A, const arma::field<arma::mat>& VB, const Rcpp::List& prior, const bool hyper_boost);
+static SEXP _bsvarTVPs_sample_hyperparameters_mss_boost_try(SEXP aux_hyper_listSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP priorSEXP, SEXP hyper_boostSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type aux_hyper(aux_hyperSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List& >::type aux_hyper_list(aux_hyper_listSEXP);
     Rcpp::traits::input_parameter< const arma::cube& >::type aux_B(aux_BSEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type aux_A(aux_ASEXP);
     Rcpp::traits::input_parameter< const arma::field<arma::mat>& >::type VB(VBSEXP);
     Rcpp::traits::input_parameter< const Rcpp::List& >::type prior(priorSEXP);
     Rcpp::traits::input_parameter< const bool >::type hyper_boost(hyper_boostSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_hyperparameters_mss_boost(aux_hyper, aux_B, aux_A, VB, prior, hyper_boost));
+    rcpp_result_gen = Rcpp::wrap(sample_hyperparameters_mss_boost(aux_hyper_list, aux_B, aux_A, VB, prior, hyper_boost));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _bsvarTVPs_sample_hyperparameters_mss_boost(SEXP aux_hyperSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP priorSEXP, SEXP hyper_boostSEXP) {
+RcppExport SEXP _bsvarTVPs_sample_hyperparameters_mss_boost(SEXP aux_hyper_listSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP priorSEXP, SEXP hyper_boostSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_sample_hyperparameters_mss_boost_try(aux_hyperSEXP, aux_BSEXP, aux_ASEXP, VBSEXP, priorSEXP, hyper_boostSEXP));
+        rcpp_result_gen = PROTECT(_bsvarTVPs_sample_hyperparameters_mss_boost_try(aux_hyper_listSEXP, aux_BSEXP, aux_ASEXP, VBSEXP, priorSEXP, hyper_boostSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -1569,26 +1569,26 @@ RcppExport SEXP _bsvarTVPs_sample_hyperparameters_mss_boost(SEXP aux_hyperSEXP, 
     return rcpp_result_gen;
 }
 // sample_hyperparameters_mss_s4_boost
-arma::mat sample_hyperparameters_mss_s4_boost(arma::mat aux_hyper, const arma::cube& aux_B, const arma::mat& aux_A, const arma::field<arma::mat>& VB, const arma::imat& aux_SL, const Rcpp::List& prior, const bool hyper_boost);
-static SEXP _bsvarTVPs_sample_hyperparameters_mss_s4_boost_try(SEXP aux_hyperSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP aux_SLSEXP, SEXP priorSEXP, SEXP hyper_boostSEXP) {
+Rcpp::List sample_hyperparameters_mss_s4_boost(Rcpp::List& aux_hyper_list, const arma::cube& aux_B, const arma::mat& aux_A, const arma::field<arma::mat>& VB, const arma::imat& aux_SL, const Rcpp::List& prior, const bool hyper_boost);
+static SEXP _bsvarTVPs_sample_hyperparameters_mss_s4_boost_try(SEXP aux_hyper_listSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP aux_SLSEXP, SEXP priorSEXP, SEXP hyper_boostSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type aux_hyper(aux_hyperSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List& >::type aux_hyper_list(aux_hyper_listSEXP);
     Rcpp::traits::input_parameter< const arma::cube& >::type aux_B(aux_BSEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type aux_A(aux_ASEXP);
     Rcpp::traits::input_parameter< const arma::field<arma::mat>& >::type VB(VBSEXP);
     Rcpp::traits::input_parameter< const arma::imat& >::type aux_SL(aux_SLSEXP);
     Rcpp::traits::input_parameter< const Rcpp::List& >::type prior(priorSEXP);
     Rcpp::traits::input_parameter< const bool >::type hyper_boost(hyper_boostSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_hyperparameters_mss_s4_boost(aux_hyper, aux_B, aux_A, VB, aux_SL, prior, hyper_boost));
+    rcpp_result_gen = Rcpp::wrap(sample_hyperparameters_mss_s4_boost(aux_hyper_list, aux_B, aux_A, VB, aux_SL, prior, hyper_boost));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _bsvarTVPs_sample_hyperparameters_mss_s4_boost(SEXP aux_hyperSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP aux_SLSEXP, SEXP priorSEXP, SEXP hyper_boostSEXP) {
+RcppExport SEXP _bsvarTVPs_sample_hyperparameters_mss_s4_boost(SEXP aux_hyper_listSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP aux_SLSEXP, SEXP priorSEXP, SEXP hyper_boostSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_sample_hyperparameters_mss_s4_boost_try(aux_hyperSEXP, aux_BSEXP, aux_ASEXP, VBSEXP, aux_SLSEXP, priorSEXP, hyper_boostSEXP));
+        rcpp_result_gen = PROTECT(_bsvarTVPs_sample_hyperparameters_mss_s4_boost_try(aux_hyper_listSEXP, aux_BSEXP, aux_ASEXP, VBSEXP, aux_SLSEXP, priorSEXP, hyper_boostSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -1609,26 +1609,26 @@ RcppExport SEXP _bsvarTVPs_sample_hyperparameters_mss_s4_boost(SEXP aux_hyperSEX
     return rcpp_result_gen;
 }
 // sample_hyperparameters_mssa_s4_boost
-arma::mat sample_hyperparameters_mssa_s4_boost(arma::mat aux_hyper, const arma::cube& aux_B, const arma::cube& aux_A, const arma::field<arma::mat>& VB, const arma::imat& aux_SL, const Rcpp::List& prior, const bool hyper_boost);
-static SEXP _bsvarTVPs_sample_hyperparameters_mssa_s4_boost_try(SEXP aux_hyperSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP aux_SLSEXP, SEXP priorSEXP, SEXP hyper_boostSEXP) {
+Rcpp::List sample_hyperparameters_mssa_s4_boost(Rcpp::List& aux_hyper_list, const arma::cube& aux_B, const arma::cube& aux_A, const arma::field<arma::mat>& VB, const arma::imat& aux_SL, const Rcpp::List& prior, const bool hyper_boost);
+static SEXP _bsvarTVPs_sample_hyperparameters_mssa_s4_boost_try(SEXP aux_hyper_listSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP aux_SLSEXP, SEXP priorSEXP, SEXP hyper_boostSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type aux_hyper(aux_hyperSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List& >::type aux_hyper_list(aux_hyper_listSEXP);
     Rcpp::traits::input_parameter< const arma::cube& >::type aux_B(aux_BSEXP);
     Rcpp::traits::input_parameter< const arma::cube& >::type aux_A(aux_ASEXP);
     Rcpp::traits::input_parameter< const arma::field<arma::mat>& >::type VB(VBSEXP);
     Rcpp::traits::input_parameter< const arma::imat& >::type aux_SL(aux_SLSEXP);
     Rcpp::traits::input_parameter< const Rcpp::List& >::type prior(priorSEXP);
     Rcpp::traits::input_parameter< const bool >::type hyper_boost(hyper_boostSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_hyperparameters_mssa_s4_boost(aux_hyper, aux_B, aux_A, VB, aux_SL, prior, hyper_boost));
+    rcpp_result_gen = Rcpp::wrap(sample_hyperparameters_mssa_s4_boost(aux_hyper_list, aux_B, aux_A, VB, aux_SL, prior, hyper_boost));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _bsvarTVPs_sample_hyperparameters_mssa_s4_boost(SEXP aux_hyperSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP aux_SLSEXP, SEXP priorSEXP, SEXP hyper_boostSEXP) {
+RcppExport SEXP _bsvarTVPs_sample_hyperparameters_mssa_s4_boost(SEXP aux_hyper_listSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP aux_SLSEXP, SEXP priorSEXP, SEXP hyper_boostSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_sample_hyperparameters_mssa_s4_boost_try(aux_hyperSEXP, aux_BSEXP, aux_ASEXP, VBSEXP, aux_SLSEXP, priorSEXP, hyper_boostSEXP));
+        rcpp_result_gen = PROTECT(_bsvarTVPs_sample_hyperparameters_mssa_s4_boost_try(aux_hyper_listSEXP, aux_BSEXP, aux_ASEXP, VBSEXP, aux_SLSEXP, priorSEXP, hyper_boostSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -2625,10 +2625,10 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
         signatures.insert("arma::mat(*sample_A_heterosk1)(arma::mat,const arma::mat&,arma::field<arma::mat>,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&)");
         signatures.insert("arma::mat(*sample_A_heterosk1_mss)(arma::mat,const arma::cube&,const arma::mat&,arma::field<arma::mat>,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&)");
         signatures.insert("arma::cube(*sample_A_heterosk1_mssa)(arma::cube,const arma::cube&,const arma::mat&,arma::field<arma::mat>,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&)");
-        signatures.insert("arma::mat(*sample_hyperparameter_boost_s4)(arma::mat,const arma::mat&,const arma::mat&,const arma::field<arma::mat>&,const arma::ivec&,const Rcpp::List&,const bool)");
-        signatures.insert("arma::mat(*sample_hyperparameters_mss_boost)(arma::mat,const arma::cube&,const arma::mat&,const arma::field<arma::mat>&,const Rcpp::List&,const bool)");
-        signatures.insert("arma::mat(*sample_hyperparameters_mss_s4_boost)(arma::mat,const arma::cube&,const arma::mat&,const arma::field<arma::mat>&,const arma::imat&,const Rcpp::List&,const bool)");
-        signatures.insert("arma::mat(*sample_hyperparameters_mssa_s4_boost)(arma::mat,const arma::cube&,const arma::cube&,const arma::field<arma::mat>&,const arma::imat&,const Rcpp::List&,const bool)");
+        signatures.insert("Rcpp::List(*sample_hyperparameter_boost_s4)(Rcpp::List&,const arma::mat&,const arma::mat&,const arma::field<arma::mat>&,const arma::ivec&,const Rcpp::List&,const bool)");
+        signatures.insert("Rcpp::List(*sample_hyperparameters_mss_boost)(Rcpp::List&,const arma::cube&,const arma::mat&,const arma::field<arma::mat>&,const Rcpp::List&,const bool)");
+        signatures.insert("Rcpp::List(*sample_hyperparameters_mss_s4_boost)(Rcpp::List&,const arma::cube&,const arma::mat&,const arma::field<arma::mat>&,const arma::imat&,const Rcpp::List&,const bool)");
+        signatures.insert("Rcpp::List(*sample_hyperparameters_mssa_s4_boost)(Rcpp::List&,const arma::cube&,const arma::cube&,const arma::field<arma::mat>&,const arma::imat&,const Rcpp::List&,const bool)");
         signatures.insert("double(*rig_inv1)(double,double)");
         signatures.insert("Rcpp::List(*sample_hyperparameter_horseshoe)(arma::mat&,arma::mat&,arma::mat&,arma::mat&,double&,double&,double&,double&,const arma::mat&,const arma::mat&,const arma::field<arma::mat>&,const arma::ivec&,const Rcpp::List&)");
         signatures.insert("Rcpp::List(*sample_hyperparameter_mss_horseshoe)(arma::cube&,arma::cube&,arma::mat&,arma::mat&,arma::vec&,arma::vec&,double&,double&,const arma::cube&,const arma::mat&,const arma::field<arma::mat>&,const Rcpp::List&)");
