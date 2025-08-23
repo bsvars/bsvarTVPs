@@ -45,7 +45,7 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
   
   mat   aux_B       = as<mat>(starting_values["B"]);
   mat   aux_A       = as<mat>(starting_values["A"]);
-  mat   aux_hyper   = as<mat>(starting_values["hyper"]);  // (2*N+1)x2 (gamma_n, s_n, s) for both B and A
+  List  aux_hyper   = as<List>(starting_values["hyper"]);  // (2*N+1)x2 (gamma_0, gamma_+, s_0, s_+, s_)
   mat   aux_h       = as<mat>(starting_values["h"]);
   vec   aux_rho     = as<vec>(starting_values["rho"]);
   vec   aux_omega   = as<vec>(starting_values["omega"]);
@@ -145,7 +145,7 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
     if (ss % thin == 0) {
       posterior_B.slice(s)          = aux_B;
       posterior_A.slice(s)          = aux_A;
-      posterior_hyper.slice(s)      = aux_hyper;
+      posterior_hyper.slice(s)      = as<mat>(aux_hyper["aux_hyper"]);
       posterior_h.slice(s)          = aux_h;
       posterior_rho.col(s)          = aux_rho;
       posterior_omega.col(s)        = aux_omega;

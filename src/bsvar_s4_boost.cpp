@@ -44,7 +44,7 @@ Rcpp::List bsvar_s4_boost_cpp (
   
   mat   aux_B       = as<mat>(starting_values["B"]);
   mat   aux_A       = as<mat>(starting_values["A"]);
-  mat   aux_hyper   = as<mat>(starting_values["hyper"]);  // (2*N+1)x2 (gamma_n, s_n, s) for both B and A
+  List  aux_hyper   = as<List>(starting_values["hyper"]);  // (2*N+1)x2 (gamma_0, gamma_+, s_0, s_+, s_)
   ivec  aux_SL      = as<ivec>(starting_values["S4_indicator"]) - 1;      // S4 indicator vector
   mat   aux_sigma(N, T, fill::ones);
   
@@ -56,10 +56,6 @@ Rcpp::List bsvar_s4_boost_cpp (
   imat  posterior_SL(N, S);
   
   vec   acceptance_count(3);
-  mat   aux_hyper_tmp       = aux_hyper;
-  mat   aux_B_tmp           = aux_B;
-  ivec  aux_SL_tmp          = aux_SL;
-  mat   aux_A_tmp           = aux_A;
   List  BSL;
   
   
@@ -93,7 +89,7 @@ Rcpp::List bsvar_s4_boost_cpp (
     if (ss % thin == 0) {
       posterior_B.slice(s)          = aux_B;
       posterior_A.slice(s)          = aux_A;
-      posterior_hyper.slice(s)      = aux_hyper;
+      posterior_hyper.slice(s)      = as<mat>(aux_hyper["aux_hyper"]);
       posterior_SL.col(s)           = aux_SL;
       s++;
     }

@@ -44,7 +44,7 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
   
   cube  aux_B       = as<cube>(starting_values["B"]);
   mat   aux_A       = as<mat>(starting_values["A"]);
-  mat   aux_hyper   = as<mat>(starting_values["hyper"]);  // (2*N+1)x2 (gamma_0, gamma_+, s_0, s_+, s_)
+  List  aux_hyper   = as<List>(starting_values["hyper"]);  // (2*N+1)x2 (gamma_0, gamma_+, s_0, s_+, s_)
   
   mat   aux_PR_TR   = as<mat>(starting_values["PR_TR"]);
   vec   aux_pi_0    = as<vec>(starting_values["pi_0"]);
@@ -218,7 +218,7 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     if (ss % thin == 0) {
       posterior_B(s)                = aux_B;
       posterior_A.slice(s)          = aux_A;
-      posterior_hyper.slice(s)      = aux_hyper;
+      posterior_hyper.slice(s)      = as<mat>(aux_hyper["aux_hyper"]);
       posterior_PR_TR.slice(s)      = aux_PR_TR;
       posterior_pi_0.col(s)         = aux_pi_0;
       posterior_xi.slice(s)         = aux_xi;
