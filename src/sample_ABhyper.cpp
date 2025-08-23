@@ -1435,3 +1435,77 @@ arma::field<arma::mat> hyper2precisionA_msa_boost (
   
   return precisionA;
 } // END hyper2precisionA_msa_boost
+
+
+
+arma::field<arma::mat> hyper2precisionB_horseshoe (
+    arma::mat&              aux_hyper_inv_gammaB,     // (N, N)
+    double&                 aux_hyper_inv_deltaB
+) {
+  
+  int         N             = aux_hyper_inv_gammaB.n_rows; 
+  field<mat>  precisionB(N);
+  
+  for (int n=0; n<N; n++) {
+    precisionB(n)           = diagmat(aux_hyper_inv_deltaB * aux_hyper_inv_gammaB.row(n));
+  }
+  
+  return precisionB;
+} // END hyper2precisionB_horseshoe
+
+
+
+arma::field<arma::mat> hyper2precisionA_horseshoe (
+    arma::mat&              aux_hyper_inv_gammaA,     // (N, K)
+    double&                 aux_hyper_inv_deltaA
+) {
+  
+  int         N             = aux_hyper_inv_gammaA.n_rows; 
+  field<mat>  precisionA(N);
+  
+  for (int n=0; n<N; n++) {
+    precisionA(n)           = diagmat(aux_hyper_inv_deltaA * aux_hyper_inv_gammaA.row(n));
+  }
+  
+  return precisionA;
+} // END hyper2precisionA_horseshoe
+
+
+
+arma::field<arma::mat> hyper2precisionB_mss_horseshoe (
+    arma::cube&             aux_hyper_inv_gammaB,     // (N, N, M)
+    arma::vec&              aux_hyper_inv_deltaB     // (M)
+) {
+  
+  int         N             = aux_hyper_inv_gammaB.n_rows; 
+  int         M             = aux_hyper_inv_gammaB.n_slices;
+  field<mat>  precisionB(N, M);
+  
+  for (int n=0; n<N; n++) {
+    for (int m=0; m<M; m++) {
+      precisionB(n, m)      = diagmat(aux_hyper_inv_deltaB(m) * aux_hyper_inv_gammaB.slice(m).row(n));
+    }
+  }
+  
+  return precisionB;
+} // END hyper2precisionB_mss_horseshoe
+
+
+arma::field<arma::mat> hyper2precisionA_msa_horseshoe (
+    arma::cube&             aux_hyper_inv_gammaA,     // (N, K, M)
+    arma::vec&              aux_hyper_inv_deltaA     // (M)
+) {
+  
+  int         N             = aux_hyper_inv_gammaA.n_rows; 
+  int         M             = aux_hyper_inv_gammaA.n_slices;
+  field<mat>  precisionA(N, M);
+  
+  for (int n=0; n<N; n++) {
+    for (int m=0; m<M; m++) {
+      precisionA(n, m)      = diagmat(aux_hyper_inv_deltaA(m) * aux_hyper_inv_gammaA.slice(m).row(n));
+    }
+  }
+  
+  return precisionA;
+} // END hyper2precisionA_msa_horseshoe
+

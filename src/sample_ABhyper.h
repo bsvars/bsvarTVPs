@@ -262,4 +262,28 @@ arma::field<arma::mat> hyper2precisionA_msa_boost (
 );
 
 
+arma::field<arma::mat> hyper2precisionB_horseshoe (
+    arma::mat&              aux_hyper_inv_gammaB,     // (N, N)
+    double&                 aux_hyper_inv_deltaB
+);
+
+
+arma::field<arma::mat> hyper2precisionA_horseshoe (
+    arma::mat&              aux_hyper_inv_gammaA,     // (N, N)
+    double&                 aux_hyper_inv_deltaA
+);
+
+
+arma::field<arma::mat> hyper2precisionB_mss_horseshoe (
+    arma::cube&             aux_hyper_inv_gammaB,     // (N, N, M)
+    arma::vec&              aux_hyper_inv_deltaB     // (M)
+);
+
+
+arma::field<arma::mat> hyper2precisionA_msa_horseshoe (
+    arma::cube&             aux_hyper_inv_gammaA,     // (N, K, M)
+    arma::vec&              aux_hyper_inv_deltaA     // (M)
+);
+
+
 #endif  // _SAMPLE_ABHYPER_TVP_H_
