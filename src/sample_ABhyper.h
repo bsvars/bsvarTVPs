@@ -109,7 +109,7 @@ arma::cube sample_A_heterosk1_mssa (
 );
 
 
-arma::mat sample_hyperparameter_boost_s4 (
+Rcpp::List sample_hyperparameter_boost_s4 (
     arma::mat               aux_hyper,      // (2 * N + 1) x 2
     const arma::mat&        aux_B,
     const arma::mat&        aux_A,
@@ -120,7 +120,7 @@ arma::mat sample_hyperparameter_boost_s4 (
 );
 
 
-arma::mat sample_hyperparameters_mss_boost (
+Rcpp::List sample_hyperparameters_mss_boost (
     arma::mat               aux_hyper,
     const arma::cube&       aux_B,            // NxNxM
     const arma::mat&        aux_A,
@@ -130,7 +130,7 @@ arma::mat sample_hyperparameters_mss_boost (
 );
 
 
-arma::mat sample_hyperparameters_mss_s4_boost (
+Rcpp::List sample_hyperparameters_mss_s4_boost (
     arma::mat               aux_hyper,
     const arma::cube&       aux_B,            // NxNxM
     const arma::mat&        aux_A,
@@ -141,7 +141,7 @@ arma::mat sample_hyperparameters_mss_s4_boost (
 );
 
 
-arma::mat sample_hyperparameters_mssa_s4_boost (
+Rcpp::List sample_hyperparameters_mssa_s4_boost (
     arma::mat               aux_hyper,
     const arma::cube&       aux_B,            // NxNxM
     const arma::cube&       aux_A,            // NxKxM
@@ -226,25 +226,25 @@ Rcpp::List sample_hyperparameter_mssa_s4_horseshoe (
 
 
 arma::field<arma::mat> hyper2precisionB_boost (
-    arma::mat               aux_hyper,      // (2 * N + 1) x 2
+    Rcpp::List              aux_hyper_list,      // (2 * N + 1) x 2
     const Rcpp::List&       prior
 );
 
 
 arma::field<arma::mat> hyper2precisionA_boost (
-    arma::mat               aux_hyper,      // (2 * N + 1) x 2
+    Rcpp::List              aux_hyper_list,      // (2 * N + 1) x 2
     const Rcpp::List&       prior
 );
 
 
 arma::field<arma::mat> hyper2precisionB_mss_boost (
-    arma::mat               aux_hyper,      // (2 * N + 1) x 2
+    Rcpp::List              aux_hyper_list,      // (2 * N + 1) x 2
     const Rcpp::List&       prior
 );
 
 
 arma::field<arma::mat> hyper2precisionA_msa_boost (
-    arma::mat               aux_hyper,      // (2 * N + 1) x 2
+    Rcpp::List              aux_hyper_list,      // (2 * N + 1) x 2
     const Rcpp::List&       prior
 );
 

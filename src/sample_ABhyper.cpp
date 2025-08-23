@@ -584,7 +584,7 @@ arma::cube sample_A_heterosk1_mssa (
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
-arma::mat sample_hyperparameter_boost_s4 (
+Rcpp::List sample_hyperparameter_boost_s4 (
     arma::mat               aux_hyper,      // (2 * N + 1) x 2
     const arma::mat&        aux_B,
     const arma::mat&        aux_A,
@@ -666,14 +666,16 @@ arma::mat sample_hyperparameter_boost_s4 (
     }
   }
   
-  return aux_hyper;
+  return List::create(
+    _["aux_hyper"] = aux_hyper
+  );
 } // END sample_hyperparameter_boost_s4
 
 
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
-arma::mat sample_hyperparameters_mss_boost (
+Rcpp::List sample_hyperparameters_mss_boost (
     arma::mat               aux_hyper,
     const arma::cube&       aux_B,            // NxNxM
     const arma::mat&        aux_A,
@@ -751,14 +753,16 @@ arma::mat sample_hyperparameters_mss_boost (
     }
   }
   
-  return aux_hyper;
+  return List::create(
+    _["aux_hyper"] = aux_hyper
+  );
 } // END sample_hyperparameters_mss_boost
 
 
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
-arma::mat sample_hyperparameters_mss_s4_boost (
+Rcpp::List sample_hyperparameters_mss_s4_boost (
     arma::mat               aux_hyper,
     const arma::cube&       aux_B,            // NxNxM
     const arma::mat&        aux_A,
@@ -847,14 +851,16 @@ arma::mat sample_hyperparameters_mss_s4_boost (
     }
   }
   
-  return aux_hyper;
+  return List::create(
+    _["aux_hyper"] = aux_hyper
+  );
 } // END sample_hyperparameters_mss_s4_boost
 
 
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
-arma::mat sample_hyperparameters_mssa_s4_boost (
+Rcpp::List sample_hyperparameters_mssa_s4_boost (
     arma::mat               aux_hyper,
     const arma::cube&       aux_B,            // NxNxM
     const arma::cube&       aux_A,            // NxKxM
@@ -945,7 +951,9 @@ arma::mat sample_hyperparameters_mssa_s4_boost (
     }
   }
   
-  return aux_hyper;
+  return List::create(
+    _["aux_hyper"] = aux_hyper
+  );
 } // END sample_hyperparameters_mssa_s4_boost
 
 
@@ -1354,10 +1362,11 @@ Rcpp::List sample_hyperparameter_mssa_s4_horseshoe (
 
 
 arma::field<arma::mat> hyper2precisionB_boost (
-    arma::mat               aux_hyper,      // (2 * N + 1) x 2
+    Rcpp::List              aux_hyper_list,      // (2 * N + 1) x 2
     const Rcpp::List&       prior
 ) {
   
+  mat         aux_hyper     = as<mat>(aux_hyper_list["aux_hyper"]); 
   mat         prior_SS_inv  = as<mat>(prior["B_V_inv"]);
   int         N             = prior_SS_inv.n_rows; 
   field<mat>  precisionB(N);
@@ -1371,10 +1380,11 @@ arma::field<arma::mat> hyper2precisionB_boost (
 
 
 arma::field<arma::mat> hyper2precisionA_boost (
-    arma::mat               aux_hyper,      // (2 * N + 1) x 2
+    Rcpp::List              aux_hyper_list,      // (2 * N + 1) x 2
     const Rcpp::List&       prior
 ) {
   
+  mat         aux_hyper     = as<mat>(aux_hyper_list["aux_hyper"]); 
   mat         prior_A_V_inv = as<mat>(prior["A_V_inv"]);
   int         N             = prior_A_V_inv.n_rows; 
   field<mat>  precisionA(N);
@@ -1388,10 +1398,11 @@ arma::field<arma::mat> hyper2precisionA_boost (
 
 
 arma::field<arma::mat> hyper2precisionB_mss_boost (
-    arma::mat               aux_hyper,      // (2 * N + 1) x 2
+    Rcpp::List              aux_hyper_list,      // (2 * N + 1) x 2
     const Rcpp::List&       prior
 ) {
   
+  mat         aux_hyper     = as<mat>(aux_hyper_list["aux_hyper"]); 
   mat         prior_SS_inv  = as<mat>(prior["B_V_inv"]);
   mat         prior_PR_TR   = as<mat>(prior["PR_TR"]);
   
@@ -1410,10 +1421,11 @@ arma::field<arma::mat> hyper2precisionB_mss_boost (
 
 
 arma::field<arma::mat> hyper2precisionA_msa_boost (
-    arma::mat               aux_hyper,      // (2 * N + 1) x 2
+    Rcpp::List              aux_hyper_list,      // (2 * N + 1) x 2
     const Rcpp::List&       prior
 ) {
   
+  mat         aux_hyper     = as<mat>(aux_hyper_list["aux_hyper"]); 
   mat         prior_A_V_inv = as<mat>(prior["A_V_inv"]);
   mat         prior_PR_TR   = as<mat>(prior["PR_TR"]);
   
