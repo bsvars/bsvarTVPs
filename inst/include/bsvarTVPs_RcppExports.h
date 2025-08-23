@@ -655,17 +655,17 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::mat >(rcpp_result_gen);
     }
 
-    inline arma::mat sample_B_heterosk1_boost(arma::mat aux_B, const arma::mat& aux_A, const arma::mat& aux_hyper, const arma::mat& aux_sigma, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB) {
-        typedef SEXP(*Ptr_sample_B_heterosk1_boost)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
-        static Ptr_sample_B_heterosk1_boost p_sample_B_heterosk1_boost = NULL;
-        if (p_sample_B_heterosk1_boost == NULL) {
-            validateSignature("arma::mat(*sample_B_heterosk1_boost)(arma::mat,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
-            p_sample_B_heterosk1_boost = (Ptr_sample_B_heterosk1_boost)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_B_heterosk1_boost");
+    inline arma::mat sample_B_heterosk1(arma::mat aux_B, const arma::mat& aux_A, arma::field<arma::mat> prior_precision, const arma::mat& aux_sigma, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB) {
+        typedef SEXP(*Ptr_sample_B_heterosk1)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+        static Ptr_sample_B_heterosk1 p_sample_B_heterosk1 = NULL;
+        if (p_sample_B_heterosk1 == NULL) {
+            validateSignature("arma::mat(*sample_B_heterosk1)(arma::mat,const arma::mat&,arma::field<arma::mat>,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
+            p_sample_B_heterosk1 = (Ptr_sample_B_heterosk1)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_B_heterosk1");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_sample_B_heterosk1_boost(Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(aux_A)), Shield<SEXP>(Rcpp::wrap(aux_hyper)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(Y)), Shield<SEXP>(Rcpp::wrap(X)), Shield<SEXP>(Rcpp::wrap(prior)), Shield<SEXP>(Rcpp::wrap(VB)));
+            rcpp_result_gen = p_sample_B_heterosk1(Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(aux_A)), Shield<SEXP>(Rcpp::wrap(prior_precision)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(Y)), Shield<SEXP>(Rcpp::wrap(X)), Shield<SEXP>(Rcpp::wrap(prior)), Shield<SEXP>(Rcpp::wrap(VB)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -676,17 +676,17 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::mat >(rcpp_result_gen);
     }
 
-    inline Rcpp::List sample_B_heterosk1_s4_boost(arma::mat aux_B, arma::ivec aux_SL, const arma::mat& aux_A, const arma::mat& aux_hyper, const arma::mat& aux_sigma, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VBL) {
-        typedef SEXP(*Ptr_sample_B_heterosk1_s4_boost)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
-        static Ptr_sample_B_heterosk1_s4_boost p_sample_B_heterosk1_s4_boost = NULL;
-        if (p_sample_B_heterosk1_s4_boost == NULL) {
-            validateSignature("Rcpp::List(*sample_B_heterosk1_s4_boost)(arma::mat,arma::ivec,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
-            p_sample_B_heterosk1_s4_boost = (Ptr_sample_B_heterosk1_s4_boost)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_B_heterosk1_s4_boost");
+    inline Rcpp::List sample_B_heterosk1_s4(arma::mat aux_B, arma::ivec aux_SL, const arma::mat& aux_A, arma::field<arma::mat> prior_precision, const arma::mat& aux_sigma, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VBL) {
+        typedef SEXP(*Ptr_sample_B_heterosk1_s4)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+        static Ptr_sample_B_heterosk1_s4 p_sample_B_heterosk1_s4 = NULL;
+        if (p_sample_B_heterosk1_s4 == NULL) {
+            validateSignature("Rcpp::List(*sample_B_heterosk1_s4)(arma::mat,arma::ivec,const arma::mat&,arma::field<arma::mat>,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
+            p_sample_B_heterosk1_s4 = (Ptr_sample_B_heterosk1_s4)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_B_heterosk1_s4");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_sample_B_heterosk1_s4_boost(Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(aux_SL)), Shield<SEXP>(Rcpp::wrap(aux_A)), Shield<SEXP>(Rcpp::wrap(aux_hyper)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(Y)), Shield<SEXP>(Rcpp::wrap(X)), Shield<SEXP>(Rcpp::wrap(prior)), Shield<SEXP>(Rcpp::wrap(VBL)));
+            rcpp_result_gen = p_sample_B_heterosk1_s4(Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(aux_SL)), Shield<SEXP>(Rcpp::wrap(aux_A)), Shield<SEXP>(Rcpp::wrap(prior_precision)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(Y)), Shield<SEXP>(Rcpp::wrap(X)), Shield<SEXP>(Rcpp::wrap(prior)), Shield<SEXP>(Rcpp::wrap(VBL)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -697,17 +697,17 @@ namespace bsvarTVPs {
         return Rcpp::as<Rcpp::List >(rcpp_result_gen);
     }
 
-    inline arma::cube sample_B_mss_boost(arma::cube aux_B, const arma::mat& aux_A, const arma::mat& aux_hyper, const arma::mat& aux_sigma, const arma::mat& aux_xi, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB) {
-        typedef SEXP(*Ptr_sample_B_mss_boost)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
-        static Ptr_sample_B_mss_boost p_sample_B_mss_boost = NULL;
-        if (p_sample_B_mss_boost == NULL) {
-            validateSignature("arma::cube(*sample_B_mss_boost)(arma::cube,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
-            p_sample_B_mss_boost = (Ptr_sample_B_mss_boost)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_B_mss_boost");
+    inline arma::cube sample_B_mss(arma::cube aux_B, const arma::mat& aux_A, arma::field<arma::mat> prior_precision, const arma::mat& aux_sigma, const arma::mat& aux_xi, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB) {
+        typedef SEXP(*Ptr_sample_B_mss)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+        static Ptr_sample_B_mss p_sample_B_mss = NULL;
+        if (p_sample_B_mss == NULL) {
+            validateSignature("arma::cube(*sample_B_mss)(arma::cube,const arma::mat&,arma::field<arma::mat>,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
+            p_sample_B_mss = (Ptr_sample_B_mss)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_B_mss");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_sample_B_mss_boost(Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(aux_A)), Shield<SEXP>(Rcpp::wrap(aux_hyper)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(aux_xi)), Shield<SEXP>(Rcpp::wrap(Y)), Shield<SEXP>(Rcpp::wrap(X)), Shield<SEXP>(Rcpp::wrap(prior)), Shield<SEXP>(Rcpp::wrap(VB)));
+            rcpp_result_gen = p_sample_B_mss(Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(aux_A)), Shield<SEXP>(Rcpp::wrap(prior_precision)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(aux_xi)), Shield<SEXP>(Rcpp::wrap(Y)), Shield<SEXP>(Rcpp::wrap(X)), Shield<SEXP>(Rcpp::wrap(prior)), Shield<SEXP>(Rcpp::wrap(VB)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -718,17 +718,17 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::cube >(rcpp_result_gen);
     }
 
-    inline Rcpp::List sample_B_mss_s4_boost(arma::cube aux_B, arma::imat aux_SL, const arma::mat& aux_A, const arma::mat& aux_hyper, const arma::mat& aux_sigma, const arma::mat& aux_xi, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB) {
-        typedef SEXP(*Ptr_sample_B_mss_s4_boost)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
-        static Ptr_sample_B_mss_s4_boost p_sample_B_mss_s4_boost = NULL;
-        if (p_sample_B_mss_s4_boost == NULL) {
-            validateSignature("Rcpp::List(*sample_B_mss_s4_boost)(arma::cube,arma::imat,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
-            p_sample_B_mss_s4_boost = (Ptr_sample_B_mss_s4_boost)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_B_mss_s4_boost");
+    inline Rcpp::List sample_B_mss_s4(arma::cube aux_B, arma::imat aux_SL, const arma::mat& aux_A, arma::field<arma::mat> prior_precision, const arma::mat& aux_sigma, const arma::mat& aux_xi, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB) {
+        typedef SEXP(*Ptr_sample_B_mss_s4)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+        static Ptr_sample_B_mss_s4 p_sample_B_mss_s4 = NULL;
+        if (p_sample_B_mss_s4 == NULL) {
+            validateSignature("Rcpp::List(*sample_B_mss_s4)(arma::cube,arma::imat,const arma::mat&,arma::field<arma::mat>,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
+            p_sample_B_mss_s4 = (Ptr_sample_B_mss_s4)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_B_mss_s4");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_sample_B_mss_s4_boost(Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(aux_SL)), Shield<SEXP>(Rcpp::wrap(aux_A)), Shield<SEXP>(Rcpp::wrap(aux_hyper)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(aux_xi)), Shield<SEXP>(Rcpp::wrap(Y)), Shield<SEXP>(Rcpp::wrap(X)), Shield<SEXP>(Rcpp::wrap(prior)), Shield<SEXP>(Rcpp::wrap(VB)));
+            rcpp_result_gen = p_sample_B_mss_s4(Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(aux_SL)), Shield<SEXP>(Rcpp::wrap(aux_A)), Shield<SEXP>(Rcpp::wrap(prior_precision)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(aux_xi)), Shield<SEXP>(Rcpp::wrap(Y)), Shield<SEXP>(Rcpp::wrap(X)), Shield<SEXP>(Rcpp::wrap(prior)), Shield<SEXP>(Rcpp::wrap(VB)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -739,17 +739,17 @@ namespace bsvarTVPs {
         return Rcpp::as<Rcpp::List >(rcpp_result_gen);
     }
 
-    inline Rcpp::List sample_B_mssa_s4_boost(arma::cube aux_B, arma::imat aux_SL, const arma::cube& aux_A, const arma::mat& aux_hyper, const arma::mat& aux_sigma, const arma::mat& aux_xi, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB) {
-        typedef SEXP(*Ptr_sample_B_mssa_s4_boost)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
-        static Ptr_sample_B_mssa_s4_boost p_sample_B_mssa_s4_boost = NULL;
-        if (p_sample_B_mssa_s4_boost == NULL) {
-            validateSignature("Rcpp::List(*sample_B_mssa_s4_boost)(arma::cube,arma::imat,const arma::cube&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
-            p_sample_B_mssa_s4_boost = (Ptr_sample_B_mssa_s4_boost)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_B_mssa_s4_boost");
+    inline Rcpp::List sample_B_mssa_s4(arma::cube aux_B, arma::imat aux_SL, const arma::cube& aux_A, arma::field<arma::mat> prior_precision, const arma::mat& aux_sigma, const arma::mat& aux_xi, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB) {
+        typedef SEXP(*Ptr_sample_B_mssa_s4)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+        static Ptr_sample_B_mssa_s4 p_sample_B_mssa_s4 = NULL;
+        if (p_sample_B_mssa_s4 == NULL) {
+            validateSignature("Rcpp::List(*sample_B_mssa_s4)(arma::cube,arma::imat,const arma::cube&,arma::field<arma::mat>,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
+            p_sample_B_mssa_s4 = (Ptr_sample_B_mssa_s4)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_B_mssa_s4");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_sample_B_mssa_s4_boost(Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(aux_SL)), Shield<SEXP>(Rcpp::wrap(aux_A)), Shield<SEXP>(Rcpp::wrap(aux_hyper)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(aux_xi)), Shield<SEXP>(Rcpp::wrap(Y)), Shield<SEXP>(Rcpp::wrap(X)), Shield<SEXP>(Rcpp::wrap(prior)), Shield<SEXP>(Rcpp::wrap(VB)));
+            rcpp_result_gen = p_sample_B_mssa_s4(Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(aux_SL)), Shield<SEXP>(Rcpp::wrap(aux_A)), Shield<SEXP>(Rcpp::wrap(prior_precision)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(aux_xi)), Shield<SEXP>(Rcpp::wrap(Y)), Shield<SEXP>(Rcpp::wrap(X)), Shield<SEXP>(Rcpp::wrap(prior)), Shield<SEXP>(Rcpp::wrap(VB)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -760,17 +760,17 @@ namespace bsvarTVPs {
         return Rcpp::as<Rcpp::List >(rcpp_result_gen);
     }
 
-    inline arma::mat sample_A_heterosk1_boost(arma::mat aux_A, const arma::mat& aux_B, const arma::mat& aux_hyper, const arma::mat& aux_sigma, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior) {
-        typedef SEXP(*Ptr_sample_A_heterosk1_boost)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
-        static Ptr_sample_A_heterosk1_boost p_sample_A_heterosk1_boost = NULL;
-        if (p_sample_A_heterosk1_boost == NULL) {
-            validateSignature("arma::mat(*sample_A_heterosk1_boost)(arma::mat,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&)");
-            p_sample_A_heterosk1_boost = (Ptr_sample_A_heterosk1_boost)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_A_heterosk1_boost");
+    inline arma::mat sample_A_heterosk1(arma::mat aux_A, const arma::mat& aux_B, arma::field<arma::mat> prior_precision, const arma::mat& aux_sigma, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior) {
+        typedef SEXP(*Ptr_sample_A_heterosk1)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+        static Ptr_sample_A_heterosk1 p_sample_A_heterosk1 = NULL;
+        if (p_sample_A_heterosk1 == NULL) {
+            validateSignature("arma::mat(*sample_A_heterosk1)(arma::mat,const arma::mat&,arma::field<arma::mat>,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&)");
+            p_sample_A_heterosk1 = (Ptr_sample_A_heterosk1)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_A_heterosk1");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_sample_A_heterosk1_boost(Shield<SEXP>(Rcpp::wrap(aux_A)), Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(aux_hyper)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(Y)), Shield<SEXP>(Rcpp::wrap(X)), Shield<SEXP>(Rcpp::wrap(prior)));
+            rcpp_result_gen = p_sample_A_heterosk1(Shield<SEXP>(Rcpp::wrap(aux_A)), Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(prior_precision)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(Y)), Shield<SEXP>(Rcpp::wrap(X)), Shield<SEXP>(Rcpp::wrap(prior)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -781,17 +781,17 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::mat >(rcpp_result_gen);
     }
 
-    inline arma::mat sample_A_heterosk1_mss_boost(arma::mat aux_A, const arma::cube& aux_B, const arma::mat& aux_xi, const arma::mat& aux_hyper, const arma::mat& aux_sigma, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior) {
-        typedef SEXP(*Ptr_sample_A_heterosk1_mss_boost)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
-        static Ptr_sample_A_heterosk1_mss_boost p_sample_A_heterosk1_mss_boost = NULL;
-        if (p_sample_A_heterosk1_mss_boost == NULL) {
-            validateSignature("arma::mat(*sample_A_heterosk1_mss_boost)(arma::mat,const arma::cube&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&)");
-            p_sample_A_heterosk1_mss_boost = (Ptr_sample_A_heterosk1_mss_boost)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_A_heterosk1_mss_boost");
+    inline arma::mat sample_A_heterosk1_mss(arma::mat aux_A, const arma::cube& aux_B, const arma::mat& aux_xi, arma::field<arma::mat> prior_precision, const arma::mat& aux_sigma, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior) {
+        typedef SEXP(*Ptr_sample_A_heterosk1_mss)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+        static Ptr_sample_A_heterosk1_mss p_sample_A_heterosk1_mss = NULL;
+        if (p_sample_A_heterosk1_mss == NULL) {
+            validateSignature("arma::mat(*sample_A_heterosk1_mss)(arma::mat,const arma::cube&,const arma::mat&,arma::field<arma::mat>,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&)");
+            p_sample_A_heterosk1_mss = (Ptr_sample_A_heterosk1_mss)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_A_heterosk1_mss");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_sample_A_heterosk1_mss_boost(Shield<SEXP>(Rcpp::wrap(aux_A)), Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(aux_xi)), Shield<SEXP>(Rcpp::wrap(aux_hyper)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(Y)), Shield<SEXP>(Rcpp::wrap(X)), Shield<SEXP>(Rcpp::wrap(prior)));
+            rcpp_result_gen = p_sample_A_heterosk1_mss(Shield<SEXP>(Rcpp::wrap(aux_A)), Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(aux_xi)), Shield<SEXP>(Rcpp::wrap(prior_precision)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(Y)), Shield<SEXP>(Rcpp::wrap(X)), Shield<SEXP>(Rcpp::wrap(prior)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -802,17 +802,17 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::mat >(rcpp_result_gen);
     }
 
-    inline arma::cube sample_A_heterosk1_mssa_boost(arma::cube aux_A, const arma::cube& aux_B, const arma::mat& aux_xi, const arma::mat& aux_hyper, const arma::mat& aux_sigma, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior) {
-        typedef SEXP(*Ptr_sample_A_heterosk1_mssa_boost)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
-        static Ptr_sample_A_heterosk1_mssa_boost p_sample_A_heterosk1_mssa_boost = NULL;
-        if (p_sample_A_heterosk1_mssa_boost == NULL) {
-            validateSignature("arma::cube(*sample_A_heterosk1_mssa_boost)(arma::cube,const arma::cube&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&)");
-            p_sample_A_heterosk1_mssa_boost = (Ptr_sample_A_heterosk1_mssa_boost)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_A_heterosk1_mssa_boost");
+    inline arma::cube sample_A_heterosk1_mssa(arma::cube aux_A, const arma::cube& aux_B, const arma::mat& aux_xi, arma::field<arma::mat> prior_precision, const arma::mat& aux_sigma, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior) {
+        typedef SEXP(*Ptr_sample_A_heterosk1_mssa)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+        static Ptr_sample_A_heterosk1_mssa p_sample_A_heterosk1_mssa = NULL;
+        if (p_sample_A_heterosk1_mssa == NULL) {
+            validateSignature("arma::cube(*sample_A_heterosk1_mssa)(arma::cube,const arma::cube&,const arma::mat&,arma::field<arma::mat>,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&)");
+            p_sample_A_heterosk1_mssa = (Ptr_sample_A_heterosk1_mssa)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_A_heterosk1_mssa");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_sample_A_heterosk1_mssa_boost(Shield<SEXP>(Rcpp::wrap(aux_A)), Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(aux_xi)), Shield<SEXP>(Rcpp::wrap(aux_hyper)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(Y)), Shield<SEXP>(Rcpp::wrap(X)), Shield<SEXP>(Rcpp::wrap(prior)));
+            rcpp_result_gen = p_sample_A_heterosk1_mssa(Shield<SEXP>(Rcpp::wrap(aux_A)), Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(aux_xi)), Shield<SEXP>(Rcpp::wrap(prior_precision)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(Y)), Shield<SEXP>(Rcpp::wrap(X)), Shield<SEXP>(Rcpp::wrap(prior)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
