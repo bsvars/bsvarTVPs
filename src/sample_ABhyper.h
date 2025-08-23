@@ -38,7 +38,6 @@ arma::cube sample_B_mss (
     arma::cube        aux_B,          // NxNxM
     const arma::mat&  aux_A,          // NxK
     arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
-    const arma::mat&  aux_hyper,      // (2*N+1)x2
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  aux_xi,         // MxT
     const arma::mat&  Y,              // NxT dependent variables
