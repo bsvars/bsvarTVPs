@@ -110,7 +110,7 @@ arma::cube sample_A_heterosk1_mssa (
 
 
 Rcpp::List sample_hyperparameter_boost_s4 (
-    arma::mat               aux_hyper,      // (2 * N + 1) x 2
+    Rcpp::List&             aux_hyper_list,      // (2 * N + 1) x 2
     const arma::mat&        aux_B,
     const arma::mat&        aux_A,
     const arma::field<arma::mat>& VB,
@@ -121,7 +121,7 @@ Rcpp::List sample_hyperparameter_boost_s4 (
 
 
 Rcpp::List sample_hyperparameters_mss_boost (
-    arma::mat               aux_hyper,
+    Rcpp::List&             aux_hyper_list,      // (2 * N + 1) x 2
     const arma::cube&       aux_B,            // NxNxM
     const arma::mat&        aux_A,
     const arma::field<arma::mat>& VB,
@@ -131,7 +131,7 @@ Rcpp::List sample_hyperparameters_mss_boost (
 
 
 Rcpp::List sample_hyperparameters_mss_s4_boost (
-    arma::mat               aux_hyper,
+    Rcpp::List&             aux_hyper_list,      // (2 * N + 1) x 2
     const arma::cube&       aux_B,            // NxNxM
     const arma::mat&        aux_A,
     const arma::field<arma::mat>& VB,
@@ -142,7 +142,7 @@ Rcpp::List sample_hyperparameters_mss_s4_boost (
 
 
 Rcpp::List sample_hyperparameters_mssa_s4_boost (
-    arma::mat               aux_hyper,
+    Rcpp::List&             aux_hyper_list,      // (2 * N + 1) x 2
     const arma::cube&       aux_B,            // NxNxM
     const arma::cube&       aux_A,            // NxKxM
     const arma::field<arma::mat>& VB,
