@@ -9,6 +9,24 @@ using namespace arma;
 
 
 
+
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+arma::mat orthogonal_complement_matrix_TW (const arma::mat& x) {
+  // # x is a mxn matrix and m>n
+  // # the function returns a mx(m-n) matrix, out, that is an orthogonal complement of x, i.e.:
+  // # t(x)%*%out = 0 and det(cbind(x,out))!=0
+  int n_nrow     = x.n_rows;
+  int n_ncol     = x.n_cols;
+  mat Q;
+  mat R;
+  qr(Q, R, x);
+  mat ocm = Q.tail_cols(n_nrow-n_ncol);
+  return ocm;
+} // END orthogonal_complement_matrix_TW
+
+
+
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
 arma::mat sample_B_heterosk1_boost (
@@ -88,6 +106,236 @@ arma::mat sample_B_heterosk1_boost (
   
   return aux_B;
 } // END sample_B_heterosk1_boost
+
+
+
+
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+Rcpp::List sample_B_heterosk1_s4 (
+    arma::mat                     aux_B,          // NxN
+    arma::ivec                    aux_SL,         // Nx1 row-specific S4 indicators
+    const arma::mat&              aux_A,          // NxK
+    const arma::vec&              aux_hyper,      // NxM
+    const arma::mat&              aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+    const arma::mat&              Y,              // NxT dependent variables
+    const arma::mat&              X,              // KxT dependent variables
+    const Rcpp::List&             prior,          // a list of priors - original dimensions
+    const arma::field<arma::mat>& VBL       // restrictions on B0 in S4 arrangement
+) {
+  // the function draws new values of aux_B and aux_SL
+  
+  const int N           = aux_B.n_rows;
+  const int T           = Y.n_cols;
+  
+  int         Ltmp      = VBL.n_elem - 1;
+  vec         Lm        = VBL(Ltmp);
+  double      L         = accu(Lm);
+  field<mat>  VB        = VBL.rows(0, L-1);
+  
+  const int posterior_nu    = T + N;
+  mat prior_SS_inv          = pow(aux_hyper(0), -1) * as<mat>(prior["B_V_inv"]);
+  mat shocks                = Y - aux_A * X;
+  
+  for (int n=0; n<N; n++) {
+    mat aux_B_nL(Lm(n), N);
+    vec log_posterior_kernel_nL(Lm(n));
+    mat aux_B_tmp           = aux_B;
+    
+    for (int l=0; l<Lm(n); l++) {
+      int ll = 0;
+      if (n == 0) {
+        ll                    = l;
+      } else {
+        vec Lm_cs             = cumsum(Lm);
+        ll                    = Lm_cs(n-1) + l;
+      }
+      
+      // set scale matrix
+      mat shocks_sigma        = shocks.each_row() / aux_sigma.row(n);
+      mat posterior_SS_inv    = prior_SS_inv + shocks_sigma * shocks_sigma.t();
+      mat posterior_S_inv     = VB(ll) * posterior_SS_inv * VB(ll).t();
+      posterior_S_inv         = 0.5*( posterior_S_inv + posterior_S_inv.t() );
+      
+      // sample B
+      mat Un                  = chol(posterior_nu * inv_sympd(posterior_S_inv));
+      mat B_tmp               = aux_B;
+      B_tmp.shed_row(n);
+      rowvec w                = trans(orthogonal_complement_matrix_TW(B_tmp.t()));
+      vec w1_tmp              = trans(w * VB(ll).t() * Un.t());
+      double w1w1_tmp         = as_scalar(sum(pow(w1_tmp, 2)));
+      mat w1                  = w1_tmp.t()/sqrt(w1w1_tmp);
+      mat Wn;
+      int rn                  = VB(ll).n_rows;
+      if (rn==1) {
+        Wn                    = w1;
+      } else {
+        Wn                    = join_rows(w1.t(), orthogonal_complement_matrix_TW(w1.t()));
+      }
+      
+      vec   alpha(rn);
+      vec   u                 = rnorm(posterior_nu+1, 0, pow(posterior_nu, -0.5));
+      alpha(0)                = pow(as_scalar(sum(pow(u,2))), 0.5);
+      if (R::runif(0,1)<0.5) {
+        alpha(0)             *= -1;
+      }
+      if (rn>1){
+        vec nn                = Rcpp::rnorm(rn-1, 0, pow(posterior_nu, -0.5));
+        alpha.rows(1,rn-1)    = nn;
+      }
+      rowvec b0n              = alpha.t() * Wn * Un;
+      aux_B_nL.row(l)         = b0n * VB(ll);
+      
+      // posterior kernel
+      aux_B_tmp.row(n)            = aux_B_nL.row(l);
+      mat std_shocks              = (aux_B_tmp * shocks) / aux_sigma;
+      log_posterior_kernel_nL(l) -= 0.5 * accu(square(std_shocks));                   // likelihood kernel exp part
+      double abs_log_det_B;
+      double sign_;
+      log_det(abs_log_det_B, sign_, aux_B_tmp); 
+      log_posterior_kernel_nL(l) += T * abs_log_det_B;                                // likelihood kernel det part
+      log_posterior_kernel_nL(l) -= 0.5 * as_scalar(b0n * posterior_S_inv * b0n.t()); // prior B kernel
+      log_posterior_kernel_nL(l) += log(1/Lm(n));                                     // prior multinomial - it's flat, so this does not matter
+    } // END loop l
+    
+    // Sample S4 indicator
+    int     index_s4          = 0;
+    if (Lm(n) > 1) {
+      // Compute S4 components probabilities
+      log_posterior_kernel_nL -= log_posterior_kernel_nL.max();
+      vec     pr_s4           = exp(log_posterior_kernel_nL)/accu(exp(log_posterior_kernel_nL));
+      
+      // Sample S4 indicator
+      NumericVector seq_1S    = wrap(seq_len(Lm(n)) - 1);
+      index_s4                = csample_num1(seq_1S, wrap(pr_s4));
+    }
+    aux_SL(n)                 = index_s4;
+    aux_B.row(n)              = aux_B_nL.row(index_s4);
+    
+  } // END n loop
+  
+  return List::create(
+    _["aux_B"]    = aux_B,
+    _["aux_SL"]   = aux_SL
+  );
+} // END sample_B_heterosk1_s4
+
+
+
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+Rcpp::List sample_B_heterosk1_s4_boost (
+    arma::mat                     aux_B,          // NxN
+    arma::ivec                    aux_SL,         // Nx1 row-specific S4 indicators
+    const arma::mat&              aux_A,          // NxK
+    const arma::mat&              aux_hyper,      // (2*N+1)x2
+    const arma::mat&              aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+    const arma::mat&              Y,              // NxT dependent variables
+    const arma::mat&              X,              // KxT dependent variables
+    const Rcpp::List&             prior,          // a list of priors - original dimensions
+    const arma::field<arma::mat>& VBL       // restrictions on B0 in S4 arrangement
+) {
+  // the function draws new values of aux_B and aux_SL
+  
+  const int N           = aux_B.n_rows;
+  const int T           = Y.n_cols;
+  
+  int         Ltmp      = VBL.n_elem - 1;
+  vec         Lm        = VBL(Ltmp);
+  double      L         = accu(Lm);
+  field<mat>  VB        = VBL.rows(0, L-1);
+  
+  const int posterior_nu    = T + N;
+  mat prior_B_V_inv         = as<mat>(prior["B_V_inv"]);
+  mat shocks                = Y - aux_A * X;
+  
+  for (int n=0; n<N; n++) {
+    mat aux_B_nL(Lm(n), N);
+    vec log_posterior_kernel_nL(Lm(n));
+    mat aux_B_tmp           = aux_B;
+    
+    for (int l=0; l<Lm(n); l++) {
+      int ll = 0;
+      if (n == 0) {
+        ll                    = l;
+      } else {
+        vec Lm_cs             = cumsum(Lm);
+        ll                    = Lm_cs(n-1) + l;
+      }
+      
+      // set scale matrix
+      mat shocks_sigma        = shocks.each_row() / aux_sigma.row(n);
+      mat posterior_SS_inv    = pow(aux_hyper(n, 0), -1) * prior_B_V_inv + shocks_sigma * shocks_sigma.t();
+      mat posterior_S_inv     = VB(ll) * posterior_SS_inv * VB(ll).t();
+      posterior_S_inv         = 0.5*( posterior_S_inv + posterior_S_inv.t() );
+      
+      // sample B
+      mat Un                  = chol(posterior_nu * inv_sympd(posterior_S_inv));
+      mat B_tmp               = aux_B;
+      B_tmp.shed_row(n);
+      rowvec w                = trans(orthogonal_complement_matrix_TW(B_tmp.t()));
+      vec w1_tmp              = trans(w * VB(ll).t() * Un.t());
+      double w1w1_tmp         = as_scalar(sum(pow(w1_tmp, 2)));
+      mat w1                  = w1_tmp.t()/sqrt(w1w1_tmp);
+      mat Wn;
+      int rn                  = VB(ll).n_rows;
+      if (rn==1) {
+        Wn                    = w1;
+      } else {
+        Wn                    = join_rows(w1.t(), orthogonal_complement_matrix_TW(w1.t()));
+      }
+      
+      vec   alpha(rn);
+      vec   u                 = rnorm(posterior_nu+1, 0, pow(posterior_nu, -0.5));
+      alpha(0)                = pow(as_scalar(sum(pow(u,2))), 0.5);
+      if (R::runif(0,1)<0.5) {
+        alpha(0)             *= -1;
+      }
+      if (rn>1){
+        vec nn                = Rcpp::rnorm(rn-1, 0, pow(posterior_nu, -0.5));
+        alpha.rows(1,rn-1)    = nn;
+      }
+      rowvec b0n              = alpha.t() * Wn * Un;
+      aux_B_nL.row(l)         = b0n * VB(ll);
+      
+      // posterior kernel
+      aux_B_tmp.row(n)            = aux_B_nL.row(l);
+      mat std_shocks              = (aux_B_tmp * shocks) / aux_sigma;
+      log_posterior_kernel_nL(l) -= 0.5 * accu(square(std_shocks));                   // likelihood kernel exp part
+      double abs_log_det_B;
+      double sign_;
+      log_det(abs_log_det_B, sign_, aux_B_tmp); 
+      log_posterior_kernel_nL(l) += T * abs_log_det_B;                                // likelihood kernel det part
+      log_posterior_kernel_nL(l) -= 0.5 * as_scalar(b0n * posterior_S_inv * b0n.t()); // prior B kernel
+      log_posterior_kernel_nL(l) += log(1/Lm(n));                                     // prior multinomial - it's flat, so this does not matter
+    } // END loop l
+    
+    // Sample S4 indicator
+    int     index_s4          = 0;
+    if (Lm(n) > 1) {
+      // Compute S4 components probabilities
+      log_posterior_kernel_nL -= log_posterior_kernel_nL.max();
+      vec     pr_s4           = exp(log_posterior_kernel_nL)/accu(exp(log_posterior_kernel_nL));
+      
+      // Sample S4 indicator
+      NumericVector seq_1S    = wrap(seq_len(Lm(n)) - 1);
+      index_s4                = csample_num1(seq_1S, wrap(pr_s4));
+    }
+    aux_SL(n)                 = index_s4;
+    aux_B.row(n)              = aux_B_nL.row(index_s4);
+    
+  } // END n loop
+  
+  return List::create(
+    _["aux_B"]    = aux_B,
+    _["aux_SL"]   = aux_SL
+  );
+} // END sample_B_heterosk1_s4_boost
+
+
+
+
+
 
 
 
