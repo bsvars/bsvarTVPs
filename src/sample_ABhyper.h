@@ -154,13 +154,17 @@ double rig1 (
 );
 
 
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
 Rcpp::List sample_hyperparameter_horseshoe (
     arma::mat&              aux_hyper_gammaB,     // (N, N)
     arma::mat&              aux_hyper_gB,         // (N, N)
     arma::mat&              aux_hyper_gammaA,     // (N, K)
     arma::mat&              aux_hyper_gA,         // (N, K)
-    arma::vec&              aux_hyper_deltaBA,    // (2)
-    arma::vec&              aux_hyper_dBA,        // (2)
+    double&                 aux_hyper_deltaB,
+    double&                 aux_hyper_dB,
+    double&                 aux_hyper_deltaA,
+    double&                 aux_hyper_dA,
     const arma::mat&        aux_B,                // (N, N)
     const arma::mat&        aux_A,                // (N, K)     
     const arma::field<arma::mat>& VB,             // (N)

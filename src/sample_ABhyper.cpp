@@ -840,8 +840,10 @@ Rcpp::List sample_hyperparameter_horseshoe (
     arma::mat&              aux_hyper_gB,         // (N, N)
     arma::mat&              aux_hyper_gammaA,     // (N, K)
     arma::mat&              aux_hyper_gA,         // (N, K)
-    arma::vec&              aux_hyper_deltaBA,    // (2)
-    arma::vec&              aux_hyper_dBA,        // (2)
+    double&                 aux_hyper_deltaB,
+    double&                 aux_hyper_dB,
+    double&                 aux_hyper_deltaA,
+    double&                 aux_hyper_dA,
     const arma::mat&        aux_B,                // (N, N)
     const arma::mat&        aux_A,                // (N, K)     
     const arma::field<arma::mat>& VB,             // (N)
@@ -866,26 +868,25 @@ Rcpp::List sample_hyperparameter_horseshoe (
       ll       += Lm_cs(n-1);
     }
     rn(n)                = VB(ll).n_rows;
-    bn_unrestrict.row(n) = sum(VB(n));
+    bn_unrestrict.row(n) = sum(VB(ll));
   }
   const int KB  = accu(rn);
   
   mat   prior_A               = as<mat>(prior["A"]);
   
   //sample aux_hyper_dBA
-  for (int i=0; i<2; i++) {
-    aux_hyper_dBA(i) = rig1(1, 1 + pow(aux_hyper_deltaBA(i), -1));
-  }
+  aux_hyper_dB    = rig1(1, 1 + pow(aux_hyper_deltaB, -1));
+  aux_hyper_dA    = rig1(1, 1 + pow(aux_hyper_deltaA, -1));
   
   // sample aux_hyper_deltaBA
-  aux_hyper_deltaBA(0) = rig1( 
+  aux_hyper_deltaB = rig1( 
     (KB + 1) / 2, 
-    pow(aux_hyper_dBA(0), -1) + 0.5 * accu(square(aux_B) / aux_hyper_gammaB)
+    pow(aux_hyper_dB, -1) + 0.5 * accu(square(aux_B) / aux_hyper_gammaB)
   );
   
-  aux_hyper_deltaBA(1) = rig1( 
+  aux_hyper_deltaA = rig1( 
     (K * N + 1) / 2, 
-    pow(aux_hyper_dBA(1), -1) + 0.5 * accu(square(aux_A - prior_A) / aux_hyper_gammaA)
+    pow(aux_hyper_dA, -1) + 0.5 * accu(square(aux_A - prior_A) / aux_hyper_gammaA)
   );
   
   // sample other aux_hyper_*
@@ -899,7 +900,7 @@ Rcpp::List sample_hyperparameter_horseshoe (
         // sample aux_hyper_gammaB
         aux_hyper_gammaB(n, i)  = rig1(
           1, 
-          pow(aux_hyper_gB(n, i), -1) + pow(aux_B(n, i), 2) / (2 * aux_hyper_deltaBA(0)) 
+          pow(aux_hyper_gB(n, i), -1) + pow(aux_B(n, i), 2) / (2 * aux_hyper_deltaB) 
         );
       }
     } // END i loop
@@ -912,7 +913,7 @@ Rcpp::List sample_hyperparameter_horseshoe (
       // sample aux_hyper_gammaA
       aux_hyper_gammaA(n, k)    = rig1(
         1, 
-        pow(aux_hyper_gA(n, k), -1) + pow(aux_A(n, k) - prior_A(n, k), 2) / (2 * aux_hyper_deltaBA(1))
+        pow(aux_hyper_gA(n, k), -1) + pow(aux_A(n, k) - prior_A(n, k), 2) / (2 * aux_hyper_deltaA)
       );
     } // END k loop
   }
@@ -922,7 +923,10 @@ Rcpp::List sample_hyperparameter_horseshoe (
     _["aux_hyper_gB"]     = aux_hyper_gB,
     _["aux_hyper_gammaA"] = aux_hyper_gammaA,
     _["aux_hyper_gA"]     = aux_hyper_gA,
-    _["aux_hyper_deltaBA"] = aux_hyper_deltaBA,
-    _["aux_hyper_dBA"]     = aux_hyper_dBA
+    _["aux_hyper_deltaB"] = aux_hyper_deltaB,
+    _["aux_hyper_dB"]     = aux_hyper_dB,
+    _["aux_hyper_deltaA"] = aux_hyper_deltaA,
+    _["aux_hyper_dA"]     = aux_hyper_dA
   );
 } // END sample_hyperparameter_horseshoe
+
