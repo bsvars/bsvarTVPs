@@ -835,7 +835,7 @@ double rig1 (
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
-void sample_hyperparameter_horseshoe (
+Rcpp::List sample_hyperparameter_horseshoe (
     arma::mat&              aux_hyper_gammaB,     // (N, N)
     arma::mat&              aux_hyper_gB,         // (N, N)
     arma::mat&              aux_hyper_gammaA,     // (N, K)
@@ -917,4 +917,12 @@ void sample_hyperparameter_horseshoe (
     } // END k loop
   }
   
+  return List::create(
+    _["aux_hyper_gammaB"] = aux_hyper_gammaB,
+    _["aux_hyper_gB"]     = aux_hyper_gB,
+    _["aux_hyper_gammaA"] = aux_hyper_gammaA,
+    _["aux_hyper_gA"]     = aux_hyper_gA,
+    _["aux_hyper_deltaBA"] = aux_hyper_deltaBA,
+    _["aux_hyper_dBA"]     = aux_hyper_dBA
+  );
 } // END sample_hyperparameter_horseshoe

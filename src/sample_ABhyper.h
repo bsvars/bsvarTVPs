@@ -154,7 +154,7 @@ double rig1 (
 );
 
 
-void sample_hyperparameter_horseshoe (
+Rcpp::List sample_hyperparameter_horseshoe (
     arma::mat&              aux_hyper_gammaB,     // (N, N)
     arma::mat&              aux_hyper_gB,         // (N, N)
     arma::mat&              aux_hyper_gammaA,     // (N, K)
