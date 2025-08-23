@@ -1023,3 +1023,102 @@ Rcpp::List sample_hyperparameter_mss_horseshoe (
   );
 } // END sample_hyperparameter_mss_horseshoe
 
+
+
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+Rcpp::List sample_hyperparameter_mss_s4_horseshoe (
+    arma::cube&             aux_hyper_gammaB,     // (N, N, M)
+    arma::cube&             aux_hyper_gB,         // (N, N, M)
+    arma::mat&              aux_hyper_gammaA,     // (N, K)
+    arma::mat&              aux_hyper_gA,         // (N, K)
+    arma::vec&              aux_hyper_deltaB,     // (M)
+    arma::vec&              aux_hyper_dB,         // (M)
+    double&                 aux_hyper_deltaA,
+    double&                 aux_hyper_dA,
+    const arma::cube&       aux_B,                // (N, N, M)
+    const arma::mat&        aux_A,                // (N, K)     
+    const arma::field<arma::mat>& VB,             // (R + 1)
+    const arma::ivec&       aux_SL,               // Nx1 row-specific S4 indicators
+    const Rcpp::List&       prior
+) {
+  
+  // the function draws the values of aux_hyper_* by reference
+  
+  const int N = aux_B.n_rows;
+  const int K = aux_A.n_cols;
+  const int M = aux_B.n_slices;
+  
+  ivec      rn(N);
+  int       Ltmp = VB.n_elem - 1;
+  vec       Lm  = VB(Ltmp);
+  vec       Lm_cs = cumsum(Lm);
+  mat       bn_unrestrict(N, N);
+  
+  for (int n=0; n<N; n++) {
+    int ll                = aux_SL(n);
+    if (n>0) {
+      ll                 += Lm_cs(n-1);
+    }
+    rn(n)                 = VB(ll).n_rows;
+    bn_unrestrict.row(n)  = sum(VB(ll));
+  }
+  const int KB            = accu(rn);
+  mat   prior_A           = as<mat>(prior["A"]);
+  
+  //sample aux_hyper_dBA
+  for (int m=0; m<M; m++) {
+    aux_hyper_dB(m)       = rig1(1, 1 + pow(aux_hyper_deltaB(m), -1));
+    aux_hyper_deltaB(m)   = rig1( 
+      (KB + 1) / 2, 
+      pow(aux_hyper_dB(m), -1) + 0.5 * accu(square(aux_B.slice(m)) / aux_hyper_gammaB.slice(m))
+    );
+  }
+  aux_hyper_dA            = rig1(1, 1 + pow(aux_hyper_deltaA, -1));
+  aux_hyper_deltaA        = rig1( 
+    (K * N + 1) / 2, 
+    pow(aux_hyper_dA, -1) + 0.5 * accu(square(aux_A - prior_A) / aux_hyper_gammaA)
+  );
+  
+  // sample other aux_hyper_*
+  for (int n=0; n<N; n++) {
+    for (int i=0; i<N; i++) {
+      for (int m=0; m<M; m++) {
+        if ( bn_unrestrict(n, i) == 1 ) {
+          
+          // sample aux_hyper_gB
+          aux_hyper_gB(n, i, m)     = rig1(1, 1 + pow(aux_hyper_gammaB(n, i, m), -1));
+          
+          // sample aux_hyper_gammaB
+          aux_hyper_gammaB(n, i, m) = rig1(
+            1, 
+            pow(aux_hyper_gB(n, i, m), -1) + pow(aux_B(n, i, m), 2) / (2 * aux_hyper_deltaB(m)) 
+          );
+        } // END m loop
+      }
+    } // END i loop
+    
+    for (int k=0; k<K; k++) {
+      
+      // sample aux_hyper_gA
+      aux_hyper_gA(n, k)        = rig1(1, 1+ pow(aux_hyper_gammaA(n, k), -1));
+      
+      // sample aux_hyper_gammaA
+      aux_hyper_gammaA(n, k)    = rig1(
+        1, 
+        pow(aux_hyper_gA(n, k), -1) + pow(aux_A(n, k) - prior_A(n, k), 2) / (2 * aux_hyper_deltaA)
+      );
+    } // END k loop
+  } // END n loop
+  
+  return List::create(
+    _["aux_hyper_gammaB"] = aux_hyper_gammaB,
+    _["aux_hyper_gB"]     = aux_hyper_gB,
+    _["aux_hyper_gammaA"] = aux_hyper_gammaA,
+    _["aux_hyper_gA"]     = aux_hyper_gA,
+    _["aux_hyper_deltaB"] = aux_hyper_deltaB,
+    _["aux_hyper_dB"]     = aux_hyper_dB,
+    _["aux_hyper_deltaA"] = aux_hyper_deltaA,
+    _["aux_hyper_dA"]     = aux_hyper_dA
+  );
+} // END sample_hyperparameter_mss_s4_horseshoe

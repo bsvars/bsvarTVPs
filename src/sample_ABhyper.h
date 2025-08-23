@@ -189,4 +189,21 @@ Rcpp::List sample_hyperparameter_mss_horseshoe (
 );
 
 
+Rcpp::List sample_hyperparameter_mss_s4_horseshoe (
+    arma::cube&             aux_hyper_gammaB,     // (N, N, M)
+    arma::cube&             aux_hyper_gB,         // (N, N, M)
+    arma::mat&              aux_hyper_gammaA,     // (N, K)
+    arma::mat&              aux_hyper_gA,         // (N, K)
+    arma::vec&              aux_hyper_deltaB,     // (M)
+    arma::vec&              aux_hyper_dB,         // (M)
+    double&                 aux_hyper_deltaA,
+    double&                 aux_hyper_dA,
+    const arma::cube&       aux_B,                // (N, N, M)
+    const arma::mat&        aux_A,                // (N, K)     
+    const arma::field<arma::mat>& VB,             // (R + 1)
+    const arma::ivec&       aux_SL,               // Nx1 row-specific S4 indicators
+    const Rcpp::List&       prior
+);
+
+
 #endif  // _SAMPLE_ABHYPER_TVP_H_
