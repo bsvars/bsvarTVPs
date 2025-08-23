@@ -9,11 +9,23 @@
 arma::mat orthogonal_complement_matrix_TW (const arma::mat& x);
 
 
-Rcpp::List sample_B_heterosk1_s4_boost (
+arma::mat sample_B_heterosk1 (
+    arma::mat         aux_B,          // NxN
+    const arma::mat&  aux_A,          // NxK
+    arma::field<arma::mat> prior_precision, // (N)(N,N)
+    const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+    const arma::mat&  Y,              // NxT dependent variables
+    const arma::mat&  X,              // KxT dependent variables
+    const Rcpp::List& prior,          // a list of priors - original dimensions
+    const arma::field<arma::mat>& VB        // restrictions on B0
+);
+
+
+Rcpp::List sample_B_heterosk1_s4 (
     arma::mat                     aux_B,          // NxN
     arma::ivec                    aux_SL,         // Nx1 row-specific S4 indicators
     const arma::mat&              aux_A,          // NxK
-    const arma::mat&              aux_hyper,      // (2*N+1)x2
+    arma::field<arma::mat>        prior_precision, // (N)(N,N)
     const arma::mat&              aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&              Y,              // NxT dependent variables
     const arma::mat&              X,              // KxT dependent variables
@@ -22,34 +34,38 @@ Rcpp::List sample_B_heterosk1_s4_boost (
 );
 
 
-arma::mat sample_B_heterosk1 (
-    arma::mat         aux_B,          // NxN
-    const arma::mat&  aux_A,          // NxK
-    const arma::vec&  aux_hyper,      // NxM
-    const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&  Y,              // NxT dependent variables
-    const arma::mat&  X,              // KxT dependent variables
-    const Rcpp::List& prior,          // a list of priors - original dimensions
-    const arma::field<arma::mat>& VB        // restrictions on B0
-);
-
-
-arma::mat sample_B_heterosk1_boost (
-    arma::mat         aux_B,          // NxN
-    const arma::mat&  aux_A,          // NxK
-    const arma::mat&  aux_hyper,      // (2*N+1)x2
-    const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&  Y,              // NxT dependent variables
-    const arma::mat&  X,              // KxT dependent variables
-    const Rcpp::List& prior,          // a list of priors - original dimensions
-    const arma::field<arma::mat>& VB        // restrictions on B0
-);
-
-
-arma::cube sample_B_mss_boost (
+arma::cube sample_B_mss (
     arma::cube        aux_B,          // NxNxM
     const arma::mat&  aux_A,          // NxK
+    arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
     const arma::mat&  aux_hyper,      // (2*N+1)x2
+    const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+    const arma::mat&  aux_xi,         // MxT
+    const arma::mat&  Y,              // NxT dependent variables
+    const arma::mat&  X,              // KxT dependent variables
+    const Rcpp::List& prior,          // a list of priors - original dimensions
+    const arma::field<arma::mat>& VB        // restrictions on B0
+);
+
+Rcpp::List sample_B_mss_s4 (
+    arma::cube        aux_B,          // NxNxM
+    arma::imat        aux_SL,         // NxM row-specific S4 indicators
+    const arma::mat&  aux_A,          // NxK
+    arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
+    const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+    const arma::mat&  aux_xi,         // MxT
+    const arma::mat&  Y,              // NxT dependent variables
+    const arma::mat&  X,              // KxT dependent variables
+    const Rcpp::List& prior,          // a list of priors - original dimensions
+    const arma::field<arma::mat>& VB        // restrictions on B0
+);
+
+
+Rcpp::List sample_B_mssa_s4 (
+    arma::cube        aux_B,          // NxNxM
+    arma::imat        aux_SL,         // NxM row-specific S4 indicators
+    const arma::cube& aux_A,          // NxKxM
+    arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  aux_xi,         // MxT
     const arma::mat&  Y,              // NxT dependent variables
@@ -59,50 +75,22 @@ arma::cube sample_B_mss_boost (
 );
   
 
-Rcpp::List sample_B_mss_s4_boost (
-    arma::cube        aux_B,          // NxNxM
-    arma::imat        aux_SL,         // NxM row-specific S4 indicators
-    const arma::mat&  aux_A,          // NxK
-    const arma::mat&  aux_hyper,      // (2*N+1x2)
-    const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&  aux_xi,         // MxT
-    const arma::mat&  Y,              // NxT dependent variables
-    const arma::mat&  X,              // KxT dependent variables
-    const Rcpp::List& prior,          // a list of priors - original dimensions
-    const arma::field<arma::mat>& VB        // restrictions on B0
-);
+arma::mat sample_A_heterosk1 (
+      arma::mat         aux_A,          // NxK
+      const arma::mat&  aux_B,          // NxN
+      arma::field<arma::mat>  prior_precision, // (N)(N,N)
+      const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+      const arma::mat&  Y,              // NxT dependent variables
+      const arma::mat&  X,              // KxT dependent variables
+      const Rcpp::List& prior           // a list of priors - original dimensions
+  );
 
 
-Rcpp::List sample_B_mssa_s4_boost (
-    arma::cube        aux_B,          // NxNxM
-    arma::imat        aux_SL,         // NxM row-specific S4 indicators
-    const arma::cube& aux_A,          // NxKxM
-    const arma::mat&  aux_hyper,      // (2*N+1x2)
-    const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&  aux_xi,         // MxT
-    const arma::mat&  Y,              // NxT dependent variables
-    const arma::mat&  X,              // KxT dependent variables
-    const Rcpp::List& prior,          // a list of priors - original dimensions
-    const arma::field<arma::mat>& VB        // restrictions on B0
-);
-
-
-arma::mat sample_A_heterosk1_boost (
-    arma::mat         aux_A,          // NxK
-    const arma::mat&  aux_B,          // NxN
-    const arma::mat&  aux_hyper,      // (2*N+1)x2
-    const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&  Y,              // NxT dependent variables
-    const arma::mat&  X,              // KxT dependent variables
-    const Rcpp::List& prior           // a list of priors - original dimensions
-);
-
-
-arma::mat sample_A_heterosk1_mss_boost (
+arma::mat sample_A_heterosk1_mss (
     arma::mat         aux_A,          // NxK
     const arma::cube& aux_B,          // NxNxM
     const arma::mat&  aux_xi,         // MxT
-    const arma::mat&  aux_hyper,      // (2*N+1)x2
+    arma::field<arma::mat>  prior_precision, // (N)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  Y,              // NxT dependent variables
     const arma::mat&  X,              // KxT dependent variables
@@ -110,11 +98,11 @@ arma::mat sample_A_heterosk1_mss_boost (
 );
 
 
-arma::cube sample_A_heterosk1_mssa_boost (
+arma::cube sample_A_heterosk1_mssa (
     arma::cube        aux_A,          // NxKxM
     const arma::cube& aux_B,          // NxNxM
     const arma::mat&  aux_xi,         // MxT
-    const arma::mat&  aux_hyper,      // (2*N+1)x2
+    arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  Y,              // NxT dependent variables
     const arma::mat&  X,              // KxT dependent variables

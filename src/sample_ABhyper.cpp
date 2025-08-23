@@ -29,10 +29,10 @@ arma::mat orthogonal_complement_matrix_TW (const arma::mat& x) {
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
-arma::mat sample_B_heterosk1_boost (
+arma::mat sample_B_heterosk1 (
     arma::mat         aux_B,          // NxN
     const arma::mat&  aux_A,          // NxK
-    const arma::mat&  aux_hyper,      // (2*N+1)x2
+    arma::field<arma::mat> prior_precision, // (N)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  Y,              // NxT dependent variables
     const arma::mat&  X,              // KxT dependent variables
@@ -44,7 +44,6 @@ arma::mat sample_B_heterosk1_boost (
   const int T               = Y.n_cols;
   
   const int posterior_nu    = T + as<int>(prior["B_nu"]);
-  mat prior_SS_inv          = as<mat>(prior["B_V_inv"]);
   mat shocks                = Y - aux_A * X;
   
   for (int n=0; n<N; n++) {
@@ -52,7 +51,7 @@ arma::mat sample_B_heterosk1_boost (
     // Rcout << " structural equation: " << n + 1 << endl;
     // set scale matrix
     mat shocks_sigma        = shocks.each_row() / aux_sigma.row(n);
-    mat posterior_SS_inv    = pow(aux_hyper(n, 0), -1) * prior_SS_inv + shocks_sigma * shocks_sigma.t();
+    mat posterior_SS_inv    = prior_precision(n) + shocks_sigma * shocks_sigma.t();
     mat posterior_S_inv     = VB(n) * posterior_SS_inv * VB(n).t();
     posterior_S_inv         = 0.5*( posterior_S_inv + posterior_S_inv.t() );
     
@@ -105,18 +104,18 @@ arma::mat sample_B_heterosk1_boost (
   } // END n loop
   
   return aux_B;
-} // END sample_B_heterosk1_boost
+} // END sample_B_heterosk1
 
 
 
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
-Rcpp::List sample_B_heterosk1_s4_boost (
+Rcpp::List sample_B_heterosk1_s4 (
     arma::mat                     aux_B,          // NxN
     arma::ivec                    aux_SL,         // Nx1 row-specific S4 indicators
     const arma::mat&              aux_A,          // NxK
-    const arma::mat&              aux_hyper,      // (2*N+1)x2
+    arma::field<arma::mat>        prior_precision, // (N)(N,N)
     const arma::mat&              aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&              Y,              // NxT dependent variables
     const arma::mat&              X,              // KxT dependent variables
@@ -134,7 +133,6 @@ Rcpp::List sample_B_heterosk1_s4_boost (
   field<mat>  VB        = VBL.rows(0, L-1);
   
   const int posterior_nu    = T + N;
-  mat prior_B_V_inv         = as<mat>(prior["B_V_inv"]);
   mat shocks                = Y - aux_A * X;
   
   for (int n=0; n<N; n++) {
@@ -153,7 +151,7 @@ Rcpp::List sample_B_heterosk1_s4_boost (
       
       // set scale matrix
       mat shocks_sigma        = shocks.each_row() / aux_sigma.row(n);
-      mat posterior_SS_inv    = pow(aux_hyper(n, 0), -1) * prior_B_V_inv + shocks_sigma * shocks_sigma.t();
+      mat posterior_SS_inv    = prior_precision(n) + shocks_sigma * shocks_sigma.t();
       mat posterior_S_inv     = VB(ll) * posterior_SS_inv * VB(ll).t();
       posterior_S_inv         = 0.5*( posterior_S_inv + posterior_S_inv.t() );
       
@@ -218,7 +216,7 @@ Rcpp::List sample_B_heterosk1_s4_boost (
     _["aux_B"]    = aux_B,
     _["aux_SL"]   = aux_SL
   );
-} // END sample_B_heterosk1_s4_boost
+} // END sample_B_heterosk1_s4
 
 
 
@@ -229,9 +227,10 @@ Rcpp::List sample_B_heterosk1_s4_boost (
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
-arma::cube sample_B_mss_boost (
+arma::cube sample_B_mss (
     arma::cube        aux_B,          // NxNxM
     const arma::mat&  aux_A,          // NxK
+    arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
     const arma::mat&  aux_hyper,      // (2*N+1)x2
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  aux_xi,         // MxT
@@ -263,11 +262,11 @@ arma::cube sample_B_mss_boost (
       }
     }
     
-    aux_B.slice(m)    = sample_B_heterosk1_boost(aux_B.slice(m), aux_A, aux_hyper, aux_sigma_m, Y_m, X_m, prior, VB);
+    aux_B.slice(m)    = sample_B_heterosk1(aux_B.slice(m), aux_A, prior_precision.col(m), aux_sigma_m, Y_m, X_m, prior, VB);
   }
   
   return aux_B;
-} // END sample_B_mss_boost
+} // END sample_B_mss
 
 
 
@@ -278,11 +277,11 @@ arma::cube sample_B_mss_boost (
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
-Rcpp::List sample_B_mss_s4_boost (
+Rcpp::List sample_B_mss_s4 (
     arma::cube        aux_B,          // NxNxM
     arma::imat        aux_SL,         // NxM row-specific S4 indicators
     const arma::mat&  aux_A,          // NxK
-    const arma::mat&  aux_hyper,      // (2*N+1x2)
+    arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  aux_xi,         // MxT
     const arma::mat&  Y,              // NxT dependent variables
@@ -313,7 +312,7 @@ Rcpp::List sample_B_mss_s4_boost (
       }
     }
     
-    List BSL_m              = sample_B_heterosk1_s4_boost(aux_B.slice(m), aux_SL.col(m), aux_A, aux_hyper, aux_sigma_m, Y_m, X_m, prior, VB);
+    List BSL_m              = sample_B_heterosk1_s4(aux_B.slice(m), aux_SL.col(m), aux_A, prior_precision.col(m), aux_sigma_m, Y_m, X_m, prior, VB);
     aux_B.slice(m)          = as<mat>(BSL_m["aux_B"]);
     aux_SL.col(m)           = as<ivec>(BSL_m["aux_SL"]);
   }
@@ -322,7 +321,7 @@ Rcpp::List sample_B_mss_s4_boost (
     _["aux_B"]    = aux_B,
     _["aux_SL"]   = aux_SL
   );
-} // END sample_B_mss_s4_boost
+} // END sample_B_mss_s4
 
 
 
@@ -330,11 +329,11 @@ Rcpp::List sample_B_mss_s4_boost (
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
-Rcpp::List sample_B_mssa_s4_boost (
+Rcpp::List sample_B_mssa_s4 (
     arma::cube        aux_B,          // NxNxM
     arma::imat        aux_SL,         // NxM row-specific S4 indicators
     const arma::cube& aux_A,          // NxKxM
-    const arma::mat&  aux_hyper,      // (2*N+1x2)
+    arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  aux_xi,         // MxT
     const arma::mat&  Y,              // NxT dependent variables
@@ -365,7 +364,7 @@ Rcpp::List sample_B_mssa_s4_boost (
       }
     }
     
-    List BSL_m              = sample_B_heterosk1_s4_boost(aux_B.slice(m), aux_SL.col(m), aux_A.slice(m), aux_hyper, aux_sigma_m, Y_m, X_m, prior, VB);
+    List BSL_m              = sample_B_heterosk1_s4(aux_B.slice(m), aux_SL.col(m), aux_A.slice(m), prior_precision.col(m), aux_sigma_m, Y_m, X_m, prior, VB);
     aux_B.slice(m)          = as<mat>(BSL_m["aux_B"]);
     aux_SL.col(m)           = as<ivec>(BSL_m["aux_SL"]);
   }
@@ -382,10 +381,10 @@ Rcpp::List sample_B_mssa_s4_boost (
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
-arma::mat sample_A_heterosk1_boost (
+arma::mat sample_A_heterosk1 (
     arma::mat         aux_A,          // NxK
     const arma::mat&  aux_B,          // NxN
-    const arma::mat&  aux_hyper,      // (2*N+1)x2
+    arma::field<arma::mat>  prior_precision, // (N)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  Y,              // NxT dependent variables
     const arma::mat&  X,              // KxT dependent variables
@@ -396,7 +395,6 @@ arma::mat sample_A_heterosk1_boost (
   const int K         = aux_A.n_cols;
   
   mat prior_A_mean    = as<mat>(prior["A"]);
-  mat prior_A_V_inv   = as<mat>(prior["A_V_inv"]);
   
   rowvec    zerosA(K);
   vec sigma_vectorised= vectorise(aux_sigma);
@@ -409,9 +407,9 @@ arma::mat sample_A_heterosk1_boost (
     mat   Wn          = kron( trans(X), aux_B.col(n) );
     mat   Wn_sigma    = Wn.each_col() / sigma_vectorised;
     
-    mat     precision = pow(aux_hyper(n, 1), -1) * prior_A_V_inv + trans(Wn_sigma) * Wn_sigma;
+    mat     precision = prior_precision(n) + trans(Wn_sigma) * Wn_sigma;
     precision         = 0.5 * (precision + precision.t());
-    rowvec  location  = prior_A_mean.row(n) * pow(aux_hyper(n, 1), -1) * prior_A_V_inv + trans(zn_sigma) * Wn_sigma;
+    rowvec  location  = prior_A_mean.row(n) * prior_precision(n) + trans(zn_sigma) * Wn_sigma;
     
     mat     precision_chol = trimatu(chol(precision));
     vec     xx(K, fill::randn);
@@ -421,17 +419,17 @@ arma::mat sample_A_heterosk1_boost (
   } // END n loop
   
   return aux_A;
-} // END sample_A_heterosk1_boost
+} // END sample_A_heterosk1
 
 
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
-arma::mat sample_A_heterosk1_mss_boost (
+arma::mat sample_A_heterosk1_mss (
     arma::mat         aux_A,          // NxK
     const arma::cube& aux_B,          // NxNxM
     const arma::mat&  aux_xi,         // MxT
-    const arma::mat&  aux_hyper,      // (2*N+1)x2
+    arma::field<arma::mat>  prior_precision, // (N)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  Y,              // NxT dependent variables
     const arma::mat&  X,              // KxT dependent variables
@@ -445,7 +443,6 @@ arma::mat sample_A_heterosk1_mss_boost (
   const vec Tm       = sum(aux_xi, 1);
   
   mat prior_A_mean    = as<mat>(prior["A"]);
-  mat prior_A_V_inv    = as<mat>(prior["A_V_inv"]);
   rowvec    zerosA(K);
   
   field<mat> YM(M);
@@ -487,10 +484,9 @@ arma::mat sample_A_heterosk1_mss_boost (
     mat   zn_sigma    = zn / Sn;
     mat   Wn_sigma    = Wn.each_col() / Sn;
     
-    // Rcout << " pow(aux_hyper(n, 1), -1): " << pow(aux_hyper(n, 1), -1) << endl;
-    mat     precision = pow(aux_hyper(n, 1), -1) * prior_A_V_inv + trans(Wn_sigma) * Wn_sigma;
+    mat     precision = prior_precision(n) + trans(Wn_sigma) * Wn_sigma;
     precision         = 0.5 * (precision + precision.t());
-    rowvec  location  = prior_A_mean.row(n) * pow(aux_hyper(n, 1), -1) * prior_A_V_inv + trans(zn_sigma) * Wn_sigma;
+    rowvec  location  = prior_A_mean.row(n) * prior_precision(n) + trans(zn_sigma) * Wn_sigma;
     
     mat     precision_chol(size(precision));
     try {
@@ -505,7 +501,7 @@ arma::mat sample_A_heterosk1_mss_boost (
   } // END n loop
   
   return aux_A;
-} // END sample_A_heterosk1_mss_boost
+} // END sample_A_heterosk1_mss
 
 
 
@@ -513,11 +509,11 @@ arma::mat sample_A_heterosk1_mss_boost (
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
-arma::cube sample_A_heterosk1_mssa_boost (
+arma::cube sample_A_heterosk1_mssa (
     arma::cube        aux_A,          // NxKxM
     const arma::cube& aux_B,          // NxNxM
     const arma::mat&  aux_xi,         // MxT
-    const arma::mat&  aux_hyper,      // (2*N+1)x2
+    arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  Y,              // NxT dependent variables
     const arma::mat&  X,              // KxT dependent variables
@@ -531,7 +527,6 @@ arma::cube sample_A_heterosk1_mssa_boost (
   const vec Tm        = sum(aux_xi, 1);
   
   mat prior_A_mean    = as<mat>(prior["A"]);
-  mat prior_A_V_inv   = as<mat>(prior["A_V_inv"]);
   
   rowvec    zerosA(K);
   
@@ -569,9 +564,9 @@ arma::cube sample_A_heterosk1_mssa_boost (
       mat   Wn          = kron( trans(XM(m)), aux_B.slice(m).col(n) );
       mat   Wn_sigma    = Wn.each_col() / sigma_vectorised;
       
-      mat     precision = pow(aux_hyper(n, 1), -1) * prior_A_V_inv + trans(Wn_sigma) * Wn_sigma;
+      mat     precision = prior_precision(n, m) + trans(Wn_sigma) * Wn_sigma;
       precision         = 0.5 * (precision + precision.t());
-      rowvec  location  = prior_A_mean.row(n) * pow(aux_hyper(n, 1), -1) * prior_A_V_inv + trans(zn_sigma) * Wn_sigma;
+      rowvec  location  = prior_A_mean.row(n) * prior_precision(n, m) + trans(zn_sigma) * Wn_sigma;
       
       mat     precision_chol = trimatu(chol(precision));
       vec     xx(K, fill::randn);
@@ -582,7 +577,7 @@ arma::cube sample_A_heterosk1_mssa_boost (
   } // END m loop
   
   return aux_A;
-} // END sample_A_heterosk1_mssa_boost
+} // END sample_A_heterosk1_mssa
 
 
 
