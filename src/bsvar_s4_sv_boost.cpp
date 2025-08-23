@@ -95,15 +95,18 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
     if (ss % 200 == 0) checkUserInterrupt();
     
     // sample aux_hyper
-    aux_hyper           = sample_hyperparameter_boost_s4( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, hyper_boost);
+    aux_hyper           = sample_hyperparameter_boost_s4( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, true);
+    
+    field<mat> precisionB = hyper2precisionB_boost(aux_hyper, prior);
+    field<mat> precisionA = hyper2precisionA_boost(aux_hyper, prior);
     
     // sample aux_B
-    BSL                 = sample_B_heterosk1_s4_boost(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, Y, X, prior, VB);
+    BSL                 = sample_B_heterosk1_s4(aux_B, aux_SL, aux_A, precisionB, aux_sigma, Y, X, prior, VB);
     aux_B               = as<mat>(BSL["aux_B"]);
     aux_SL              = as<ivec>(BSL["aux_SL"]);
     
     // sample aux_A
-    aux_A               = sample_A_heterosk1_boost(aux_A, aux_B, aux_hyper, aux_sigma, Y, X, prior);
+    aux_A               = sample_A_heterosk1(aux_A, aux_B, precisionA, aux_sigma, Y, X, prior);
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
     mat U = aux_B * (Y - aux_A * X);

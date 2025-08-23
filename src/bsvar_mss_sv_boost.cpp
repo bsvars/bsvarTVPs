@@ -131,15 +131,18 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     // sample aux_hyper
     // Rcout << "befor aux_hyper" << endl;
     try {
-      aux_hyper       = sample_hyperparameters_mss_boost( aux_hyper, aux_B, aux_A, VB, prior, hyper_boost);
+      aux_hyper       = sample_hyperparameters_mss_boost( aux_hyper, aux_B, aux_A, VB, prior, true);
     } catch (std::runtime_error &e) {
       Rcout << "   sample_hyperparameters_mss_boost failure " << endl;
     }
     
+    field<mat> precisionB = hyper2precisionB_mss_boost(aux_hyper, prior);
+    field<mat> precisionA = hyper2precisionA_boost(aux_hyper, prior);
+    
     // sample aux_B
     // Rcout << "befor aux_B" << endl;
     try {
-      aux_B           = sample_B_mss_boost(aux_B, aux_A, aux_hyper, aux_sigma, aux_xi, Y, X, prior, VB);
+      aux_B           = sample_B_mss(aux_B, aux_A, precisionB, aux_sigma, aux_xi, Y, X, prior, VB);
     } catch (std::runtime_error &e) {
       Rcout << "   sample_B_mss_boost failure " << endl;
     }
@@ -147,7 +150,7 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     // sample aux_A
     // Rcout << "befor aux_A" << endl;
     try {
-      aux_A           = sample_A_heterosk1_mss_boost(aux_A, aux_B, aux_xi, aux_hyper, aux_sigma, Y, X, prior);
+      aux_A           = sample_A_heterosk1_mss(aux_A, aux_B, aux_xi, precisionA, aux_sigma, Y, X, prior);
     } catch (std::runtime_error &e) {
       Rcout << "   sample_A_heterosk1_mss_boost failure " << endl;
     }

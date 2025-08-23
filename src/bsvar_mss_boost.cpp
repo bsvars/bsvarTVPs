@@ -82,9 +82,7 @@ Rcpp::List bsvar_mss_boost_cpp (
     
     // sample aux_xi
     mat E             = Y - aux_A * X;
-    aux_xi_tmp        = aux_xi;
-    aux_xi_tmp        = sample_Markov_process_mss(aux_xi, E, aux_B, aux_sigma, aux_PR_TR, aux_pi_0);
-    aux_xi            = aux_xi_tmp;
+    aux_xi            = sample_Markov_process_mss(aux_xi, E, aux_B, aux_sigma, aux_PR_TR, aux_pi_0);
     
     // sample aux_PR_TR and aux_pi_0
     PR_TR_tmp         = sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
@@ -92,19 +90,16 @@ Rcpp::List bsvar_mss_boost_cpp (
     aux_pi_0          = as<vec>(PR_TR_tmp["aux_pi_0"]);
     
     // sample aux_hyper
-    aux_hyper_tmp     = aux_hyper;
-    aux_hyper_tmp     = sample_hyperparameters_mss_boost( aux_hyper, aux_B, aux_A, VB, prior, hyper_boost);
-    aux_hyper         = aux_hyper_tmp;
+    aux_hyper         = sample_hyperparameters_mss_boost( aux_hyper, aux_B, aux_A, VB, prior, true);
+    
+    field<mat> precisionB = hyper2precisionB_mss_boost(aux_hyper, prior);
+    field<mat> precisionA = hyper2precisionA_boost(aux_hyper, prior);
     
     // sample aux_B
-    aux_B_tmp         = aux_B;
-    aux_B_tmp         = sample_B_mss_boost(aux_B, aux_A, aux_hyper, aux_sigma, aux_xi, Y, X, prior, VB);
-    aux_B             = aux_B_tmp;
+    aux_B             = sample_B_mss(aux_B, aux_A, precisionB, aux_sigma, aux_xi, Y, X, prior, VB);
     
     // sample aux_A
-    aux_A_tmp         = aux_A;
-    aux_A_tmp         = sample_A_heterosk1_mss_boost(aux_A, aux_B, aux_xi, aux_hyper, aux_sigma, Y, X, prior);
-    aux_A             = aux_A_tmp;
+    aux_A             = sample_A_heterosk1_mss(aux_A, aux_B, aux_xi, precisionA, aux_sigma, Y, X, prior);
     
     if (ss % thin == 0) {
       posterior_B(s)                = aux_B;

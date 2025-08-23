@@ -114,36 +114,33 @@ Rcpp::List bsvar_mss_s4_sv_boost_cpp (
     if (ss % 200 == 0) checkUserInterrupt();
     
     // sample aux_xi
-    Rcout << "1" << endl;
     mat E = Y - aux_A * X;
     aux_xi            = sample_Markov_process_mss(aux_xi, E, aux_B, aux_sigma, aux_PR_TR, aux_pi_0);
     
     // sample aux_PR_TR and aux_pi_0
-    Rcout << "2" << endl;
     PR_TR_tmp         = sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
     aux_PR_TR         = as<mat>(PR_TR_tmp["aux_PR_TR"]);
     aux_pi_0          = as<vec>(PR_TR_tmp["aux_pi_0"]);
     
     // sample aux_hyper
-    Rcout << "3" << endl;
-    aux_hyper         = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, hyper_boost);
+    aux_hyper         = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, true);
+    
+    field<mat> precisionB = hyper2precisionB_mss_boost(aux_hyper, prior);
+    field<mat> precisionA = hyper2precisionA_boost(aux_hyper, prior);
     
     // sample aux_B
-    Rcout << "4" << endl;
     BSL     = List::create(
       _["aux_B"]      = aux_B,
       _["aux_SL"]     = aux_SL
     );
-    BSL               = sample_B_mss_s4_boost(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, aux_xi, Y, X, prior, VB);
+    BSL               = sample_B_mss_s4(aux_B, aux_SL, aux_A, precisionB, aux_sigma, aux_xi, Y, X, prior, VB);
     aux_B             = as<cube>(BSL["aux_B"]);
     aux_SL            = as<imat>(BSL["aux_SL"]);
     
     // sample aux_A
-    Rcout << "5" << endl;
-    aux_A             = sample_A_heterosk1_mss_boost(aux_A, aux_B, aux_xi, aux_hyper, aux_sigma, Y, X, prior);
+    aux_A             = sample_A_heterosk1_mss(aux_A, aux_B, aux_xi, precisionA, aux_sigma, Y, X, prior);
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
-    Rcout << "6" << endl;
     mat U(N, T);
     E = Y - aux_A * X;
     for (int m=0; m<M; m++) {
@@ -154,7 +151,6 @@ Rcpp::List bsvar_mss_s4_sv_boost_cpp (
       }
     }
     
-    Rcout << "7" << endl;
     for (int n=0; n<N; n++) {
       rowvec  h_tmp     = aux_h.row(n);
       double  rho_tmp   = aux_rho(n);

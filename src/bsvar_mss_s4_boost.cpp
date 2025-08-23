@@ -94,19 +94,22 @@ Rcpp::List bsvar_mss_s4_boost_cpp (
     aux_pi_0          = as<vec>(PR_TR_tmp["aux_pi_0"]);
     
     // sample aux_hyper
-    aux_hyper         = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, hyper_boost);
+    aux_hyper         = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, true);
+    
+    field<mat> precisionB = hyper2precisionB_mss_boost(aux_hyper, prior);
+    field<mat> precisionA = hyper2precisionA_boost(aux_hyper, prior);
     
     // sample aux_B
     BSL     = List::create(
       _["aux_B"]      = aux_B,
       _["aux_SL"]     = aux_SL
     );
-    BSL               = sample_B_mss_s4_boost(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, aux_xi, Y, X, prior, VB);
+    BSL               = sample_B_mss_s4(aux_B, aux_SL, aux_A, precisionB, aux_sigma, aux_xi, Y, X, prior, VB);
     aux_B             = as<cube>(BSL["aux_B"]);
     aux_SL            = as<imat>(BSL["aux_SL"]);
     
     // sample aux_A
-    aux_A             = sample_A_heterosk1_mss_boost(aux_A, aux_B, aux_xi, aux_hyper, aux_sigma, Y, X, prior);
+    aux_A             = sample_A_heterosk1_mss(aux_A, aux_B, aux_xi, precisionA, aux_sigma, Y, X, prior);
     
     if (ss % thin == 0) {
       posterior_B(s)                = aux_B;

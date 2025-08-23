@@ -131,14 +131,17 @@ Rcpp::List bsvar_mssa_s4_sv_boost_cpp (
     
     // sample aux_hyper
     try {
-      aux_hyper         = sample_hyperparameters_mssa_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, hyper_boost);
+      aux_hyper         = sample_hyperparameters_mssa_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, true);
     } catch (std::runtime_error &e) {
       Rcout << "  sample_hyperparameters_mssa_s4_boost failure " << endl;
     }
     
+    field<mat> precisionB = hyper2precisionB_mss_boost(aux_hyper, prior);
+    field<mat> precisionA = hyper2precisionA_msa_boost(aux_hyper, prior);
+    
     // sample aux_B
     try {
-      BSL               = sample_B_mssa_s4_boost(aux_B, aux_SL, aux_A, aux_hyper, aux_sigma, aux_xi, Y, X, prior, VB);
+      BSL               = sample_B_mssa_s4(aux_B, aux_SL, aux_A, precisionB, aux_sigma, aux_xi, Y, X, prior, VB);
       aux_B             = as<cube>(BSL["aux_B"]);
       aux_SL            = as<imat>(BSL["aux_SL"]);
     } catch (std::runtime_error &e) {
@@ -147,7 +150,7 @@ Rcpp::List bsvar_mssa_s4_sv_boost_cpp (
     
     // sample aux_A
     try {
-      aux_A             = sample_A_heterosk1_mssa_boost(aux_A, aux_B, aux_xi, aux_hyper, aux_sigma, Y, X, prior);
+      aux_A             = sample_A_heterosk1_mssa(aux_A, aux_B, aux_xi, precisionA, aux_sigma, Y, X, prior);
     } catch (std::runtime_error &e) {
       Rcout << "  sample_A_heterosk1_mssa_boost failure " << endl;
     }
