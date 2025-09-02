@@ -32,7 +32,7 @@ bool is_non_explosive_cube (
   
   bool non_explosive = true;
   for (int m=0; m<M; m++) {
-    non_explosive *= is_non_explosive_mat(A.slice(m));
+    non_explosive = non_explosive & is_non_explosive_mat(A.slice(m));
   }
   
   return non_explosive;
