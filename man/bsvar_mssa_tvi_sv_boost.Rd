@@ -14,7 +14,7 @@ bsvar_mssa_tvi_sv_boost(
   starting_values,
   thin = 100L,
   centred_sv = FALSE,
-  hyper_boost = TRUE
+  hyper_select = 1
 )
 }
 \arguments{
@@ -35,8 +35,8 @@ bsvar_mssa_tvi_sv_boost(
 \item{centred_sv}{a logical value indicating whether the SV model should be 
 in its centred form}
 
-\item{hyper_boost}{a logical value indicating whether prior variances and scales 
-beyond level one of the hierarchy are to be estimated}
+\item{hyper_select}{an integer choosing th type of hyper-parameter hierarchy: 
+\code{1} - horseshoe prior, \code{2} - 3-level hierarchy, \code{3} - fixed hyper-parameters.}
 }
 \value{
 An object of class \code{PosteriorBSVARSVMSATVI} - a list containing the Bayesian estimation output in two elements:

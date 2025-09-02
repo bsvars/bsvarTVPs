@@ -15,7 +15,7 @@ Rcpp::List bsvar_mss_boost_cpp (
     const arma::field<arma::mat>& VB,        // restrictions on B0
     const Rcpp::List&             starting_values,
     const int                     thin = 100,  // introduce thinning
-    const bool                    hyper_boost = true
+    const int                     hyper_select = 1
 );
 
 #endif  // _BSVAR_MSS_BOOST_H_

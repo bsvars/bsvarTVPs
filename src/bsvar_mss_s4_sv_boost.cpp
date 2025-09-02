@@ -20,7 +20,7 @@ Rcpp::List bsvar_mss_s4_sv_boost_cpp (
     const Rcpp::List&             starting_values,
     const int                     thin = 100, // introduce thinning
     const bool                    centred_sv = false,  // introduce thinning
-    const bool                    hyper_boost = true
+    const int                     hyper_select = 1
 ) {
   // // Progress bar setup
   vec prog_rep_points = arma::round(arma::linspace(0, SS, 50));
@@ -83,7 +83,7 @@ Rcpp::List bsvar_mss_s4_sv_boost_cpp (
   
   field<cube> posterior_B(S);
   cube  posterior_A(N, K, S);
-  cube  posterior_hyper(2 * N + 1, 2, S);
+  List  posterior_hyper;
   
   cube  posterior_PR_TR(M, M, S);
   mat   posterior_pi_0(M,S);
@@ -104,6 +104,9 @@ Rcpp::List bsvar_mss_s4_sv_boost_cpp (
   List  sv_n;
   List  PR_TR_tmp;
   
+  field<mat> precisionB;
+  field<mat> precisionA;
+  
   int   s = 0;
   
   for (int ss=0; ss<SS; ss++) {
@@ -123,10 +126,25 @@ Rcpp::List bsvar_mss_s4_sv_boost_cpp (
     aux_pi_0          = as<vec>(PR_TR_tmp["aux_pi_0"]);
     
     // sample aux_hyper
-    aux_hyper         = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, true);
-    
-    field<mat> precisionB = hyper2precisionB_mss_boost(aux_hyper, prior);
-    field<mat> precisionA = hyper2precisionA_boost(aux_hyper, prior);
+    if ( hyper_select == 1 ) {
+      
+      aux_hyper           = sample_hyperparameter_mss_s4_horseshoe(aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
+      precisionB          = hyper2precisionB_mss_horseshoe(aux_hyper);
+      precisionA          = hyper2precisionA_horseshoe(aux_hyper);
+      
+    } else if ( hyper_select == 2 ) {
+      
+      aux_hyper         = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, true);
+      precisionB        = hyper2precisionB_mss_boost(aux_hyper, prior);
+      precisionA        = hyper2precisionA_boost(aux_hyper, prior);
+      
+    } else if ( hyper_select == 3 ) {
+      
+      aux_hyper         = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, false);
+      precisionB        = hyper2precisionB_mss_boost(aux_hyper, prior);
+      precisionA        = hyper2precisionA_boost(aux_hyper, prior);
+      
+    }
     
     // sample aux_B
     BSL     = List::create(
@@ -188,7 +206,7 @@ Rcpp::List bsvar_mss_s4_sv_boost_cpp (
     if (ss % thin == 0) {
       posterior_B(s)                = aux_B;
       posterior_A.slice(s)          = aux_A;
-      posterior_hyper.slice(s)      = as<mat>(aux_hyper["aux_hyper"]);
+      // posterior_hyper(s)            = aux_hyper;
       posterior_PR_TR.slice(s)      = aux_PR_TR;
       posterior_pi_0.col(s)         = aux_pi_0;
       posterior_xi.slice(s)         = aux_xi;

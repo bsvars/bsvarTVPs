@@ -20,7 +20,7 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
     const Rcpp::List&             starting_values,
     const int                     thin = 100, // introduce thinning
     const bool                    centred_sv = false,
-    const bool                    hyper_boost = true
+    const int                     hyper_select = 1
 ) {
   // Progress bar setup
   vec prog_rep_points = arma::round(arma::linspace(0, SS, 50));
@@ -70,7 +70,7 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
   
   cube  posterior_B(N, N, S);
   cube  posterior_A(N, K, S);
-  cube  posterior_hyper(2 * N + 1, 2, S);
+  List  posterior_hyper;
   cube  posterior_h(N, T, S);
   mat   posterior_rho(N, S);
   mat   posterior_omega(N, S);
@@ -85,6 +85,9 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
   List  BSL;
   List  sv_n;
   
+  field<mat> precisionB;
+  field<mat> precisionA;
+  
   int   s = 0;
   
   for (int ss=0; ss<SS; ss++) {
@@ -95,10 +98,25 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
     if (ss % 200 == 0) checkUserInterrupt();
     
     // sample aux_hyper
-    aux_hyper           = sample_hyperparameter_boost_s4( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, true);
-    
-    field<mat> precisionB = hyper2precisionB_boost(aux_hyper, prior);
-    field<mat> precisionA = hyper2precisionA_boost(aux_hyper, prior);
+    if ( hyper_select == 1 ) {
+      
+      aux_hyper           = sample_hyperparameter_horseshoe(aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
+      precisionB          = hyper2precisionB_horseshoe(aux_hyper);
+      precisionA          = hyper2precisionA_horseshoe(aux_hyper);
+      
+    } else if ( hyper_select == 2 ) {
+      
+      aux_hyper           = sample_hyperparameter_boost_s4( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, true);
+      precisionB          = hyper2precisionB_boost(aux_hyper, prior);
+      precisionA          = hyper2precisionA_boost(aux_hyper, prior);
+      
+    } else if ( hyper_select == 3 ) {
+      
+      aux_hyper           = sample_hyperparameter_boost_s4( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, false);
+      precisionB          = hyper2precisionB_boost(aux_hyper, prior);
+      precisionA          = hyper2precisionA_boost(aux_hyper, prior);
+      
+    }
     
     // sample aux_B
     BSL                 = sample_B_heterosk1_s4(aux_B, aux_SL, aux_A, precisionB, aux_sigma, Y, X, prior, VB);
@@ -145,11 +163,11 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
     if (ss % thin == 0) {
       posterior_B.slice(s)          = aux_B;
       posterior_A.slice(s)          = aux_A;
-      posterior_hyper.slice(s)      = as<mat>(aux_hyper["aux_hyper"]);
+      // posterior_hyper(s)            = aux_hyper;
       posterior_h.slice(s)          = aux_h;
       posterior_rho.col(s)          = aux_rho;
       posterior_omega.col(s)        = aux_omega;
-      posterior_sigma2v.col(ss)       = aux_sigma2v;
+      posterior_sigma2v.col(ss)     = aux_sigma2v;
       posterior_S.slice(s)          = aux_S;
       posterior_sigma2_omega.col(s) = aux_sigma2_omega;
       posterior_s_.col(s)           = aux_s_;

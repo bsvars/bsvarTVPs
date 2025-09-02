@@ -977,14 +977,7 @@ double rig_inv1 (
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
 Rcpp::List sample_hyperparameter_horseshoe (
-    arma::mat&              aux_hyper_inv_gammaB,     // (N, N)
-    arma::mat&              aux_hyper_inv_gB,         // (N, N)
-    arma::mat&              aux_hyper_inv_gammaA,     // (N, K)
-    arma::mat&              aux_hyper_inv_gA,         // (N, K)
-    double&                 aux_hyper_inv_deltaB,
-    double&                 aux_hyper_inv_dB,
-    double&                 aux_hyper_inv_deltaA,
-    double&                 aux_hyper_inv_dA,
+    Rcpp::List&             aux_hyper_list,
     const arma::mat&        aux_B,                // (N, N)
     const arma::mat&        aux_A,                // (N, K)     
     const arma::field<arma::mat>& VB,             // (N)
@@ -992,7 +985,14 @@ Rcpp::List sample_hyperparameter_horseshoe (
     const Rcpp::List&       prior
 ) {
   
-  // the function draws the values of aux_hyper_inv_* by reference
+  mat       aux_hyper_inv_gammaB  = as<mat>(aux_hyper_list["aux_hyper_inv_gammaB"]); // (N, N)
+  mat       aux_hyper_inv_gB      = as<mat>(aux_hyper_list["aux_hyper_inv_gB"]);         // (N, N)
+  mat       aux_hyper_inv_gammaA  = as<mat>(aux_hyper_list["aux_hyper_inv_gammaA"]); // (N, K)
+  mat       aux_hyper_inv_gA      = as<mat>(aux_hyper_list["aux_hyper_inv_gA"]);         // (N, K)
+  double    aux_hyper_inv_deltaB  = as<double>(aux_hyper_list["aux_hyper_inv_deltaB"]);
+  double    aux_hyper_inv_dB      = as<double>(aux_hyper_list["aux_hyper_inv_dB"]);
+  double    aux_hyper_inv_deltaA  = as<double>(aux_hyper_list["aux_hyper_inv_deltaA"]);
+  double    aux_hyper_inv_dA      = as<double>(aux_hyper_list["aux_hyper_inv_dA"]);
   
   const int N = aux_B.n_rows;
   const int K = aux_A.n_cols;
@@ -1077,14 +1077,7 @@ Rcpp::List sample_hyperparameter_horseshoe (
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
 Rcpp::List sample_hyperparameter_mss_horseshoe (
-    arma::cube&             aux_hyper_inv_gammaB,     // (N, N, M)
-    arma::cube&             aux_hyper_inv_gB,         // (N, N, M)
-    arma::mat&              aux_hyper_inv_gammaA,     // (N, K)
-    arma::mat&              aux_hyper_inv_gA,         // (N, K)
-    arma::vec&              aux_hyper_inv_deltaB,     // (M)
-    arma::vec&              aux_hyper_inv_dB,         // (M)
-    double&                 aux_hyper_inv_deltaA,
-    double&                 aux_hyper_inv_dA,
+    Rcpp::List&             aux_hyper_list,
     const arma::cube&       aux_B,                // (N, N, M)
     const arma::mat&        aux_A,                // (N, K)     
     const arma::field<arma::mat>& VB,             // (N)
@@ -1092,6 +1085,15 @@ Rcpp::List sample_hyperparameter_mss_horseshoe (
 ) {
   
   // the function draws the values of aux_hyper_inv_* by reference
+  
+  cube      aux_hyper_inv_gammaB = as<cube>(aux_hyper_list["aux_hyper_inv_gammaB"]); // (N, N, M)
+  cube      aux_hyper_inv_gB = as<cube>(aux_hyper_list["aux_hyper_inv_gB"]);         // (N, N, M)
+  mat       aux_hyper_inv_gammaA = as<mat>(aux_hyper_list["aux_hyper_inv_gammaA"]); // (N, K)
+  mat       aux_hyper_inv_gA = as<mat>(aux_hyper_list["aux_hyper_inv_gA"]);         // (N, K)
+  vec       aux_hyper_inv_deltaB = as<vec>(aux_hyper_list["aux_hyper_inv_deltaB"]); // (M)
+  vec       aux_hyper_inv_dB = as<vec>(aux_hyper_list["aux_hyper_inv_dB"]);         // (M)
+  double    aux_hyper_inv_deltaA = as<double>(aux_hyper_list["aux_hyper_inv_deltaA"]);
+  double    aux_hyper_inv_dA = as<double>(aux_hyper_list["aux_hyper_inv_dA"]);
   
   const int N = aux_B.n_rows;
   const int K = aux_A.n_cols;
@@ -1169,14 +1171,7 @@ Rcpp::List sample_hyperparameter_mss_horseshoe (
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
 Rcpp::List sample_hyperparameter_mss_s4_horseshoe (
-    arma::cube&             aux_hyper_inv_gammaB,     // (N, N, M)
-    arma::cube&             aux_hyper_inv_gB,         // (N, N, M)
-    arma::mat&              aux_hyper_inv_gammaA,     // (N, K)
-    arma::mat&              aux_hyper_inv_gA,         // (N, K)
-    arma::vec&              aux_hyper_inv_deltaB,     // (M)
-    arma::vec&              aux_hyper_inv_dB,         // (M)
-    double&                 aux_hyper_inv_deltaA,
-    double&                 aux_hyper_inv_dA,
+    Rcpp::List&             aux_hyper_list,
     const arma::cube&       aux_B,                // (N, N, M)
     const arma::mat&        aux_A,                // (N, K)     
     const arma::field<arma::mat>& VB,             // (R + 1)
@@ -1185,6 +1180,14 @@ Rcpp::List sample_hyperparameter_mss_s4_horseshoe (
 ) {
   
   // the function draws the values of aux_hyper_inv_* by reference
+  cube      aux_hyper_inv_gammaB = as<cube>(aux_hyper_list["aux_hyper_inv_gammaB"]); // (N, N, M)
+  cube      aux_hyper_inv_gB = as<cube>(aux_hyper_list["aux_hyper_inv_gB"]);         // (N, N, M)
+  mat       aux_hyper_inv_gammaA = as<mat>(aux_hyper_list["aux_hyper_inv_gammaA"]); // (N, K)
+  mat       aux_hyper_inv_gA = as<mat>(aux_hyper_list["aux_hyper_inv_gA"]);         // (N, K)
+  vec       aux_hyper_inv_deltaB = as<vec>(aux_hyper_list["aux_hyper_inv_deltaB"]); // (M)
+  vec       aux_hyper_inv_dB = as<vec>(aux_hyper_list["aux_hyper_inv_dB"]);         // (M)
+  double    aux_hyper_inv_deltaA = as<double>(aux_hyper_list["aux_hyper_inv_deltaA"]);
+  double    aux_hyper_inv_dA = as<double>(aux_hyper_list["aux_hyper_inv_dA"]);
   
   const int N = aux_B.n_rows;
   const int K = aux_A.n_cols;
@@ -1268,14 +1271,7 @@ Rcpp::List sample_hyperparameter_mss_s4_horseshoe (
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
 Rcpp::List sample_hyperparameter_mssa_s4_horseshoe (
-    arma::cube&             aux_hyper_inv_gammaB,     // (N, N, M)
-    arma::cube&             aux_hyper_inv_gB,         // (N, N, M)
-    arma::cube&             aux_hyper_inv_gammaA,     // (N, K, M)
-    arma::cube&             aux_hyper_inv_gA,         // (N, K, M)
-    arma::vec&              aux_hyper_inv_deltaB,     // (M)
-    arma::vec&              aux_hyper_inv_dB,         // (M)
-    arma::vec&              aux_hyper_inv_deltaA,     // (M)
-    arma::vec&              aux_hyper_inv_dA,         // (M)
+    Rcpp::List&             aux_hyper_list,
     const arma::cube&       aux_B,                // (N, N, M)
     const arma::cube&       aux_A,                // (N, K, M)     
     const arma::field<arma::mat>& VB,             // (R + 1)
@@ -1284,6 +1280,15 @@ Rcpp::List sample_hyperparameter_mssa_s4_horseshoe (
 ) {
   
   // the function draws the values of aux_hyper_inv_* by reference
+  
+  cube      aux_hyper_inv_gammaB = as<cube>(aux_hyper_list["aux_hyper_inv_gammaB"]); // (N, N, M)
+  cube      aux_hyper_inv_gB = as<cube>(aux_hyper_list["aux_hyper_inv_gB"]);         // (N, N, M)
+  cube      aux_hyper_inv_gammaA = as<cube>(aux_hyper_list["aux_hyper_inv_gammaA"]); // (N, K, M)
+  cube      aux_hyper_inv_gA = as<cube>(aux_hyper_list["aux_hyper_inv_gA"]);         // (N, K, M)
+  vec       aux_hyper_inv_deltaB = as<vec>(aux_hyper_list["aux_hyper_inv_deltaB"]); // (M)
+  vec       aux_hyper_inv_dB = as<vec>(aux_hyper_list["aux_hyper_inv_dB"]);         // (M)
+  vec       aux_hyper_inv_deltaA = as<vec>(aux_hyper_list["aux_hyper_inv_deltaA"]); // (M)
+  vec       aux_hyper_inv_dA = as<vec>(aux_hyper_list["aux_hyper_inv_dA"]);         // (M)
   
   const int N = aux_B.n_rows;
   const int K = aux_A.n_cols;
@@ -1424,7 +1429,7 @@ arma::field<arma::mat> hyper2precisionB_mss_boost (
 
 
 arma::field<arma::mat> hyper2precisionA_msa_boost (
-    Rcpp::List              aux_hyper_list,      // (2 * N + 1) x 2
+    Rcpp::List              aux_hyper_list,
     const Rcpp::List&       prior
 ) {
   
@@ -1448,9 +1453,11 @@ arma::field<arma::mat> hyper2precisionA_msa_boost (
 
 
 arma::field<arma::mat> hyper2precisionB_horseshoe (
-    arma::mat&              aux_hyper_inv_gammaB,     // (N, N)
-    double&                 aux_hyper_inv_deltaB
+    Rcpp::List              aux_hyper_list
 ) {
+  
+  mat         aux_hyper_inv_gammaB = as<mat>(aux_hyper_list["aux_hyper_inv_gammaB"]);
+  double      aux_hyper_inv_deltaB = as<double>(aux_hyper_list["aux_hyper_inv_deltaB"]);
   
   int         N             = aux_hyper_inv_gammaB.n_rows; 
   field<mat>  precisionB(N);
@@ -1465,9 +1472,11 @@ arma::field<arma::mat> hyper2precisionB_horseshoe (
 
 
 arma::field<arma::mat> hyper2precisionA_horseshoe (
-    arma::mat&              aux_hyper_inv_gammaA,     // (N, K)
-    double&                 aux_hyper_inv_deltaA
+    Rcpp::List              aux_hyper_list
 ) {
+  
+  mat         aux_hyper_inv_gammaA = as<mat>(aux_hyper_list["aux_hyper_inv_gammaA"]);
+  double      aux_hyper_inv_deltaA = as<double>(aux_hyper_list["aux_hyper_inv_deltaA"]);
   
   int         N             = aux_hyper_inv_gammaA.n_rows; 
   field<mat>  precisionA(N);
@@ -1482,9 +1491,11 @@ arma::field<arma::mat> hyper2precisionA_horseshoe (
 
 
 arma::field<arma::mat> hyper2precisionB_mss_horseshoe (
-    arma::cube&             aux_hyper_inv_gammaB,     // (N, N, M)
-    arma::vec&              aux_hyper_inv_deltaB     // (M)
+    Rcpp::List              aux_hyper_list
 ) {
+  
+  cube        aux_hyper_inv_gammaB = as<cube>(aux_hyper_list["aux_hyper_inv_gammaB"]); // (N, N, M)
+  vec         aux_hyper_inv_deltaB = as<vec>(aux_hyper_list["aux_hyper_inv_deltaB"]);   // (M)
   
   int         N             = aux_hyper_inv_gammaB.n_rows; 
   int         M             = aux_hyper_inv_gammaB.n_slices;
@@ -1501,9 +1512,11 @@ arma::field<arma::mat> hyper2precisionB_mss_horseshoe (
 
 
 arma::field<arma::mat> hyper2precisionA_msa_horseshoe (
-    arma::cube&             aux_hyper_inv_gammaA,     // (N, K, M)
-    arma::vec&              aux_hyper_inv_deltaA     // (M)
+    Rcpp::List              aux_hyper_list
 ) {
+  
+  cube        aux_hyper_inv_gammaA = as<cube>(aux_hyper_list["aux_hyper_inv_gammaA"]); // (N, K, M)
+  vec         aux_hyper_inv_deltaA = as<vec>(aux_hyper_list["aux_hyper_inv_deltaA"]);   // (M)
   
   int         N             = aux_hyper_inv_gammaA.n_rows; 
   int         M             = aux_hyper_inv_gammaA.n_slices;

@@ -159,14 +159,7 @@ double rig_inv1 (
 
 
 Rcpp::List sample_hyperparameter_horseshoe (
-    arma::mat&              aux_hyper_inv_gammaB,     // (N, N)
-    arma::mat&              aux_hyper_inv_gB,         // (N, N)
-    arma::mat&              aux_hyper_inv_gammaA,     // (N, K)
-    arma::mat&              aux_hyper_inv_gA,         // (N, K)
-    double&                 aux_hyper_inv_deltaB,
-    double&                 aux_hyper_inv_dB,
-    double&                 aux_hyper_inv_deltaA,
-    double&                 aux_hyper_inv_dA,
+    Rcpp::List&             aux_hyper_list,
     const arma::mat&        aux_B,                // (N, N)
     const arma::mat&        aux_A,                // (N, K)     
     const arma::field<arma::mat>& VB,             // (N)
@@ -176,14 +169,7 @@ Rcpp::List sample_hyperparameter_horseshoe (
 
 
 Rcpp::List sample_hyperparameter_mss_horseshoe (
-    arma::cube&             aux_hyper_inv_gammaB,     // (N, N, M)
-    arma::cube&             aux_hyper_inv_gB,         // (N, N, M)
-    arma::mat&              aux_hyper_inv_gammaA,     // (N, K)
-    arma::mat&              aux_hyper_inv_gA,         // (N, K)
-    arma::vec&              aux_hyper_inv_deltaB,     // (M)
-    arma::vec&              aux_hyper_inv_dB,         // (M)
-    double&                 aux_hyper_inv_deltaA,
-    double&                 aux_hyper_inv_dA,
+    Rcpp::List&             aux_hyper_list,
     const arma::cube&       aux_B,                // (N, N, M)
     const arma::mat&        aux_A,                // (N, K)     
     const arma::field<arma::mat>& VB,             // (N)
@@ -192,14 +178,7 @@ Rcpp::List sample_hyperparameter_mss_horseshoe (
 
 
 Rcpp::List sample_hyperparameter_mss_s4_horseshoe (
-    arma::cube&             aux_hyper_inv_gammaB,     // (N, N, M)
-    arma::cube&             aux_hyper_inv_gB,         // (N, N, M)
-    arma::mat&              aux_hyper_inv_gammaA,     // (N, K)
-    arma::mat&              aux_hyper_inv_gA,         // (N, K)
-    arma::vec&              aux_hyper_inv_deltaB,     // (M)
-    arma::vec&              aux_hyper_inv_dB,         // (M)
-    double&                 aux_hyper_inv_deltaA,
-    double&                 aux_hyper_inv_dA,
+    Rcpp::List&             aux_hyper_list,
     const arma::cube&       aux_B,                // (N, N, M)
     const arma::mat&        aux_A,                // (N, K)     
     const arma::field<arma::mat>& VB,             // (R + 1)
@@ -209,14 +188,7 @@ Rcpp::List sample_hyperparameter_mss_s4_horseshoe (
 
 
 Rcpp::List sample_hyperparameter_mssa_s4_horseshoe (
-    arma::cube&             aux_hyper_inv_gammaB,     // (N, N, M)
-    arma::cube&             aux_hyper_inv_gB,         // (N, N, M)
-    arma::cube&             aux_hyper_inv_gammaA,     // (N, K, M)
-    arma::cube&             aux_hyper_inv_gA,         // (N, K, M)
-    arma::vec&              aux_hyper_inv_deltaB,     // (M)
-    arma::vec&              aux_hyper_inv_dB,         // (M)
-    arma::vec&              aux_hyper_inv_deltaA,     // (M)
-    arma::vec&              aux_hyper_inv_dA,         // (M)
+    Rcpp::List&             aux_hyper_list,
     const arma::cube&       aux_B,                // (N, N, M)
     const arma::cube&       aux_A,                // (N, K, M)     
     const arma::field<arma::mat>& VB,             // (R + 1)
@@ -250,26 +222,22 @@ arma::field<arma::mat> hyper2precisionA_msa_boost (
 
 
 arma::field<arma::mat> hyper2precisionB_horseshoe (
-    arma::mat&              aux_hyper_inv_gammaB,     // (N, N)
-    double&                 aux_hyper_inv_deltaB
+    Rcpp::List              aux_hyper_list
 );
 
 
 arma::field<arma::mat> hyper2precisionA_horseshoe (
-    arma::mat&              aux_hyper_inv_gammaA,     // (N, N)
-    double&                 aux_hyper_inv_deltaA
+    Rcpp::List              aux_hyper_list
 );
 
 
 arma::field<arma::mat> hyper2precisionB_mss_horseshoe (
-    arma::cube&             aux_hyper_inv_gammaB,     // (N, N, M)
-    arma::vec&              aux_hyper_inv_deltaB     // (M)
+    Rcpp::List              aux_hyper_list
 );
 
 
 arma::field<arma::mat> hyper2precisionA_msa_horseshoe (
-    arma::cube&             aux_hyper_inv_gammaA,     // (N, K, M)
-    arma::vec&              aux_hyper_inv_deltaA     // (M)
+    Rcpp::List              aux_hyper_list
 );
 
 
