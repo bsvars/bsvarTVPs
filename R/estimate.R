@@ -179,7 +179,7 @@ bsvar_mss_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L
 #' 
 #' @export
 bsvar_tvi_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, centred_sv = FALSE, hyper_select = 1, studentt = TRUE) {
-  output          = .Call(`_bsvarTVPs_bsvar_s4_sv_boost_cpp`, SS, Y, X, prior, VB, starting_values, thin, finiteM, hyper_select, studentt)
+  output          = .Call(`_bsvarTVPs_bsvar_s4_sv_boost_cpp`, SS, Y, X, prior, VB, starting_values, thin, centred_sv, hyper_select, studentt)
   class(output)   = "PosteriorBSVARSVTVI"
   return(output)
 }
