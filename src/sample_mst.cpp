@@ -50,7 +50,7 @@ double log_kernel_df_ms_nm (
   lk_df   += 0.5 * Tm * aux_df * log(0.5 * (aux_df - 2));      // lambda prior
   lk_df   -= 0.5 * (aux_df - 2) * accu(log(aux_lambda));       // lambda prior
   lk_df   -= 0.5 * (aux_df - 2) * accu(pow(aux_lambda, -1));  // lambda prior
-  lk_df   -= prior_df_a * aux_df;                             // df prior
+  lk_df   -= prior_df_a * (aux_df - 2);                       // df prior shifted exponential
   
   return lk_df;
 } // END log_kernel_df_ms_nm
