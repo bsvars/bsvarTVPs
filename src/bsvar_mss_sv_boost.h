@@ -16,6 +16,7 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     const Rcpp::List&             starting_values,
     const int                     thin = 100, // introduce thinning
     const bool                    centred_sv = false,  // introduce thinning
+    const bool                    finiteM = true,
     const int                     hyper_select = 1,
     const bool                    studentt = false
 );

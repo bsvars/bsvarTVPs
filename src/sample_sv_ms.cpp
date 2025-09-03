@@ -758,11 +758,11 @@ arma::mat sample_Markov_process (
     const bool        finiteM = true
 ) {
   
-  int minimum_regime_occurrences = 10;
-  int max_iterations = 50;
+  int minimum_regime_occurrences = 0;
+  int max_iterations = 1;
   if ( finiteM ) {
-    minimum_regime_occurrences = 10;
-    max_iterations = 50;
+    minimum_regime_occurrences = 2;
+    max_iterations = 10;
   }
   
   const int   T   = Z.n_cols;

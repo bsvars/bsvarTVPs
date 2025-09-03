@@ -71,8 +71,8 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
   double  adaptive_scale_init = pow(R::psigamma(15, 1) - 29 * pow(28, -2), -1) / (T / M);
   mat     adaptive_scale(N, M, fill::value(adaptive_scale_init));
   
-  mat   aux_lambda(N, T, fill::ones);
-  mat   aux_lambda_tmp(N, T, fill::ones);
+  mat   aux_lambda  = as<mat>(starting_values["lambda"]);
+  mat   aux_lambda_tmp = pow(aux_lambda, 0.5);
   mat   aux_df = as<mat>(starting_values["df"]);
   mat   aux_xi(M , T, fill::ones);
   

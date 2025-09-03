@@ -21,6 +21,7 @@ Rcpp::List bsvar_mssa_s4_sv_boost_cpp (
     const Rcpp::List&             starting_values,
     const int                     thin = 100, // introduce thinning
     const bool                    centred_sv = false,
+    const bool                    finiteM = true,
     const int                     hyper_select = 1,
     const bool                    studentt = false
 ) {
@@ -69,8 +70,8 @@ Rcpp::List bsvar_mssa_s4_sv_boost_cpp (
   double  adaptive_scale_init = pow(R::psigamma(15, 1) - 29 * pow(28, -2), -1) / (T / M);
   mat     adaptive_scale(N, M, fill::value(adaptive_scale_init));
   
-  mat   aux_lambda(N, T, fill::ones);
-  mat   aux_lambda_tmp(N, T, fill::ones);
+  mat   aux_lambda  = as<mat>(starting_values["lambda"]);
+  mat   aux_lambda_tmp = pow(aux_lambda, 0.5);
   mat   aux_df = as<mat>(starting_values["df"]);
   
   mat   aux_h       = as<mat>(starting_values["h"]);
@@ -176,7 +177,7 @@ Rcpp::List bsvar_mssa_s4_sv_boost_cpp (
       }
       Z.slice(m)    = (aux_B.slice(m) * (Y - aux_A.slice(m) * X)) / (aux_lambda_tmp % aux_sigma_tmp_m);
     }
-    aux_xi            = sample_Markov_process(Z, aux_xi, aux_PR_TR, aux_pi_0, true);
+    aux_xi            = sample_Markov_process(Z, aux_xi, aux_PR_TR, aux_pi_0, finiteM);
     
     
     // sample aux_PR_TR and aux_pi_0
