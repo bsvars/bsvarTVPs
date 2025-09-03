@@ -24,7 +24,7 @@ Rcpp::List sample_df_ms (
     const arma::mat&  aux_lambda,         // NxT
     const arma::mat&  aux_xi,             // MxT
     const arma::mat&  U,                  // NxT
-    const double&     prior_df_a,         // hyper-parameter for exponential prior for aux_df
+    const Rcpp::List& prior,              // hyper-parameter for exponential prior for aux_df
     const int&        s,                  // MCMC iteration
     arma::mat&        adaptive_scale,     // NxM
     const arma::vec&  adptive_alpha_gamma // 2x1 vector with target acceptance rate and step size

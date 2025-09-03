@@ -4,6 +4,7 @@
 
 #include "sample_ABhyper.h"
 #include "sample_sv_ms.h"
+#include "sample_mst.h"
 
 using namespace Rcpp;
 using namespace arma;
@@ -20,7 +21,8 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     const Rcpp::List&             starting_values,
     const int                     thin = 100, // introduce thinning
     const bool                    centred_sv = false,  // introduce thinning
-    const int                     hyper_select = 1
+    const int                     hyper_select = 1,
+    const bool                    studentt = false
 ) {
   // // Progress bar setup
   vec prog_rep_points = arma::round(arma::linspace(0, SS, 50));
@@ -31,6 +33,9 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
   Rcout << "**************************************************|" << endl;
   Rcout << " Gibbs sampler for the SVAR-SV model              |" << endl;
   Rcout << "    with Markov-switching structural matrix       |" << endl;
+  if ( studentt ) {
+    Rcout << "    and Student-t structural shocks               |" << endl;
+  }
   Rcout << "**************************************************|" << endl;
   Rcout << " Progress of the MCMC simulation for " << SS << " draws" << endl;
   Rcout << "    Every " << thin << "th draw is saved via MCMC thinning" << endl;
@@ -62,6 +67,20 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
   const int M       = aux_PR_TR.n_cols;
   vec      Tm       = sum(aux_xi, 1);
   
+  // parameters for adaptive sampling of degrees of freedom
+  NumericVector aag = {0.44, 0.6};
+  const vec     adptive_alpha_gamma = as<vec>(aag);
+  
+  // the initial value for the adaptive_scale is set to the negative inverse of 
+  // Hessian for the posterior log_kenel for df evaluated at df = 30
+  double  adaptive_scale_init = pow(R::psigamma(15, 1) - 29 * pow(28, -2), -1) / (T / M);
+  mat     adaptive_scale(N, M, fill::value(adaptive_scale_init));
+  
+  mat   aux_lambda(N, T, fill::ones);
+  mat   aux_lambda_tmp(N, T, fill::ones);
+  mat   aux_df = as<mat>(starting_values["df"]);
+  
+  
   rowvec    omega_T_n(T);
   if ( centred_sv ) {
     for (int n=0; n<N; n++) {
@@ -75,6 +94,7 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
       aux_sigma.row(n) = exp(0.5 * (aux_h.row(n) % omega_T_n));
     }
   }
+  mat   aux_sigma_tmp = aux_sigma;
   
   const int   S     = floor(SS / thin);
   
@@ -85,6 +105,9 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
   cube  posterior_PR_TR(M, M, S);
   mat   posterior_pi_0(M,S);
   cube  posterior_xi(M, T, S);
+  
+  cube  posterior_lambda(N, T, S);
+  cube  posterior_df(N, M, S);
   
   cube  posterior_h(N, T, S);
   mat   posterior_rho(N, S);
@@ -102,6 +125,9 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
   field<mat> precisionB;
   field<mat> precisionA;
   
+  mat aux_sigma_tmp_m(N, T, fill::ones);
+  mat sigmaT(N, T, fill::ones);
+  
   int   s = 0;
   
   // Rcout << "befor loop" << endl;
@@ -112,14 +138,43 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     // Check for user interrupts
     if (ss % 200 == 0) checkUserInterrupt();
     
+    // sample aux_lambda and aux_df
+    mat E             = (Y - aux_A * X);
+    if ( studentt ) {
+      
+      mat U           = E;
+      for (int t=0; t<T; t++) {
+        int   m       = aux_xi.col(t).index_max();
+        U.col(t)      = aux_B.slice(m) * (Y.col(t) - aux_A * X.col(t));
+      }
+      U              /= aux_sigma_tmp;
+      
+      
+      aux_lambda      = sample_lambda_ms(aux_df, aux_xi, U);
+      aux_lambda_tmp  = pow(aux_lambda, 0.5);
+      aux_sigma       = aux_sigma_tmp % aux_lambda_tmp;
+      
+      List aux_df_tmp = sample_df_ms (aux_df, aux_lambda, aux_xi, U, prior, ss, adaptive_scale, adptive_alpha_gamma);
+      aux_df          = as<mat>(aux_df_tmp["aux_df"]);
+      adaptive_scale  = as<mat>(aux_df_tmp["adaptive_scale"]);
+    } // END studentt
+    
     // sample aux_xi
-    // Rcout << "befor aux_xi" << endl;
-    mat E             = Y - aux_A * X;
-    try {
-      aux_xi            = sample_Markov_process_mss(aux_xi, E, aux_B, aux_sigma, aux_PR_TR, aux_pi_0);
-    } catch (std::runtime_error &e) {
-      Rcout << "   sample_Markov_process_mss failure " << endl;
+    cube Z(N, T, M);
+    
+    for (int m=0; m<M; m++) {
+      if ( centred_sv ) {
+        for (int t=0; t<T; t++){
+          sigmaT.col(t)    = pow( aux_sigma2v.col( aux_xi.col(t).index_max() ), 0.5);
+        }
+        aux_sigma_tmp = 2 * log(aux_sigma) / sigmaT;
+        aux_sigma_tmp_m = exp(0.5 * diagmat(pow(aux_sigma2v.col(m), 0.5)) * aux_sigma_tmp);
+      } else {
+        aux_sigma_tmp_m = exp(0.5 * diagmat(aux_omega.col(m)) * aux_h);
+      }
+      Z.slice(m)    = (aux_B.slice(m) * (Y - aux_A * X)) / (aux_lambda_tmp % aux_sigma_tmp_m);
     }
+    aux_xi            = sample_Markov_process(Z, aux_xi, aux_PR_TR, aux_pi_0, true);
     
     // sample aux_PR_TR and aux_pi_0
     // Rcout << "befor aux_PR_TR" << endl;
@@ -175,7 +230,7 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     for (int m=0; m<M; m++) {
       for (int t=0; t<T; t++) {
         if (aux_xi(m,t)==1) {
-          U.col(t)      = aux_B.slice(m) * (Y.col(t) - aux_A * X.col(t));
+          U.col(t)      = aux_B.slice(m) * (Y.col(t) - aux_A * X.col(t)) / aux_lambda_tmp.col(t);
         }
       }
     }
@@ -219,14 +274,15 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
       aux_s_(n)         = as<double>(sv_n["aux_s_n"]);
       
       if ( centred_sv ) {
-        aux_sigma.row(n) = exp(0.5 * aux_h.row(n));
+        aux_sigma_tmp.row(n) = exp(0.5 * aux_h.row(n));
       } else {
         for (int t=0; t<T; t++){
           omega_T_n(t)    = aux_omega(n, aux_xi.col(t).index_max());
         }
-        aux_sigma.row(n) = exp(0.5 * (aux_h.row(n) % omega_T_n));
+        aux_sigma_tmp.row(n) = exp(0.5 * (aux_h.row(n) % omega_T_n));
       }
     } // END n loop
+    aux_sigma       = aux_sigma_tmp % aux_lambda_tmp;
     
     if (ss % thin == 0) {
       posterior_B(s)                = aux_B;
@@ -235,6 +291,8 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
       posterior_PR_TR.slice(s)      = aux_PR_TR;
       posterior_pi_0.col(s)         = aux_pi_0;
       posterior_xi.slice(s)         = aux_xi;
+      posterior_lambda.slice(s)     = aux_lambda;
+      posterior_df.slice(s)         = aux_df;
       posterior_h.slice(s)          = aux_h;
       posterior_rho.col(s)          = aux_rho;
       posterior_omega.slice(s)      = aux_omega;
@@ -262,7 +320,9 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
       _["S"]        = aux_S,
       _["sigma2_omega"] = aux_sigma2_omega,
       _["s_"]       = aux_s_,
-      _["sigma"]    = aux_sigma
+      _["sigma"]    = aux_sigma,
+      _["lambda"]   = aux_lambda,
+      _["df"]       = aux_df
     ),
     _["posterior"]  = List::create(
       _["B"]        = posterior_B,
@@ -278,7 +338,9 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
       _["S"]        = posterior_S,
       _["sigma2_omega"] = posterior_sigma2_omega,
       _["s_"]        = posterior_s_,
-      _["sigma"]    = posterior_sigma
+      _["sigma"]    = posterior_sigma,
+      _["lambda"]   = posterior_lambda,
+      _["df"]       = posterior_df
     ),
     _["acceptance_rate"] = 1- acceptance_count/SS
   );

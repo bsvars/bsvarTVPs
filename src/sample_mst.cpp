@@ -14,7 +14,6 @@ arma::mat sample_lambda_ms (
     const arma::mat&    U           // NxT
 ) {
   const int N           = U.n_rows;
-  const int M           = U.n_cols;
   const int T           = U.n_cols;
   vec       Tm          = sum(aux_xi, 1);  
   
@@ -63,15 +62,18 @@ Rcpp::List sample_df_ms (
     const arma::mat&  aux_lambda,         // NxT
     const arma::mat&  aux_xi,             // MxT
     const arma::mat&  U,                  // NxT
-    const double&     prior_df_a,         // hyper-parameter for exponential prior for aux_df
+    const Rcpp::List& prior,              // hyper-parameter for exponential prior for aux_df
     const int&        s,                  // MCMC iteration
     arma::mat&        adaptive_scale,     // NxM
     const arma::vec&  adptive_alpha_gamma // 2x1 vector with target acceptance rate and step size
 ) {
+  
   int N = aux_df.n_rows;
   int M = aux_df.n_cols;
   mat aux_df_star(N, M);
   mat alpha(N, M, fill::ones);
+  
+  double  prior_df_a          = as<double>(prior["df_a"]);
   
   // by sampling from truncated normal it is assumed that the asymmetry from truncation 
   // is negligible for alpha computation

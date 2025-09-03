@@ -13,7 +13,8 @@ bsvar_mss_boost(
   VB,
   starting_values,
   thin = 100L,
-  hyper_select = 1
+  hyper_select = 1,
+  studentt = FALSE
 )
 }
 \arguments{
@@ -33,6 +34,9 @@ bsvar_mss_boost(
 
 \item{hyper_select}{an integer choosing th type of hyper-parameter hierarchy: 
 \code{1} - horseshoe prior, \code{2} - 3-level hierarchy, \code{3} - fixed hyper-parameters.}
+
+\item{studentt}{a logical value, if \code{TRUE} the model is estimated with 
+t-distributed structural shocks, if \code{FALSE} the shocks are Gaussian}
 }
 \value{
 An object of class \code{PosteriorBSVARMS} - a list containing the Bayesian estimation output in two elements:

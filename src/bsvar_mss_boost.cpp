@@ -4,6 +4,7 @@
 
 #include "sample_ABhyper.h"
 #include "sample_sv_ms.h"
+#include "sample_mst.h"
 
 using namespace Rcpp;
 using namespace arma;
@@ -19,7 +20,8 @@ Rcpp::List bsvar_mss_boost_cpp (
     const arma::field<arma::mat>& VB,        // restrictions on B0
     const Rcpp::List&             starting_values,
     const int                     thin = 100,  // introduce thinning
-    const int                     hyper_select = 1
+    const int                     hyper_select = 1,
+    const bool                    studentt = false
 ) {
   // // Progress bar setup
   vec prog_rep_points = arma::round(arma::linspace(0, SS, 50));
@@ -30,6 +32,9 @@ Rcpp::List bsvar_mss_boost_cpp (
   Rcout << "**************************************************|" << endl;
   Rcout << " Gibbs sampler for the SVAR model                 |" << endl;
   Rcout << "    with Markov-switching structural matrix       |" << endl;
+  if ( studentt ) {
+  Rcout << "    and Student-t structural shocks               |" << endl;
+  }
   Rcout << "**************************************************|" << endl;
   Rcout << " Progress of the MCMC simulation for " << SS << " draws" << endl;
   Rcout << "    Every " << thin << "th draw is saved via MCMC thinning" << endl;
@@ -47,12 +52,23 @@ Rcpp::List bsvar_mss_boost_cpp (
   
   mat   aux_PR_TR   = as<mat>(starting_values["PR_TR"]);
   vec   aux_pi_0    = as<vec>(starting_values["pi_0"]);
-  mat  aux_xi       = as<mat>(starting_values["xi"]);
-  
-  mat   aux_sigma(N, T, fill::ones);
+  mat   aux_xi      = as<mat>(starting_values["xi"]);
   
   const int M       = aux_PR_TR.n_cols;
   vec      Tm       = sum(aux_xi, 1);
+  
+  // parameters for adaptive sampling of degrees of freedom
+  NumericVector aag = {0.44, 0.6};
+  const vec     adptive_alpha_gamma = as<vec>(aag);
+  
+  // the initial value for the adaptive_scale is set to the negative inverse of 
+  // Hessian for the posterior log_kenel for df evaluated at df = 30
+  double  adaptive_scale_init = pow(R::psigamma(15, 1) - 29 * pow(28, -2), -1) / (T / M);
+  mat     adaptive_scale(N, M, fill::value(adaptive_scale_init));
+  
+  mat   aux_lambda(N, T, fill::ones);
+  mat   aux_sigma(N, T, fill::ones);
+  mat   aux_df = as<mat>(starting_values["df"]);
   
   const int   S     = floor(SS / thin);
   
@@ -63,6 +79,9 @@ Rcpp::List bsvar_mss_boost_cpp (
   cube  posterior_PR_TR(M, M, S);
   mat   posterior_pi_0(M,S);
   cube  posterior_xi(M, T, S);
+  
+  cube  posterior_lambda(N, T, S);
+  cube  posterior_df(N, M, S);
   
   vec   acceptance_count(4);
   List  PR_TR_tmp;
@@ -79,9 +98,30 @@ Rcpp::List bsvar_mss_boost_cpp (
     // Check for user interrupts
     if (ss % 200 == 0) checkUserInterrupt();
     
+    // sample aux_lambda and aux_df
+    mat E             = (Y - aux_A * X);
+    if ( studentt ) {
+      
+      mat U           = E;
+      for (int t=0; t<T; t++) {
+        int   m       = aux_xi.col(t).index_max();
+        U.col(t)      = aux_B.slice(m) * (Y.col(t) - aux_A * X.col(t));
+      }
+      
+      aux_lambda      = sample_lambda_ms(aux_df, aux_xi, U);
+      aux_sigma       = pow(aux_lambda, 0.5);
+      
+      List aux_df_tmp = sample_df_ms (aux_df, aux_lambda, aux_xi, U, prior, ss, adaptive_scale, adptive_alpha_gamma);
+      aux_df          = as<mat>(aux_df_tmp["aux_df"]);
+      adaptive_scale  = as<mat>(aux_df_tmp["adaptive_scale"]);
+    } // END studentt
+    
     // sample aux_xi
-    mat E             = Y - aux_A * X;
-    aux_xi            = sample_Markov_process_mss(aux_xi, E, aux_B, aux_sigma, aux_PR_TR, aux_pi_0);
+    cube Z(N, T, M);
+    for (int m=0; m<M; m++) {
+      Z.slice(m)    = pow(aux_lambda, -0.5) % (aux_B.slice(m) * (Y - aux_A * X) );
+    }
+    aux_xi            = sample_Markov_process(Z, aux_xi, aux_PR_TR, aux_pi_0, true);
     
     // sample aux_PR_TR and aux_pi_0
     PR_TR_tmp         = sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
@@ -122,6 +162,8 @@ Rcpp::List bsvar_mss_boost_cpp (
       posterior_PR_TR.slice(s)      = aux_PR_TR;
       posterior_pi_0.col(s)         = aux_pi_0;
       posterior_xi.slice(s)         = aux_xi;
+      posterior_lambda.slice(s)     = aux_lambda;
+      posterior_df.slice(s)         = aux_df;
       s++;
     }
   } // END ss loop
@@ -133,7 +175,9 @@ Rcpp::List bsvar_mss_boost_cpp (
       _["hyper"]    = aux_hyper,
       _["PR_TR"]    = aux_PR_TR,
       _["pi_0"]     = aux_pi_0,
-      _["xi"]       = aux_xi
+      _["xi"]       = aux_xi,
+      _["lambda"]   = aux_lambda,
+      _["df"]       = aux_df
     ),
     _["posterior"]  = List::create(
       _["B"]        = posterior_B,
@@ -141,7 +185,9 @@ Rcpp::List bsvar_mss_boost_cpp (
       _["hyper"]    = posterior_hyper,
       _["PR_TR"]    = posterior_PR_TR,
       _["pi_0"]     = posterior_pi_0,
-      _["xi"]       = posterior_xi
+      _["xi"]       = posterior_xi,
+      _["lambda"]   = posterior_lambda,
+      _["df"]       = posterior_df
     ),
     _["acceptance_rate"] = 1- acceptance_count/SS
   );

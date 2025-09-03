@@ -750,11 +750,9 @@ arma::mat smoothing (
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
-arma::mat sample_Markov_process_mss (
+arma::mat sample_Markov_process (
+    const arma::cube& Z,                  // NxTxM
     arma::mat         aux_xi,             // MxT
-    const arma::mat&  E,                  // NxT
-    const arma::cube& aux_B,              // NxNxM
-    const arma::mat&  aux_sigma,          // NxM
     const arma::mat&  aux_PR_TR,          // MxM
     const arma::vec&  aux_pi_0,           // Mx1
     const bool        finiteM = true
@@ -767,90 +765,10 @@ arma::mat sample_Markov_process_mss (
     max_iterations = 50;
   }
   
-  const int   T   = E.n_cols;
-  const int   N   = E.n_rows;
+  const int   T   = Z.n_cols;
   const int   M   = aux_PR_TR.n_rows;
   mat aux_xi_tmp = aux_xi;
   mat aux_xi_out = aux_xi;
-  
-  cube  Z(N, T, M);
-  for (int m=0; m<M; m++) {
-    Z.slice(m)    = pow(aux_sigma, -1) % (aux_B.slice(m) * E);
-  }
-  
-  mat filtered    = filtering(Z, aux_PR_TR, aux_pi_0);
-  mat smoothed    = smoothing(filtered, aux_PR_TR);
-  mat    aj       = eye(M, M);
-  
-  // Rcout << "aux_xi: " << aux_xi << endl;
-  // Rcout << "aux_B: " << aux_B << endl;
-  // Rcout << " smoothed.col(T-1): " << smoothed.col(T-1) << endl;
-  
-  mat xi(M, T);
-  int draw        = csample_num1(wrap(seq_len(M)), wrap(smoothed.col(T-1)));
-  aux_xi_tmp.col(T-1)     = aj.col(draw-1);
-  
-  if ( minimum_regime_occurrences==0 ) {
-    for (int t=T-2; t>=0; --t) {
-      vec xi_Tmj    = (aux_PR_TR * (aux_xi.col(t+1)/(aux_PR_TR.t() * filtered.col(t)))) % filtered.col(t);
-      draw          = csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
-      aux_xi_tmp.col(t)   = aj.col(draw-1);
-    }
-    aux_xi_out = aux_xi_tmp;
-  } else {
-    int regime_occurrences  = 1;
-    int iterations  = 1;
-    while ( (regime_occurrences<minimum_regime_occurrences) & (iterations<max_iterations) ) {
-      for (int t=T-2; t>=0; --t) {
-        vec xi_Tmj    = (aux_PR_TR * (aux_xi.col(t+1)/(aux_PR_TR.t() * filtered.col(t)))) % filtered.col(t);
-        draw          = csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
-        aux_xi_tmp.col(t)   = aj.col(draw-1);
-      }
-      mat transitions       = count_regime_transitions(aux_xi_tmp);
-      regime_occurrences    = min(transitions.diag());
-      iterations++;
-    } // END while
-    if ( iterations<max_iterations ) aux_xi_out = aux_xi_tmp;
-  }
-  
-  return aux_xi_out;
-} // END sample_Markov_process_mss
-
-
-
-
-
-// [[Rcpp::interfaces(cpp)]]
-// [[Rcpp::export]]
-arma::mat sample_Markov_process_mssa (
-    arma::mat         aux_xi,             // MxT
-    const arma::cube& aux_B,              // NxNxM
-    const arma::cube& aux_A,              // NxKxM
-    const arma::mat&  Y,
-    const arma::mat&  X,
-    const arma::mat&  aux_sigma,          // NxM
-    const arma::mat&  aux_PR_TR,          // MxM
-    const arma::vec&  aux_pi_0,           // Mx1
-    const bool        finiteM = true
-) {
-  
-  int minimum_regime_occurrences = 10;
-  int max_iterations = 50;
-  if ( finiteM ) {
-    minimum_regime_occurrences = 10;
-    max_iterations = 50;
-  }
-  
-  const int   T   = Y.n_cols;
-  const int   N   = Y.n_rows;
-  const int   M   = aux_PR_TR.n_rows;
-  mat aux_xi_tmp = aux_xi;
-  mat aux_xi_out = aux_xi;
-  
-  cube  Z(N, T, M);
-  for (int m=0; m<M; m++) {
-    Z.slice(m)    = pow(aux_sigma, -1) % (aux_B.slice(m) * (Y - aux_A.slice(m) * X));
-  }
   
   mat filtered    = filtering(Z, aux_PR_TR, aux_pi_0);
   mat smoothed    = smoothing(filtered, aux_PR_TR);
@@ -884,25 +802,7 @@ arma::mat sample_Markov_process_mssa (
   }
   
   return aux_xi_out;
-} // END sample_Markov_process_mssa
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+} // END sample_Markov_process
 
 
 
@@ -946,6 +846,4 @@ Rcpp::List sample_transition_probabilities (
     _["aux_pi_0"]         = aux_pi_0
     );
 } // END sample_transition_probabilities
-
-
 

@@ -18,6 +18,8 @@
 #' in its centred form
 #' @param hyper_select an integer choosing th type of hyper-parameter hierarchy: 
 #' \code{1} - horseshoe prior, \code{2} - 3-level hierarchy, \code{3} - fixed hyper-parameters.
+#' @param studentt a logical value, if \code{TRUE} the model is estimated with 
+#' t-distributed structural shocks, if \code{FALSE} the shocks are Gaussian
 #' 
 #' @return An object of class \code{PosteriorBSVARSVMSTVI} - a list containing the Bayesian estimation output in two elements:
 #' 
@@ -34,8 +36,8 @@
 #' Monetary Policy Shock Identification?
 #' 
 #' @export
-bsvar_mss_tvi_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, centred_sv = FALSE, hyper_select = 1) {
-  output          = .Call(`_bsvarTVPs_bsvar_mss_s4_sv_boost_cpp`, SS, Y, X, prior, VB, starting_values, thin, centred_sv, hyper_select)
+bsvar_mss_tvi_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, centred_sv = FALSE, hyper_select = 1, studentt = TRUE) {
+  output          = .Call(`_bsvarTVPs_bsvar_mss_s4_sv_boost_cpp`, SS, Y, X, prior, VB, starting_values, thin, centred_sv, hyper_select, studentt)
   class(output)   = "PosteriorBSVARSVMSTVI"
   return(output)
 }
@@ -61,6 +63,8 @@ bsvar_mss_tvi_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 
 #' in its centred form
 #' @param hyper_select an integer choosing th type of hyper-parameter hierarchy: 
 #' \code{1} - horseshoe prior, \code{2} - 3-level hierarchy, \code{3} - fixed hyper-parameters.
+#' @param studentt a logical value, if \code{TRUE} the model is estimated with 
+#' t-distributed structural shocks, if \code{FALSE} the shocks are Gaussian
 #' 
 #' @return An object of class \code{PosteriorBSVARSVMSATVI} - a list containing the Bayesian estimation output in two elements:
 #' 
@@ -77,8 +81,8 @@ bsvar_mss_tvi_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 
 #' Monetary Policy Shock Identification?
 #' 
 #' @export
-bsvar_mssa_tvi_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, centred_sv = FALSE, hyper_select = 1) {
-  output          = .Call(`_bsvarTVPs_bsvar_mssa_s4_sv_boost_cpp`, SS, Y, X, prior, VB, starting_values, thin, centred_sv, hyper_select)
+bsvar_mssa_tvi_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, centred_sv = FALSE, hyper_select = 1, studentt = TRUE) {
+  output          = .Call(`_bsvarTVPs_bsvar_mssa_s4_sv_boost_cpp`, SS, Y, X, prior, VB, starting_values, thin, centred_sv, hyper_select, studentt)
   class(output)   = "PosteriorBSVARSVMSATVI"
   return(output)
 }
@@ -103,6 +107,8 @@ bsvar_mssa_tvi_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin =
 #' in its centred form
 #' @param hyper_select an integer choosing th type of hyper-parameter hierarchy: 
 #' \code{1} - horseshoe prior, \code{2} - 3-level hierarchy, \code{3} - fixed hyper-parameters.
+#' @param studentt a logical value, if \code{TRUE} the model is estimated with 
+#' t-distributed structural shocks, if \code{FALSE} the shocks are Gaussian
 #' 
 #' @return  An object of class \code{PosteriorBSVARSVMS} - a list containing the Bayesian estimation output in two elements:
 #' 
@@ -119,8 +125,8 @@ bsvar_mssa_tvi_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin =
 #' Monetary Policy Shock Identification?
 #' 
 #' @export
-bsvar_mss_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, centred_sv = FALSE, hyper_select = 1) {
-  output          = .Call(`_bsvarTVPs_bsvar_mss_sv_boost_cpp`, SS, Y, X, prior, VB, starting_values, thin, centred_sv, hyper_select)
+bsvar_mss_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, centred_sv = FALSE, hyper_select = 1, studentt = TRUE) {
+  output          = .Call(`_bsvarTVPs_bsvar_mss_sv_boost_cpp`, SS, Y, X, prior, VB, starting_values, thin, centred_sv, hyper_select, studentt)
   class(output)   = "PosteriorBSVARSVMS"
   return(output)
 }
@@ -148,6 +154,8 @@ bsvar_mss_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L
 #' in its centred form
 #' @param hyper_select an integer choosing th type of hyper-parameter hierarchy: 
 #' \code{1} - horseshoe prior, \code{2} - 3-level hierarchy, \code{3} - fixed hyper-parameters.
+#' @param studentt a logical value, if \code{TRUE} the model is estimated with 
+#' t-distributed structural shocks, if \code{FALSE} the shocks are Gaussian
 #' 
 #' @return  An object of class \code{PosteriorBSVARSVTVI} - a list containing the Bayesian estimation output in two elements:
 #' 
@@ -164,8 +172,8 @@ bsvar_mss_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L
 #' Monetary Policy Shock Identification?
 #' 
 #' @export
-bsvar_tvi_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, centred_sv = FALSE, hyper_select = 1) {
-  output          = .Call(`_bsvarTVPs_bsvar_s4_sv_boost_cpp`, SS, Y, X, prior, VB, starting_values, thin, centred_sv, hyper_select)
+bsvar_tvi_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, centred_sv = FALSE, hyper_select = 1, studentt = TRUE) {
+  output          = .Call(`_bsvarTVPs_bsvar_s4_sv_boost_cpp`, SS, Y, X, prior, VB, starting_values, thin, centred_sv, hyper_select, studentt)
   class(output)   = "PosteriorBSVARSVTVI"
   return(output)
 }
@@ -188,6 +196,8 @@ bsvar_tvi_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L
 #' @param thin a positive integer determining MCMC thinning
 #' @param hyper_select an integer choosing th type of hyper-parameter hierarchy: 
 #' \code{1} - horseshoe prior, \code{2} - 3-level hierarchy, \code{3} - fixed hyper-parameters.
+#' @param studentt a logical value, if \code{TRUE} the model is estimated with 
+#' t-distributed structural shocks, if \code{FALSE} the shocks are Gaussian
 #' 
 #' @return An object of class \code{PosteriorBSVARMSTVI} - a list containing the Bayesian estimation output in two elements:
 #' 
@@ -204,8 +214,8 @@ bsvar_tvi_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L
 #' Monetary Policy Shock Identification?
 #' 
 #' @export
-bsvar_mss_tvi_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, hyper_select = 1) {
-  output          = .Call(`_bsvarTVPs_bsvar_mss_s4_boost_cpp`, SS, Y, X, prior, VB, starting_values, thin, hyper_select)
+bsvar_mss_tvi_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, hyper_select = 1, studentt = TRUE) {
+  output          = .Call(`_bsvarTVPs_bsvar_mss_s4_boost_cpp`, SS, Y, X, prior, VB, starting_values, thin, hyper_select, studentt)
   class(output)   = "PosteriorBSVARMSTVI"
   return(output)
 }
@@ -228,6 +238,8 @@ bsvar_mss_tvi_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100
 #' @param thin a positive integer determining MCMC thinning
 #' @param hyper_select an integer choosing th type of hyper-parameter hierarchy: 
 #' \code{1} - horseshoe prior, \code{2} - 3-level hierarchy, \code{3} - fixed hyper-parameters.
+#' @param studentt a logical value, if \code{TRUE} the model is estimated with 
+#' t-distributed structural shocks, if \code{FALSE} the shocks are Gaussian
 #' 
 #' @return  An object of class \code{PosteriorBSVARMS} - a list containing the Bayesian estimation output in two elements:
 #' 
@@ -244,8 +256,8 @@ bsvar_mss_tvi_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100
 #' Monetary Policy Shock Identification?
 #' 
 #' @export
-bsvar_mss_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, hyper_select = 1) {
-  output          = .Call(`_bsvarTVPs_bsvar_mss_boost_cpp`, SS, Y, X, prior, VB, starting_values, thin, hyper_select)
+bsvar_mss_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, hyper_select = 1, studentt = TRUE) {
+  output          = .Call(`_bsvarTVPs_bsvar_mss_boost_cpp`, SS, Y, X, prior, VB, starting_values, thin, hyper_select, studentt)
   class(output)   = "PosteriorBSVARMS"
   return(output)
 }
@@ -268,6 +280,8 @@ bsvar_mss_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, h
 #' @param thin a positive integer determining MCMC thinning
 #' @param hyper_select an integer choosing th type of hyper-parameter hierarchy: 
 #' \code{1} - horseshoe prior, \code{2} - 3-level hierarchy, \code{3} - fixed hyper-parameters.
+#' @param studentt a logical value, if \code{TRUE} the model is estimated with 
+#' t-distributed structural shocks, if \code{FALSE} the shocks are Gaussian
 #' 
 #' @return  An object of class \code{PosteriorBSVARTVI} - a list containing the Bayesian estimation output in two elements:
 #' 
@@ -284,8 +298,8 @@ bsvar_mss_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, h
 #' Monetary Policy Shock Identification?
 #' 
 #' @export
-bsvar_tvi_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, hyper_select = 1) {
-  output          = .Call(`_bsvarTVPs_bsvar_s4_boost_cpp`, SS, Y, X, prior, VB, starting_values, thin, hyper_select)
+bsvar_tvi_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, hyper_select = 1, studentt = TRUE) {
+  output          = .Call(`_bsvarTVPs_bsvar_s4_boost_cpp`, SS, Y, X, prior, VB, starting_values, thin, hyper_select, studentt)
   class(output)   = "PosteriorBSVARTVI"
   return(output)
 }

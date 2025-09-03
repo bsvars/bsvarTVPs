@@ -4,6 +4,7 @@
 
 #include "sample_ABhyper.h"
 #include "sample_sv_ms.h"
+#include "sample_mst.h"
 
 using namespace Rcpp;
 using namespace arma;
@@ -19,7 +20,8 @@ Rcpp::List bsvar_s4_boost_cpp (
     const arma::field<arma::mat>& VB,        // restrictions on B0
     const Rcpp::List&             starting_values,
     const int                     thin = 100,
-    const int                     hyper_select = 1 // {1 - horseshoe, 2 - boost, 3 - no hierarchy};
+    const int                     hyper_select = 1, // {1 - horseshoe, 2 - boost, 3 - no hierarchy}
+    const bool                    studentt = false 
 ) {
   // Progress bar setup
   vec prog_rep_points = arma::round(arma::linspace(0, SS, 50));
@@ -31,6 +33,9 @@ Rcpp::List bsvar_s4_boost_cpp (
   Rcout << " Gibbs sampler for the SVAR model with            |" << endl;
   Rcout << "    time-varying identification                   |" << endl;
   Rcout << "    for the structural matrix                     |" << endl;
+  if ( studentt ) {
+    Rcout << "    and Student-t structural shocks               |" << endl;
+  }
   Rcout << "**************************************************|" << endl;
   Rcout << " Progress of the MCMC simulation for " << SS << " draws" << endl;
   Rcout << "    Every " << thin << "th draw is saved via MCMC thinning" << endl;
@@ -41,6 +46,7 @@ Rcpp::List bsvar_s4_boost_cpp (
   const int   T     = Y.n_cols;
   const int   N     = Y.n_rows;
   const int   K     = X.n_rows;
+  const int   M     = 1;
   
   mat   aux_B       = as<mat>(starting_values["B"]);
   mat   aux_A       = as<mat>(starting_values["A"]);
@@ -54,6 +60,23 @@ Rcpp::List bsvar_s4_boost_cpp (
   cube  posterior_A(N, K, S);
   List  posterior_hyper;
   imat  posterior_SL(N, S);
+  
+  cube  posterior_lambda(N, T, S);
+  cube  posterior_df(N, M, S);
+  
+  // parameters for adaptive sampling of degrees of freedom
+  NumericVector aag = {0.44, 0.6};
+  const vec     adptive_alpha_gamma = as<vec>(aag);
+  
+  // the initial value for the adaptive_scale is set to the negative inverse of 
+  // Hessian for the posterior log_kenel for df evaluated at df = 30
+  double  adaptive_scale_init = pow(R::psigamma(15, 1) - 29 * pow(28, -2), -1) / (T / M);
+  mat     adaptive_scale(N, M, fill::value(adaptive_scale_init));
+  
+  mat   aux_lambda(N, T, fill::ones);
+  mat   aux_lambda_tmp(N, T, fill::ones);
+  mat   aux_df = as<mat>(starting_values["df"]);
+  mat   aux_xi(M, T, fill::ones);
   
   vec   acceptance_count(3);
   List  BSL;
@@ -69,6 +92,21 @@ Rcpp::List bsvar_s4_boost_cpp (
     if (any(prog_rep_points == ss)) p.increment();
     // Check for user interrupts
     if (ss % 200 == 0) checkUserInterrupt();
+    
+    // sample aux_lambda and aux_df
+    mat U;
+    if ( studentt ) {
+      
+      U           = aux_B * (Y - aux_A * X);
+      aux_lambda      = sample_lambda_ms(aux_df, aux_xi, U);
+      aux_lambda_tmp  = pow(aux_lambda, 0.5);
+      aux_sigma       = aux_lambda_tmp;
+      
+      List aux_df_tmp = sample_df_ms (aux_df, aux_lambda, aux_xi, U, prior, ss, adaptive_scale, adptive_alpha_gamma);
+      aux_df          = as<mat>(aux_df_tmp["aux_df"]);
+      adaptive_scale  = as<mat>(aux_df_tmp["adaptive_scale"]);
+    } // END studentt
+    
     
     // sample aux_hyper
     if ( hyper_select == 1 ) {
@@ -108,6 +146,8 @@ Rcpp::List bsvar_s4_boost_cpp (
       posterior_A.slice(s)          = aux_A;
       // posterior_hyper(s)            = aux_hyper;
       posterior_SL.col(s)           = aux_SL;
+      posterior_lambda.slice(s)     = aux_lambda;
+      posterior_df.slice(s)         = aux_df;
       s++;
     }
   } // END ss loop
@@ -117,13 +157,17 @@ Rcpp::List bsvar_s4_boost_cpp (
       _["B"]        = aux_B,
       _["A"]        = aux_A,
       _["hyper"]    = aux_hyper,
-      _["S4_indicator"] = aux_SL + 1
+      _["S4_indicator"] = aux_SL + 1,
+      _["lambda"]   = aux_lambda,
+      _["df"]       = aux_df
     ),
     _["posterior"]  = List::create(
       _["B"]        = posterior_B,
       _["A"]        = posterior_A,
       _["hyper"]    = posterior_hyper,
-      _["S4_indicator"] = posterior_SL + 1
+      _["S4_indicator"] = posterior_SL + 1,
+      _["lambda"]   = posterior_lambda,
+      _["df"]       = posterior_df
     ),
     _["acceptance_rate"] = 1- acceptance_count/SS
   );

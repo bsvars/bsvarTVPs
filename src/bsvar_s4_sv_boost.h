@@ -14,7 +14,8 @@ Rcpp::List bsvar_s4_sv_boost_cpp (
     const Rcpp::List&             starting_values,
     const int                     thin = 100, // introduce thinning
     const bool                    centred_sv = false,
-    const int                     hyper_select = 1
+    const int                     hyper_select = 1,
+    const bool                    studentt = false
 );
 
 #endif  // _BSVAR_S4_SV_BOOST_H_
