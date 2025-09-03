@@ -371,6 +371,7 @@ Rcpp::List svar_nc1_mss (
   
   // sample aux_omega
   for (int m=0; m<M; m++) {
+
     rowvec  aux_h_n_m(Tm(m));
     rowvec  U_m(Tm(m));
     rowvec  alpha_S_m(Tm(m));
@@ -386,8 +387,15 @@ Rcpp::List svar_nc1_mss (
         ii++;
       }
     }
-    double    V_omega_inv = 1/( as_scalar(aux_h_n_m * diagmat(sigma_S_inv_m) * aux_h_n_m.t()) + pow(aux_sigma2_omega_n, -1) );
-    double    omega_bar   = as_scalar(aux_h_n_m * diagmat(sigma_S_inv_m) * (U_m - alpha_S_m).t());
+    double vo = pow(aux_sigma2_omega_n, -1);
+    double mo = 0; 
+    
+    if ( Tm(m) != 0 ) {
+      vo += as_scalar(aux_h_n_m * diagmat(sigma_S_inv_m) * aux_h_n_m.t());
+      mo += as_scalar(aux_h_n_m * diagmat(sigma_S_inv_m) * (U_m - alpha_S_m).t());
+    }
+    double    V_omega_inv = 1/vo;
+    double    omega_bar   = mo;
     omega_aux(m)          = R::rnorm(V_omega_inv*omega_bar, sqrt(V_omega_inv) );
   } // END m loop
   
@@ -615,8 +623,11 @@ Rcpp::List svar_ce1_mss (
         ii++;
       }
     }
-    
-    aux_sigma2v_n(m)      = (aux_sigma2_omega_n + as_scalar(aux_h_n_m * HH_rho.submat(0,0,Tm(m)-1,Tm(m)-1) * aux_h_n_m.t())) / chi2rnd( 3 + Tm(m) );
+    double ss = aux_sigma2_omega_n;
+    if ( Tm(m) != 0 ) {
+      ss += as_scalar(aux_h_n_m * HH_rho.submat(0,0,Tm(m)-1,Tm(m)-1) * aux_h_n_m.t());
+    }
+    aux_sigma2v_n(m)      = ss / chi2rnd( 3 + Tm(m) );
   } // END m loop
   
   aux_omega_n        = pow(aux_sigma2v_n, 0.5);

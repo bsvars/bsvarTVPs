@@ -50,8 +50,13 @@ arma::mat sample_B_heterosk1 (
     
     // Rcout << " structural equation: " << n + 1 << endl;
     // set scale matrix
-    mat shocks_sigma        = shocks.each_row() / aux_sigma.row(n);
-    mat posterior_SS_inv    = prior_precision(n) + shocks_sigma * shocks_sigma.t();
+    mat shocks_sigma(N, T);
+    mat ss(N, N);
+    if ( T != 0 ) {
+      shocks_sigma       += shocks.each_row() / aux_sigma.row(n);
+      ss                 += shocks_sigma * shocks_sigma.t();
+    }
+    mat posterior_SS_inv    = prior_precision(n) + ss;
     mat posterior_S_inv     = VB(n) * posterior_SS_inv * VB(n).t();
     posterior_S_inv         = 0.5*( posterior_S_inv + posterior_S_inv.t() );
     
@@ -150,8 +155,13 @@ Rcpp::List sample_B_heterosk1_s4 (
       }
       
       // set scale matrix
-      mat shocks_sigma        = shocks.each_row() / aux_sigma.row(n);
-      mat posterior_SS_inv    = prior_precision(n) + shocks_sigma * shocks_sigma.t();
+      mat shocks_sigma(N, T);
+      mat ss(N, N);
+      if ( T != 0 ) {
+        shocks_sigma       += shocks.each_row() / aux_sigma.row(n);
+        ss                 += shocks_sigma * shocks_sigma.t();
+      }
+      mat posterior_SS_inv    = prior_precision(n) + ss;
       mat posterior_S_inv     = VB(ll) * posterior_SS_inv * VB(ll).t();
       posterior_S_inv         = 0.5*( posterior_S_inv + posterior_S_inv.t() );
       
@@ -392,23 +402,36 @@ arma::mat sample_A_heterosk1 (
   // the function changes the value of aux_A by reference
   const int N         = aux_A.n_rows;
   const int K         = aux_A.n_cols;
+  const int T         = Y.n_cols;
   
   mat prior_A_mean    = as<mat>(prior["A"]);
   
   rowvec    zerosA(K);
   vec sigma_vectorised= vectorise(aux_sigma);
   
+  mat       ww(K, K);
+  rowvec    zw(K);
+  vec   zn;
+  mat   zn_sigma;
+  mat   Wn;
+  mat   Wn_sigma;
+  
   for (int n=0; n<N; n++) {
     mat   A0          = aux_A;
     A0.row(n)         = zerosA;
-    vec   zn          = vectorise( aux_B * (Y - A0 * X) );
-    mat   zn_sigma    = zn / sigma_vectorised;
-    mat   Wn          = kron( trans(X), aux_B.col(n) );
-    mat   Wn_sigma    = Wn.each_col() / sigma_vectorised;
     
-    mat     precision = prior_precision(n) + trans(Wn_sigma) * Wn_sigma;
+    if ( T != 0 ) {
+      zn          = vectorise( aux_B * (Y - A0 * X) );
+      zn_sigma    = zn / sigma_vectorised;
+      Wn          = kron( trans(X), aux_B.col(n) );
+      Wn_sigma    = Wn.each_col() / sigma_vectorised;
+      ww               += trans(Wn_sigma) * Wn_sigma;
+      zw               += trans(zn_sigma) * Wn_sigma;
+    }
+    
+    mat     precision = prior_precision(n) + ww;
     precision         = 0.5 * (precision + precision.t());
-    rowvec  location  = prior_A_mean.row(n) * prior_precision(n) + trans(zn_sigma) * Wn_sigma;
+    rowvec  location  = prior_A_mean.row(n) * prior_precision(n) + zw;
     
     mat     precision_chol = trimatu(chol(precision));
     vec     xx(K, fill::randn);
