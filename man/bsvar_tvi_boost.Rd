@@ -14,7 +14,7 @@ bsvar_tvi_boost(
   starting_values,
   thin = 100L,
   hyper_select = 1,
-  studentt = FALSE
+  studentt = TRUE
 )
 }
 \arguments{

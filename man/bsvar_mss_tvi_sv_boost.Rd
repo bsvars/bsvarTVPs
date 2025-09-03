@@ -15,7 +15,7 @@ bsvar_mss_tvi_sv_boost(
   thin = 100L,
   centred_sv = FALSE,
   hyper_select = 1,
-  studentt = FALSE
+  studentt = TRUE
 )
 }
 \arguments{
