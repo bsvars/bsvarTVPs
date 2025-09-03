@@ -84,7 +84,8 @@ Rcpp::List sample_df_ms (
       rowvec  lambda          = lambda_tmp.cols(aux_xi_m);
       
       double  kernel_ratio     = exp( log_kernel_df_ms_nm(aux_df_star(n, m), lambda, prior_df_a) - log_kernel_df_ms_nm(aux_df(n, m), lambda, prior_df_a) );
-      
+      kernel_ratio            *= RcppTN::dtn1(aux_df_star(n, m), aux_df(n, m), adaptive_scale(n), 2, R_PosInf) / RcppTN::dtn1(aux_df(n, m), aux_df_star(n, m), adaptive_scale(n), 2, R_PosInf);
+             
       if ( kernel_ratio < 1 ) alpha(n, m) = kernel_ratio;
       if ( R::runif(0, 1) < alpha(n, m) ) {
         aux_df(n, m) = aux_df_star(n, m);
