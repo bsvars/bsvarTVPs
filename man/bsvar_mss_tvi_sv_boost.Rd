@@ -14,6 +14,7 @@ bsvar_mss_tvi_sv_boost(
   starting_values,
   thin = 100L,
   centred_sv = FALSE,
+  finiteM = TRUE,
   hyper_select = 1,
   studentt = TRUE
 )
@@ -35,6 +36,9 @@ bsvar_mss_tvi_sv_boost(
 
 \item{centred_sv}{a logical value indicating whether the SV model should be 
 in its centred form}
+
+\item{finiteM}{a logical value, if \code{TRUE} a stationary Markov-switching 
+model is estimated, if \code{FALSE} an over-fitting Markov-switching model is used}
 
 \item{hyper_select}{an integer choosing th type of hyper-parameter hierarchy: 
 \code{1} - horseshoe prior, \code{2} - 3-level hierarchy, \code{3} - fixed hyper-parameters.}

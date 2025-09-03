@@ -13,6 +13,7 @@ bsvar_mss_boost(
   VB,
   starting_values,
   thin = 100L,
+  finiteM = TRUE,
   hyper_select = 1,
   studentt = TRUE
 )
@@ -31,6 +32,9 @@ bsvar_mss_boost(
 \item{starting_values}{a list providing starting values to the estimated parameters}
 
 \item{thin}{a positive integer determining MCMC thinning}
+
+\item{finiteM}{a logical value, if \code{TRUE} a stationary Markov-switching 
+model is estimated, if \code{FALSE} an over-fitting Markov-switching model is used}
 
 \item{hyper_select}{an integer choosing th type of hyper-parameter hierarchy: 
 \code{1} - horseshoe prior, \code{2} - 3-level hierarchy, \code{3} - fixed hyper-parameters.}
