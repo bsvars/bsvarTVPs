@@ -72,6 +72,7 @@ Rcpp::List bsvar_mss_s4_boost_cpp (
   mat   aux_lambda  = as<mat>(starting_values["lambda"]);
   mat   aux_lambda_tmp = pow(aux_lambda, 0.5);
   mat   aux_df = as<mat>(starting_values["df"]);
+  mat   aux_sigma(N, T, fill::ones);
   
   imat  aux_SL      = as<imat>(starting_values["S4_indicator"]) - 1;      // NxM S4 indicator matrix
   

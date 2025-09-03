@@ -54,6 +54,7 @@ Rcpp::List bsvar_mss_boost_cpp (
   mat   aux_PR_TR   = as<mat>(starting_values["PR_TR"]);
   vec   aux_pi_0    = as<vec>(starting_values["pi_0"]);
   mat   aux_xi      = as<mat>(starting_values["xi"]);
+  mat   aux_sigma(N, T, fill::ones);
   
   const int M       = aux_PR_TR.n_cols;
   vec      Tm       = sum(aux_xi, 1);
