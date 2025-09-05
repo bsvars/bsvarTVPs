@@ -147,17 +147,17 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     cube Z(N, T, M);
     
     for (int m=0; m<M; m++) {
-      // if ( centred_sv ) {
-      //   for (int t=0; t<T; t++){
-      //     sigmaT.col(t)    = pow( aux_sigma2v.col( aux_xi.col(t).index_max() ), 0.5);
-      //   }
-      //   aux_sigma_tmp = 2 * log(aux_sigma) / sigmaT;
-      //   aux_sigma_tmp_m = exp(0.5 * diagmat(pow(aux_sigma2v.col(m), 0.5)) * aux_sigma_tmp);
-      // } else {
-      //   aux_sigma_tmp_m = exp(0.5 * diagmat(aux_omega.col(m)) * aux_h);
-      // }
-      // Z.slice(m)    = (aux_B.slice(m) * (Y - aux_A * X)) / (aux_lambda_tmp % aux_sigma_tmp_m);
-      Z.slice(m)    = (aux_B.slice(m) * (Y - aux_A * X)) / (aux_lambda % aux_sigma);
+      if ( centred_sv ) {
+        for (int t=0; t<T; t++){
+          sigmaT.col(t)    = pow( aux_sigma2v.col( aux_xi.col(t).index_max() ), 0.5);
+        }
+        aux_sigma_tmp = 2 * log(aux_sigma) / sigmaT;
+        aux_sigma_tmp_m = exp(0.5 * diagmat(pow(aux_sigma2v.col(m), 0.5)) * aux_sigma_tmp);
+      } else {
+        aux_sigma_tmp_m = exp(0.5 * diagmat(aux_omega.col(m)) * aux_h);
+      }
+      Z.slice(m)    = (aux_B.slice(m) * (Y - aux_A * X)) / (aux_lambda_tmp % aux_sigma_tmp_m);
+      // Z.slice(m)    = (aux_B.slice(m) * (Y - aux_A * X)) / (aux_lambda % aux_sigma);
     }
     aux_xi            = sample_Markov_process(Z, aux_xi, aux_PR_TR, aux_pi_0, finiteM);
     
