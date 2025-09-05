@@ -139,26 +139,6 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     // Check for user interrupts
     if (ss % 200 == 0) checkUserInterrupt();
     
-    // sample aux_lambda and aux_df
-    mat E             = (Y - aux_A * X);
-    if ( studentt ) {
-      
-      mat U           = E;
-      for (int t=0; t<T; t++) {
-        int   m       = aux_xi.col(t).index_max();
-        U.col(t)      = aux_B.slice(m) * (Y.col(t) - aux_A * X.col(t));
-      }
-      U              /= aux_sigma_tmp;
-      
-      
-      aux_lambda      = sample_lambda_ms(aux_df, aux_xi, U);
-      aux_lambda_tmp  = pow(aux_lambda, 0.5);
-      aux_sigma       = aux_sigma_tmp % aux_lambda_tmp;
-      
-      List aux_df_tmp = sample_df_ms (aux_df, aux_lambda, aux_xi, U, prior, ss, adaptive_scale, adptive_alpha_gamma);
-      aux_df          = as<mat>(aux_df_tmp["aux_df"]);
-      adaptive_scale  = as<mat>(aux_df_tmp["adaptive_scale"]);
-    } // END studentt
     
     // sample aux_xi
     cube Z(N, T, M);
@@ -186,6 +166,29 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
     } catch (std::runtime_error &e) {
       Rcout << "   sample_transition_probabilities failure " << endl;
     }
+    
+    
+    // sample aux_lambda and aux_df
+    mat E             = (Y - aux_A * X);
+    if ( studentt ) {
+      
+      mat U           = E;
+      for (int t=0; t<T; t++) {
+        int   m       = aux_xi.col(t).index_max();
+        U.col(t)      = aux_B.slice(m) * (Y.col(t) - aux_A * X.col(t));
+      }
+      U              /= aux_sigma_tmp;
+      
+      aux_lambda      = sample_lambda_ms(aux_df, aux_xi, U);
+      aux_lambda_tmp  = pow(aux_lambda, 0.5);
+      aux_sigma       = aux_sigma_tmp % aux_lambda_tmp;
+      
+      List aux_df_tmp = sample_df_ms (aux_df, aux_lambda, aux_xi, U, prior, ss, adaptive_scale, adptive_alpha_gamma);
+      aux_df          = as<mat>(aux_df_tmp["aux_df"]);
+      adaptive_scale  = as<mat>(aux_df_tmp["adaptive_scale"]);
+    } // END studentt
+    
+  
     
     // sample aux_hyper
     if ( hyper_select == 1 ) {
