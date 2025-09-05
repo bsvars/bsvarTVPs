@@ -126,6 +126,9 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
   field<mat> precisionB;
   field<mat> precisionA;
   
+  precisionB          = hyper2precisionB_mss_horseshoe(aux_hyper);
+  precisionA          = hyper2precisionA_horseshoe(aux_hyper);
+  
   mat aux_sigma_tmp_m(N, T, fill::ones);
   mat sigmaT(N, T, fill::ones);
   
