@@ -192,25 +192,25 @@ Rcpp::List bsvar_mss_sv_boost_cpp (
   
     
     // sample aux_hyper
-    if ( hyper_select == 1 ) {
-      
-      aux_hyper           = sample_hyperparameter_mss_horseshoe(aux_hyper, aux_B, aux_A, VB, prior);
-      precisionB          = hyper2precisionB_mss_horseshoe(aux_hyper);
-      precisionA          = hyper2precisionA_horseshoe(aux_hyper);
-      
-    } else if ( hyper_select == 2 ) {
-      
-      aux_hyper       = sample_hyperparameters_mss_boost( aux_hyper, aux_B, aux_A, VB, prior, true);
-      precisionB      = hyper2precisionB_mss_boost(aux_hyper, prior);
-      precisionA      = hyper2precisionA_boost(aux_hyper, prior);
-      
-    } else if ( hyper_select == 3 ) {
-      
-      aux_hyper       = sample_hyperparameters_mss_boost( aux_hyper, aux_B, aux_A, VB, prior, false);
-      precisionB      = hyper2precisionB_mss_boost(aux_hyper, prior);
-      precisionA      = hyper2precisionA_boost(aux_hyper, prior);
-      
-    }
+    // if ( hyper_select == 1 ) {
+    //   
+    //   aux_hyper           = sample_hyperparameter_mss_horseshoe(aux_hyper, aux_B, aux_A, VB, prior);
+    //   precisionB          = hyper2precisionB_mss_horseshoe(aux_hyper);
+    //   precisionA          = hyper2precisionA_horseshoe(aux_hyper);
+    //   
+    // } else if ( hyper_select == 2 ) {
+    //   
+    //   aux_hyper       = sample_hyperparameters_mss_boost( aux_hyper, aux_B, aux_A, VB, prior, true);
+    //   precisionB      = hyper2precisionB_mss_boost(aux_hyper, prior);
+    //   precisionA      = hyper2precisionA_boost(aux_hyper, prior);
+    //   
+    // } else if ( hyper_select == 3 ) {
+    //   
+    //   aux_hyper       = sample_hyperparameters_mss_boost( aux_hyper, aux_B, aux_A, VB, prior, false);
+    //   precisionB      = hyper2precisionB_mss_boost(aux_hyper, prior);
+    //   precisionA      = hyper2precisionA_boost(aux_hyper, prior);
+    //   
+    // }
     
     // sample aux_B
     // Rcout << "befor aux_B" << endl;
