@@ -13,9 +13,9 @@ bsvar_mss_tvi_sv(
   VB,
   starting_values,
   thin = 100L,
-  centred_sv = FALSE,
-  finiteM = TRUE,
+  sv_select = 1,
   hyper_select = 1,
+  finiteM = TRUE,
   studentt = TRUE
 )
 }
@@ -34,14 +34,14 @@ bsvar_mss_tvi_sv(
 
 \item{thin}{a positive integer determining MCMC thinning}
 
-\item{centred_sv}{a logical value indicating whether the SV model should be 
-in its centred form}
-
-\item{finiteM}{a logical value, if \code{TRUE} a stationary Markov-switching 
-model is estimated, if \code{FALSE} an over-fitting Markov-switching model is used}
+\item{sv_select}{an integer choosing th type of volatility model: 
+\code{1} - non-centred SV, \code{2} - centred SV, \code{3} - homoskedastic.}
 
 \item{hyper_select}{an integer choosing th type of hyper-parameter hierarchy: 
 \code{1} - horseshoe prior, \code{2} - 3-level hierarchy, \code{3} - fixed hyper-parameters.}
+
+\item{finiteM}{a logical value, if \code{TRUE} a stationary Markov-switching 
+model is estimated, if \code{FALSE} an over-fitting Markov-switching model is used}
 
 \item{studentt}{a logical value, if \code{TRUE} the model is estimated with 
 t-distributed structural shocks, if \code{FALSE} the shocks are Gaussian}

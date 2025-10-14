@@ -65,8 +65,7 @@ Rcpp::List svar_nc1 (
     double          aux_s_n,                  // scale of IG2 prior for aux_sigma2_omega_n
     arma::urowvec   aux_S_n,                  // 1xT
     const arma::rowvec&   u,                  // 1xT
-    const Rcpp::List&     prior,
-    bool            sample_s_ = true
+    const Rcpp::List&     prior
 );
   
 
@@ -80,13 +79,12 @@ Rcpp::List svar_nc1_mss (
     arma::urowvec&        aux_S_n,            // 1xT
     const arma::mat&      aux_xi,             // MxT
     const arma::rowvec&   u,                  // 1xT
-    const Rcpp::List&     prior,
-    bool                  sample_s_ = true
+    const Rcpp::List&     prior
 );
 
 
 Rcpp::List svar_ce1 (
-    arma::rowvec&       aux_h_n,            // 1xT
+    arma::rowvec&       aux_h_tilde,            // 1xT
     double&             aux_rho_n,
     double&             aux_omega_n,
     double&             aux_sigma2v_n,
@@ -94,8 +92,7 @@ Rcpp::List svar_ce1 (
     double&             aux_s_n,             // scale of IG2 prior for aux_sigma2_omega_n
     arma::urowvec&      aux_S_n,            // 1xT
     const arma::rowvec& u,                  // 1xT
-    const Rcpp::List&   prior,
-    bool                sample_s_ = true
+    const Rcpp::List&   prior
 );
 
 
@@ -109,8 +106,7 @@ Rcpp::List svar_ce1_mss (
     arma::urowvec&      aux_S_n,            // 1xT
     const arma::mat&    aux_xi,             // MxT
     const arma::rowvec& u,                  // 1xT
-    const Rcpp::List&   prior,
-    bool                sample_s_ = true
+    const Rcpp::List&   prior
 );
 
 

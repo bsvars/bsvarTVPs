@@ -14,12 +14,12 @@
 #' @param VB a list providing the structural matrix specification
 #' @param starting_values a list providing starting values to the estimated parameters
 #' @param thin a positive integer determining MCMC thinning
-#' @param centred_sv a logical value indicating whether the SV model should be 
-#' in its centred form
-#' @param finiteM a logical value, if \code{TRUE} a stationary Markov-switching 
-#' model is estimated, if \code{FALSE} an over-fitting Markov-switching model is used
+#' @param sv_select an integer choosing th type of volatility model: 
+#' \code{1} - non-centred SV, \code{2} - centred SV, \code{3} - homoskedastic.
 #' @param hyper_select an integer choosing th type of hyper-parameter hierarchy: 
 #' \code{1} - horseshoe prior, \code{2} - 3-level hierarchy, \code{3} - fixed hyper-parameters.
+#' @param finiteM a logical value, if \code{TRUE} a stationary Markov-switching 
+#' model is estimated, if \code{FALSE} an over-fitting Markov-switching model is used
 #' @param studentt a logical value, if \code{TRUE} the model is estimated with 
 #' t-distributed structural shocks, if \code{FALSE} the shocks are Gaussian
 #' 
@@ -37,8 +37,8 @@
 #' Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, <doi:10.48550/arXiv.2502.19659>.
 #' 
 #' @export
-bsvar_mss_tvi_sv <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, centred_sv = FALSE, finiteM = TRUE, hyper_select = 1, studentt = TRUE) {
-  output          = .Call(`_bsvarTVPs_bsvar_mss_tvi_sv_cpp`, SS, Y, X, prior, VB, starting_values, thin, centred_sv, finiteM, hyper_select, studentt)
+bsvar_mss_tvi_sv <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, sv_select = 1, hyper_select = 1, finiteM = TRUE, studentt = TRUE) {
+  output          = .Call(`_bsvarTVPs_bsvar_mss_tvi_sv_cpp`, SS, Y, X, prior, VB, starting_values, thin, sv_select, hyper_select, finiteM, studentt)
   class(output)   = "PosteriorBSVARSVMSTVI"
   return(output)
 }
@@ -60,12 +60,12 @@ bsvar_mss_tvi_sv <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, 
 #' @param VB a list providing the structural matrix specification
 #' @param starting_values a list providing starting values to the estimated parameters
 #' @param thin a positive integer determining MCMC thinning
-#' @param centred_sv a logical value indicating whether the SV model should be 
-#' in its centred form
-#' @param finiteM a logical value, if \code{TRUE} a stationary Markov-switching 
-#' model is estimated, if \code{FALSE} an over-fitting Markov-switching model is used
+#' @param sv_select an integer choosing th type of volatility model: 
+#' \code{1} - non-centred SV, \code{2} - centred SV, \code{3} - homoskedastic.
 #' @param hyper_select an integer choosing th type of hyper-parameter hierarchy: 
 #' \code{1} - horseshoe prior, \code{2} - 3-level hierarchy, \code{3} - fixed hyper-parameters.
+#' @param finiteM a logical value, if \code{TRUE} a stationary Markov-switching 
+#' model is estimated, if \code{FALSE} an over-fitting Markov-switching model is used
 #' @param studentt a logical value, if \code{TRUE} the model is estimated with 
 #' t-distributed structural shocks, if \code{FALSE} the shocks are Gaussian
 #' 
@@ -83,8 +83,8 @@ bsvar_mss_tvi_sv <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, 
 #' Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, <doi:10.48550/arXiv.2502.19659>.
 #' 
 #' @export
-bsvar_mssa_tvi_sv <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, centred_sv = FALSE, finiteM = TRUE, hyper_select = 1, studentt = TRUE) {
-  output          = .Call(`_bsvarTVPs_bsvar_mssa_tvi_sv_cpp`, SS, Y, X, prior, VB, starting_values, thin, centred_sv, finiteM, hyper_select, studentt)
+bsvar_mssa_tvi_sv <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, sv_select = 1, hyper_select = 1, finiteM = TRUE, studentt = TRUE) {
+  output          = .Call(`_bsvarTVPs_bsvar_mssa_tvi_sv_cpp`, SS, Y, X, prior, VB, starting_values, thin, sv_select, hyper_select, finiteM, studentt)
   class(output)   = "PosteriorBSVARSVMSATVI"
   return(output)
 }
