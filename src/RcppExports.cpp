@@ -2224,6 +2224,43 @@ RcppExport SEXP _bsvarTVPs_filtering(SEXP ZSEXP, SEXP aux_PR_TRSEXP, SEXP pi_0SE
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// filtering_studentt
+arma::mat filtering_studentt(const arma::cube& Z, const arma::mat& aux_PR_TR, const arma::vec& pi_0, const arma::mat& aux_df);
+static SEXP _bsvarTVPs_filtering_studentt_try(SEXP ZSEXP, SEXP aux_PR_TRSEXP, SEXP pi_0SEXP, SEXP aux_dfSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const arma::cube& >::type Z(ZSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type aux_PR_TR(aux_PR_TRSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type pi_0(pi_0SEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type aux_df(aux_dfSEXP);
+    rcpp_result_gen = Rcpp::wrap(filtering_studentt(Z, aux_PR_TR, pi_0, aux_df));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _bsvarTVPs_filtering_studentt(SEXP ZSEXP, SEXP aux_PR_TRSEXP, SEXP pi_0SEXP, SEXP aux_dfSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_bsvarTVPs_filtering_studentt_try(ZSEXP, aux_PR_TRSEXP, pi_0SEXP, aux_dfSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 // smoothing
 arma::mat smoothing(const arma::mat& filtered, const arma::mat& aux_PR_TR);
 static SEXP _bsvarTVPs_smoothing_try(SEXP filteredSEXP, SEXP aux_PR_TRSEXP) {
@@ -2398,6 +2435,7 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
         signatures.insert("arma::mat(*count_regime_transitions)(const arma::mat&)");
         signatures.insert("arma::rowvec(*rDirichlet1)(const arma::rowvec&)");
         signatures.insert("arma::mat(*filtering)(const arma::cube&,const arma::mat&,const arma::vec&)");
+        signatures.insert("arma::mat(*filtering_studentt)(const arma::cube&,const arma::mat&,const arma::vec&,const arma::mat&)");
         signatures.insert("arma::mat(*smoothing)(const arma::mat&,const arma::mat&)");
         signatures.insert("arma::mat(*sample_Markov_process)(const arma::cube&,arma::mat,const arma::mat&,const arma::vec&,const bool)");
         signatures.insert("Rcpp::List(*sample_transition_probabilities)(arma::mat,arma::vec,const arma::mat&,const Rcpp::List&,const bool)");
@@ -2465,6 +2503,7 @@ RcppExport SEXP _bsvarTVPs_RcppExport_registerCCallable() {
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_count_regime_transitions", (DL_FUNC)_bsvarTVPs_count_regime_transitions_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_rDirichlet1", (DL_FUNC)_bsvarTVPs_rDirichlet1_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_filtering", (DL_FUNC)_bsvarTVPs_filtering_try);
+    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_filtering_studentt", (DL_FUNC)_bsvarTVPs_filtering_studentt_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_smoothing", (DL_FUNC)_bsvarTVPs_smoothing_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_sample_Markov_process", (DL_FUNC)_bsvarTVPs_sample_Markov_process_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_sample_transition_probabilities", (DL_FUNC)_bsvarTVPs_sample_transition_probabilities_try);
@@ -2531,6 +2570,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bsvarTVPs_count_regime_transitions", (DL_FUNC) &_bsvarTVPs_count_regime_transitions, 1},
     {"_bsvarTVPs_rDirichlet1", (DL_FUNC) &_bsvarTVPs_rDirichlet1, 1},
     {"_bsvarTVPs_filtering", (DL_FUNC) &_bsvarTVPs_filtering, 3},
+    {"_bsvarTVPs_filtering_studentt", (DL_FUNC) &_bsvarTVPs_filtering_studentt, 4},
     {"_bsvarTVPs_smoothing", (DL_FUNC) &_bsvarTVPs_smoothing, 2},
     {"_bsvarTVPs_sample_Markov_process", (DL_FUNC) &_bsvarTVPs_sample_Markov_process, 5},
     {"_bsvarTVPs_sample_transition_probabilities", (DL_FUNC) &_bsvarTVPs_sample_transition_probabilities, 5},

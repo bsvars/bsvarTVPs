@@ -725,6 +725,53 @@ arma::mat filtering (
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
+arma::mat filtering_studentt (
+    const arma::cube& Z,                  // NxTxM state-specific standardised residuals
+    const arma::mat&  aux_PR_TR,          // MxM
+    const arma::vec&  pi_0,               // Mx1
+    const arma::mat&  aux_df              // NxM
+) {
+  
+  // filtered probabilities for a model with MS structural matrix of SVAR-MSS-SV model
+  
+  const int   T = Z.n_cols;
+  const int   N = Z.n_rows;
+  const int   M = aux_PR_TR.n_rows;
+  
+  mat         eta_t(M, T);
+  mat         xi_t_t(M, T);
+  rowvec      log_d(T);
+  
+  // This loop evaluates Student-t pdf at Z being 
+  for (int m=0; m<M; m++) {
+    
+    mat lk_tmp  = -0.5 * log( 1 + square(Z.slice(m)) ); // NxT
+    lk_tmp.each_col() %= (1 + aux_df.col(m));
+    log_d          = sum(lk_tmp, 0);
+    log_d         -= accu(lgamma( 0.5 * aux_df.col(m) ));
+    log_d         += accu(lgamma( 0.5 * (aux_df.col(m) + 1) ));
+    
+    NumericVector   exp_log_d   = wrap(exp(log_d));
+    exp_log_d[exp_log_d==0]     = 1e-300;
+    eta_t.row(m)    = as<rowvec>(exp_log_d);
+    
+  } // END m loop
+  
+  vec xi_tm1_tm1    = pi_0;
+  
+  for (int t=0; t<T; t++) {
+    vec     num     = eta_t.col(t) % (aux_PR_TR.t() * xi_tm1_tm1);
+    double  den     = sum(num);
+    xi_t_t.col(t)   = num/den;
+    xi_tm1_tm1      = xi_t_t.col(t);
+  } // END t loop
+  
+  return xi_t_t;
+} // END filtering_studentt
+
+
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
 arma::mat smoothing (
     const arma::mat&  filtered,           // MxT
     const arma::mat&  aux_PR_TR           // MxM
