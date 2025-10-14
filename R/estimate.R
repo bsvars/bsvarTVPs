@@ -34,12 +34,11 @@
 #' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
 #' 
 #' @references
-#' Camehl, A. & Woźniak, T. (2022) What do Data Say About Time-Variation in 
-#' Monetary Policy Shock Identification?
+#' Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, <doi:10.48550/arXiv.2502.19659>.
 #' 
 #' @export
-bsvar_mss_tvi_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, centred_sv = FALSE, finiteM = TRUE, hyper_select = 1, studentt = TRUE) {
-  output          = .Call(`_bsvarTVPs_bsvar_mss_s4_sv_boost_cpp`, SS, Y, X, prior, VB, starting_values, thin, centred_sv, finiteM, hyper_select, studentt)
+bsvar_mss_tvi_sv <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, centred_sv = FALSE, finiteM = TRUE, hyper_select = 1, studentt = TRUE) {
+  output          = .Call(`_bsvarTVPs_bsvar_mss_tvi_sv_cpp`, SS, Y, X, prior, VB, starting_values, thin, centred_sv, finiteM, hyper_select, studentt)
   class(output)   = "PosteriorBSVARSVMSTVI"
   return(output)
 }
@@ -81,12 +80,11 @@ bsvar_mss_tvi_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 
 #' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
 #' 
 #' @references
-#' Camehl, A. & Woźniak, T. (2022) What do Data Say About Time-Variation in 
-#' Monetary Policy Shock Identification?
+#' Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, <doi:10.48550/arXiv.2502.19659>.
 #' 
 #' @export
-bsvar_mssa_tvi_sv_boost <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, centred_sv = FALSE, finiteM = TRUE, hyper_select = 1, studentt = TRUE) {
-  output          = .Call(`_bsvarTVPs_bsvar_mssa_s4_sv_boost_cpp`, SS, Y, X, prior, VB, starting_values, thin, centred_sv, finiteM, hyper_select, studentt)
+bsvar_mssa_tvi_sv <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, centred_sv = FALSE, finiteM = TRUE, hyper_select = 1, studentt = TRUE) {
+  output          = .Call(`_bsvarTVPs_bsvar_mssa_tvi_sv_cpp`, SS, Y, X, prior, VB, starting_values, thin, centred_sv, finiteM, hyper_select, studentt)
   class(output)   = "PosteriorBSVARSVMSATVI"
   return(output)
 }

@@ -17,8 +17,7 @@ of the autoregressive matrix \eqn{A}
 Extracts the posterior draws of the autoregressive matrix \eqn{A} and returns the as an \code{array}
 }
 \references{
-Camehl, A. & Woźniak, T. (2022) What do Data Say About Time-Variation in 
-Monetary Policy Shock Identification?
+Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, <doi:10.48550/arXiv.2502.19659>.
 }
 \author{
 Tomasz Woźniak \email{wozniak.tom@pm.me}

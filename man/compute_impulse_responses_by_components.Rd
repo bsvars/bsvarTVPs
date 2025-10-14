@@ -25,8 +25,7 @@ to the structural shocks for SVAR models with Markov-switching structural matrix
 and the TVI structure provided on \code{VB}.
 }
 \references{
-Camehl, A. & Woźniak, T. (2022) What do Data Say About Time-Variation in 
-Monetary Policy Shock Identification?
+Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, <doi:10.48550/arXiv.2502.19659>.
 }
 \author{
 Tomasz Woźniak \email{wozniak.tom@pm.me}

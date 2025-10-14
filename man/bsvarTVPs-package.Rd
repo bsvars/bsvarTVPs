@@ -10,7 +10,7 @@ Vector Autoregressions (VARs) with Stochastic Volatility heteroskedasticity,
 Markov-switching and Time-Varying Identification of the Structural Matrix, 
 and a three-level global-local hierarchical prior shrinkage for the 
 structural and autoregressive matrices. The models were developed for a paper 
-by Camehl & Woźniak (2023) <doi:10.48550/arXiv.2311.05883>. The 'bsvarTVPs' 
+by Camehl & Woźniak (2025) <doi:10.48550/arXiv.2502.19659>. The 'bsvarTVPs' 
 package is aligned regarding objects, workflows, and code structure with the 
 R packages 'bsvars' by Woźniak (2024) <doi:10.32614/CRAN.package.bsvars> and 
 'bsvarSIGNs' by Wang & Woźniak (2024) <doi:10.32614/CRAN.package.bsvarSIGNs>, 
@@ -44,7 +44,7 @@ suggestions and requests are warmly welcome!
 # upload data
 }
 \references{
-Camehl, A. & Woźniak, T. (2023) Time-Varying Identification of Monetary Policy Shocks, <doi:10.48550/arXiv.2311.05883>.
+Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, <doi:10.48550/arXiv.2502.19659>.
 
 Wang & Woźniak (2024) bsvarSIGNs: Bayesian SVARs with Sign, Zero, and Narrative Restrictions. 
 R package version 1.0.1, <doi:10.32614/CRAN.package.bsvarSIGNs>.

@@ -12,7 +12,7 @@ using namespace arma;
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
-Rcpp::List bsvar_mss_s4_sv_boost_cpp (
+Rcpp::List bsvar_mss_tvi_sv_cpp (
     const int&                    SS,         // No. of posterior draws
     const arma::mat&              Y,          // NxT dependent variables
     const arma::mat&              X,          // KxT explanatory variables
@@ -327,4 +327,4 @@ Rcpp::List bsvar_mss_s4_sv_boost_cpp (
     ),
     _["acceptance_rate"] = 1- acceptance_count/SS
   );
-} // END bsvar_mss_s4_sv_boost_cpp
+} // END bsvar_mss_tvi_sv_cpp

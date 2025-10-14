@@ -163,8 +163,7 @@ compute_impulse_responses.PosteriorBSVARSVTVI <- function(posterior, horizon, st
 #' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
 #' 
 #' @references
-#' Camehl, A. & Woźniak, T. (2022) What do Data Say About Time-Variation in 
-#' Monetary Policy Shock Identification?
+#' Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, <doi:10.48550/arXiv.2502.19659>.
 #' 
 #' @export
 compute_impulse_responses_by_components <- function(ir_posterior, TVI_posterior, VB) {
@@ -293,8 +292,7 @@ compute_structural_shocks.PosteriorBSVARSVTVI <- function(posterior) {
 #' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
 #' 
 #' @references
-#' Camehl, A. & Woźniak, T. (2022) What do Data Say About Time-Variation in 
-#' Monetary Policy Shock Identification?
+#' Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, <doi:10.48550/arXiv.2502.19659>.
 #' 
 #' @export
 compute_TVI_component_density <- function(posterior, VB) {
@@ -443,8 +441,7 @@ compute_TVI_component_density.PosteriorBSVARSVTVI <- function(posterior, VB) {
 #' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
 #' 
 #' @references
-#' Camehl, A. & Woźniak, T. (2022) What do Data Say About Time-Variation in 
-#' Monetary Policy Shock Identification?
+#' Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, <doi:10.48550/arXiv.2502.19659>.
 #' 
 #' @export
 structural_to_array <- function(posterior) {
@@ -553,8 +550,7 @@ structural_to_array.PosteriorBSVARSVTVI <- function(posterior) {
 #' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
 #' 
 #' @references
-#' Camehl, A. & Woźniak, T. (2022) What do Data Say About Time-Variation in 
-#' Monetary Policy Shock Identification?
+#' Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, <doi:10.48550/arXiv.2502.19659>.
 #' 
 #' @export
 autoregressive_to_array <- function(posterior) {
@@ -614,8 +610,7 @@ autoregressive_to_array.PosteriorBSVARSVMSATVI <- function(posterior) {
 #' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
 #' 
 #' @references
-#' Camehl, A. & Woźniak, T. (2022) What do Data Say About Time-Variation in 
-#' Monetary Policy Shock Identification?
+#' Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, <doi:10.48550/arXiv.2502.19659>.
 #' 
 #' @export
 compute_conditional_cov <- function(posterior, moment = c("cov", "cor", "sd"), thin = 1L) {
