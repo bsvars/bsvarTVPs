@@ -157,7 +157,11 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
         Z.slice(m)     /= aux_sigma_tmp_m;
       }
     }
-    aux_xi              = sample_Markov_process(Z, aux_xi, aux_PR_TR, aux_pi_0, finiteM);
+    if ( studentt ) {
+      aux_xi            = sample_Markov_process_studentt(Z, aux_xi, aux_PR_TR, aux_pi_0, aux_df, finiteM);
+    } else {
+      aux_xi            = sample_Markov_process(Z, aux_xi, aux_PR_TR, aux_pi_0, finiteM);
+    }
     
     // sample aux_PR_TR and aux_pi_0
     try {
