@@ -109,7 +109,10 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
   cube  posterior_sigma(N, T, S);
   
   vec   acceptance_count(4 + N);
-  List  BSL;
+  List  BSL = List::create(
+    _["aux_B"]      = aux_B,
+    _["aux_SL"]     = aux_SL
+  );
   List  sv_n;
   List  PR_TR_tmp;
   
@@ -123,13 +126,14 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
   int   s = 0;
   
   for (int ss=0; ss<SS; ss++) {
-    
+    Rcout<<" s: "<<s<<endl;
     // Increment progress bar
     if (any(prog_rep_points == ss)) p.increment();
     // Check for user interrupts
     if (ss % 200 == 0) checkUserInterrupt();
     
     // sample aux_lambda and aux_df
+    Rcout<<" sample aux_lambda and aux_df"<<endl;
     mat E             = (Y - aux_A * X);
     if ( studentt ) {
       
@@ -150,6 +154,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     } // END studentt
     
     // sample aux_xi
+    Rcout<<" sample aux_xi"<<endl;
     cube Z(N, T, M);
     for (int m=0; m<M; m++) {
       Z.slice(m)        = aux_B.slice(m) * (Y - aux_A * X);
@@ -158,47 +163,52 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
         Z.slice(m)     /= aux_sigma_tmp_m;
       }
     }
-    aux_xi            = sample_Markov_process(Z, aux_xi, aux_PR_TR, aux_pi_0, finiteM);
+    if ( studentt ) {
+      aux_xi          = sample_Markov_process_studentt(Z, aux_xi, aux_PR_TR, aux_pi_0, aux_df, finiteM);
+    } else {
+      aux_xi          = sample_Markov_process(Z, aux_xi, aux_PR_TR, aux_pi_0, finiteM);
+    }    
     
     // sample aux_PR_TR and aux_pi_0
+    Rcout<<" sample aux_PR_TR and aux_pi_0"<<endl;
     PR_TR_tmp         = sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
     aux_PR_TR         = as<mat>(PR_TR_tmp["aux_PR_TR"]);
     aux_pi_0          = as<vec>(PR_TR_tmp["aux_pi_0"]);
     
     // sample aux_hyper
+    Rcout<<" sample aux_hyper"<<endl;
     if ( hyper_select == 1 ) {
-      
-      aux_hyper           = sample_hyperparameter_mss_s4_horseshoe(aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
-      precisionB          = hyper2precisionB_mss_horseshoe(aux_hyper);
-      precisionA          = hyper2precisionA_horseshoe(aux_hyper);
-      
+
+      aux_hyper       = sample_hyperparameter_mss_s4_horseshoe(aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
+      precisionB      = hyper2precisionB_mss_horseshoe(aux_hyper);
+      precisionA      = hyper2precisionA_horseshoe(aux_hyper);
+
     } else if ( hyper_select == 2 ) {
-      
-      aux_hyper         = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, true);
-      precisionB        = hyper2precisionB_mss_boost(aux_hyper, prior);
-      precisionA        = hyper2precisionA_boost(aux_hyper, prior);
-      
+
+      aux_hyper       = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, true);
+      precisionB      = hyper2precisionB_mss_boost(aux_hyper, prior);
+      precisionA      = hyper2precisionA_boost(aux_hyper, prior);
+
     } else if ( hyper_select == 3 ) {
-      
-      aux_hyper         = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, false);
-      precisionB        = hyper2precisionB_mss_boost(aux_hyper, prior);
-      precisionA        = hyper2precisionA_boost(aux_hyper, prior);
-      
+
+      aux_hyper       = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, false);
+      precisionB      = hyper2precisionB_mss_boost(aux_hyper, prior);
+      precisionA      = hyper2precisionA_boost(aux_hyper, prior);
+
     }
     
     // sample aux_B
-    BSL     = List::create(
-      _["aux_B"]      = aux_B,
-      _["aux_SL"]     = aux_SL
-    );
+    Rcout<<" sample aux_B"<<endl;
     BSL               = sample_B_mss_s4(aux_B, aux_SL, aux_A, precisionB, aux_hetero, aux_xi, Y, X, prior, VB);
     aux_B             = as<cube>(BSL["aux_B"]);
     aux_SL            = as<imat>(BSL["aux_SL"]);
     
     // sample aux_A
+    Rcout<<" sample aux_A"<<endl;
     aux_A             = sample_A_heterosk1_mss(aux_A, aux_B, aux_xi, precisionA, aux_hetero, Y, X, prior);
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
+    Rcout<<" sample aux_h, aux_omega and aux_S, aux_sigma2_omega"<<endl;
     if ( sv_select != 3 ) {
       
       mat U(N, T);
@@ -222,7 +232,9 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
         double  s_n         = aux_s_(n);
         
         if ( sv_select == 2 ) {
-          sv_n              = svar_ce1_mss( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior);
+          try {
+            sv_n            = svar_ce1_mss( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior);
+          } catch (std::runtime_error &e) {}
         } else if ( sv_select == 1 ) {
           sv_n              = svar_nc1_mss( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior);
         }
@@ -245,6 +257,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
       
     } // END if( sv_select != 3 )
     
+    Rcout<<" save in posterior"<<endl;
     if (ss % thin == 0) {
       posterior_B(s)                = aux_B;
       posterior_A.slice(s)          = aux_A;
