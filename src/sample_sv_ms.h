@@ -127,6 +127,14 @@ arma::mat filtering (
 );
 
 
+arma::mat filtering_studentt (
+    const arma::cube& Z,                  // NxTxM state-specific standardised residuals
+    const arma::mat&  aux_PR_TR,          // MxM
+    const arma::vec&  pi_0,               // Mx1
+    const arma::mat&  aux_df              // NxM
+);
+
+
 arma::mat smoothing (
     const arma::mat&  filtered,           // MxT
     const arma::mat&  aux_PR_TR           // MxM
@@ -138,6 +146,16 @@ arma::mat sample_Markov_process (
     arma::mat         aux_xi,             // MxT
     const arma::mat&  aux_PR_TR,          // MxM
     const arma::vec&  aux_pi_0,           // Mx1
+    const bool        finiteM = true
+);
+
+
+arma::mat sample_Markov_process_studentt (
+    const arma::cube& Z,                  // NxTxM
+    arma::mat         aux_xi,             // MxT
+    const arma::mat&  aux_PR_TR,          // MxM
+    const arma::vec&  aux_pi_0,           // Mx1
+    const arma::mat&  aux_df,             // NxM
     const bool        finiteM = true
 );
 

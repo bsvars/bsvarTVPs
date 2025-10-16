@@ -748,6 +748,7 @@ arma::mat filtering_studentt (
     mat lk_tmp  = -0.5 * log( 1 + square(Z.slice(m)) ); // NxT
     lk_tmp.each_col() %= (1 + aux_df.col(m));
     log_d          = sum(lk_tmp, 0);
+    log_d         += -0.5 * N * log(M_PI);
     log_d         -= accu(lgamma( 0.5 * aux_df.col(m) ));
     log_d         += accu(lgamma( 0.5 * (aux_df.col(m) + 1) ));
     
@@ -768,6 +769,9 @@ arma::mat filtering_studentt (
   
   return xi_t_t;
 } // END filtering_studentt
+
+
+
 
 
 // [[Rcpp::interfaces(cpp)]]
@@ -854,6 +858,72 @@ arma::mat sample_Markov_process (
   
   return aux_xi_out;
 } // END sample_Markov_process
+
+
+
+
+
+
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+arma::mat sample_Markov_process_studentt (
+    const arma::cube& Z,                  // NxTxM
+    arma::mat         aux_xi,             // MxT
+    const arma::mat&  aux_PR_TR,          // MxM
+    const arma::vec&  aux_pi_0,           // Mx1
+    const arma::mat&  aux_df,             // NxM
+    const bool        finiteM = true
+) {
+  
+  int minimum_regime_occurrences = 0;
+  int max_iterations = 1;
+  if ( finiteM ) {
+    minimum_regime_occurrences = 2;
+    max_iterations = 10;
+  }
+  
+  const int   T   = Z.n_cols;
+  const int   M   = aux_PR_TR.n_rows;
+  mat aux_xi_tmp = aux_xi;
+  mat aux_xi_out = aux_xi;
+  
+  mat filtered    = filtering_studentt(Z, aux_PR_TR, aux_pi_0, aux_df);
+  mat smoothed    = smoothing(filtered, aux_PR_TR);
+  mat    aj       = eye(M, M);
+  
+  mat xi(M, T);
+  int draw        = csample_num1(wrap(seq_len(M)), wrap(smoothed.col(T-1)));
+  aux_xi_tmp.col(T-1)     = aj.col(draw-1);
+  
+  if ( minimum_regime_occurrences==0 ) {
+    for (int t=T-2; t>=0; --t) {
+      vec xi_Tmj    = (aux_PR_TR * (aux_xi.col(t+1)/(aux_PR_TR.t() * filtered.col(t)))) % filtered.col(t);
+      draw          = csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
+      aux_xi_tmp.col(t)   = aj.col(draw-1);
+    }
+    aux_xi_out = aux_xi_tmp;
+  } else {
+    int regime_occurrences  = 1;
+    int iterations  = 1;
+    while ( (regime_occurrences<minimum_regime_occurrences) & (iterations<max_iterations) ) {
+      for (int t=T-2; t>=0; --t) {
+        vec xi_Tmj    = (aux_PR_TR * (aux_xi.col(t+1)/(aux_PR_TR.t() * filtered.col(t)))) % filtered.col(t);
+        draw          = csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
+        aux_xi_tmp.col(t)   = aj.col(draw-1);
+      }
+      mat transitions       = count_regime_transitions(aux_xi_tmp);
+      regime_occurrences    = min(transitions.diag());
+      iterations++;
+    } // END while
+    if ( iterations<max_iterations ) aux_xi_out = aux_xi_tmp;
+  }
+  
+  return aux_xi_out;
+} // END sample_Markov_process_studentt
+
+
+
+
 
 
 
