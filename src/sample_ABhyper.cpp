@@ -131,7 +131,6 @@ Rcpp::List sample_B_heterosk1_s4 (
   
   const int N           = aux_B.n_rows;
   const int T           = Y.n_cols;
-  
   int         Ltmp      = VBL.n_elem - 1;
   vec         Lm        = VBL(Ltmp);
   double      L         = accu(Lm);
@@ -141,6 +140,7 @@ Rcpp::List sample_B_heterosk1_s4 (
   mat shocks                = Y - aux_A * X;
   
   for (int n=0; n<N; n++) {
+  
     mat aux_B_nL(Lm(n), N);
     vec log_posterior_kernel_nL(Lm(n));
     mat aux_B_tmp           = aux_B;
@@ -217,6 +217,7 @@ Rcpp::List sample_B_heterosk1_s4 (
       NumericVector seq_1S    = wrap(seq_len(Lm(n)) - 1);
       index_s4                = csample_num1(seq_1S, wrap(pr_s4));
     }
+    
     aux_SL(n)                 = index_s4;
     aux_B.row(n)              = aux_B_nL.row(index_s4);
     
@@ -1198,7 +1199,7 @@ Rcpp::List sample_hyperparameter_mss_s4_horseshoe (
     const arma::cube&       aux_B,                // (N, N, M)
     const arma::mat&        aux_A,                // (N, K)     
     const arma::field<arma::mat>& VB,             // (R + 1)
-    const arma::ivec&       aux_SL,               // Nx1 row-specific S4 indicators
+    const arma::imat&       aux_SL,               // NxM row-specific S4 indicators
     const Rcpp::List&       prior
 ) {
   
@@ -1223,13 +1224,15 @@ Rcpp::List sample_hyperparameter_mss_s4_horseshoe (
   mat       bn_unrestrict(N, N);
   
   for (int n=0; n<N; n++) {
-    int ll                = aux_SL(n);
-    if (n>0) {
-      ll                 += Lm_cs(n-1);
+    for (int m=0; m<M; m++) {
+      int ll              = aux_SL(n,m);
+      if (n>0) {
+        ll               += Lm_cs(n-1);
+      }
+      rn(n)              += VB(ll).n_rows;
     }
-    rn(n)                 = VB(ll).n_rows;
-    bn_unrestrict.row(n)  = sum(VB(ll));
   }
+  
   const int KB            = accu(rn);
   mat   prior_A           = as<mat>(prior["A"]);
   
@@ -1251,6 +1254,13 @@ Rcpp::List sample_hyperparameter_mss_s4_horseshoe (
   for (int n=0; n<N; n++) {
     for (int i=0; i<N; i++) {
       for (int m=0; m<M; m++) {
+        
+        int lll             = aux_SL(n,m);
+        if (n>0) {
+          lll              += Lm_cs(n-1);
+        }
+        bn_unrestrict.row(n)  = sum(VB(lll));
+        
         if ( bn_unrestrict(n, i) == 1 ) {
           
           // sample aux_hyper_inv_gB
@@ -1298,7 +1308,7 @@ Rcpp::List sample_hyperparameter_mssa_s4_horseshoe (
     const arma::cube&       aux_B,                // (N, N, M)
     const arma::cube&       aux_A,                // (N, K, M)     
     const arma::field<arma::mat>& VB,             // (R + 1)
-    const arma::ivec&       aux_SL,               // Nx1 row-specific S4 indicators
+    const arma::imat&       aux_SL,               // Nx1 row-specific S4 indicators
     const Rcpp::List&       prior
 ) {
   
@@ -1324,13 +1334,15 @@ Rcpp::List sample_hyperparameter_mssa_s4_horseshoe (
   mat       bn_unrestrict(N, N);
   
   for (int n=0; n<N; n++) {
-    int ll                = aux_SL(n);
-    if (n>0) {
-      ll                 += Lm_cs(n-1);
+    for (int m=0; m<M; m++) {
+      int ll              = aux_SL(n,m);
+      if (n>0) {
+        ll               += Lm_cs(n-1);
+      }
+      rn(n)              += VB(ll).n_rows;
     }
-    rn(n)                 = VB(ll).n_rows;
-    bn_unrestrict.row(n)  = sum(VB(ll));
   }
+  
   const int KB            = accu(rn);
   mat   prior_A           = as<mat>(prior["A"]);
   
@@ -1352,6 +1364,13 @@ Rcpp::List sample_hyperparameter_mssa_s4_horseshoe (
   for (int n=0; n<N; n++) {
     for (int m=0; m<M; m++) {
       for (int i=0; i<N; i++) {
+        
+        int lll             = aux_SL(n,m);
+        if (n>0) {
+          lll              += Lm_cs(n-1);
+        }
+        bn_unrestrict.row(n)  = sum(VB(lll));
+        
         if ( bn_unrestrict(n, i) == 1 ) {
           
           // sample aux_hyper_inv_gB
