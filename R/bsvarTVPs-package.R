@@ -57,7 +57,7 @@
 #' @aliases bsvarTVPs-package bsvarTVPs
 #' @useDynLib bsvarTVPs, .registration = TRUE
 #' 
-#' @importFrom bsvars specify_bsvar_sv estimate forecast compute_impulse_responses compute_fitted_values compute_historical_decompositions compute_structural_shocks compute_variance_decompositions compute_regime_probabilities compute_conditional_sd
+#' @importFrom bsvars specify_bsvar_sv specify_data_matrices estimate forecast compute_impulse_responses compute_fitted_values compute_historical_decompositions compute_structural_shocks compute_variance_decompositions compute_regime_probabilities compute_conditional_sd
 #' @importFrom HDInterval hdi
 #' @importFrom GIGrvg rgig
 #' @importFrom R6 R6Class
