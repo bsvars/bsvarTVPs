@@ -844,11 +844,11 @@ namespace bsvarTVPs {
         return Rcpp::as<Rcpp::List >(rcpp_result_gen);
     }
 
-    inline Rcpp::List sample_hyperparameter_mssa_s4_horseshoe(Rcpp::List& aux_hyper_list, const arma::cube& aux_B, const arma::cube& aux_A, const arma::field<arma::mat>& VB, const arma::ivec& aux_SL, const Rcpp::List& prior) {
+    inline Rcpp::List sample_hyperparameter_mssa_s4_horseshoe(Rcpp::List& aux_hyper_list, const arma::cube& aux_B, const arma::cube& aux_A, const arma::field<arma::mat>& VB, const arma::imat& aux_SL, const Rcpp::List& prior) {
         typedef SEXP(*Ptr_sample_hyperparameter_mssa_s4_horseshoe)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_sample_hyperparameter_mssa_s4_horseshoe p_sample_hyperparameter_mssa_s4_horseshoe = NULL;
         if (p_sample_hyperparameter_mssa_s4_horseshoe == NULL) {
-            validateSignature("Rcpp::List(*sample_hyperparameter_mssa_s4_horseshoe)(Rcpp::List&,const arma::cube&,const arma::cube&,const arma::field<arma::mat>&,const arma::ivec&,const Rcpp::List&)");
+            validateSignature("Rcpp::List(*sample_hyperparameter_mssa_s4_horseshoe)(Rcpp::List&,const arma::cube&,const arma::cube&,const arma::field<arma::mat>&,const arma::imat&,const Rcpp::List&)");
             p_sample_hyperparameter_mssa_s4_horseshoe = (Ptr_sample_hyperparameter_mssa_s4_horseshoe)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_hyperparameter_mssa_s4_horseshoe");
         }
         RObject rcpp_result_gen;

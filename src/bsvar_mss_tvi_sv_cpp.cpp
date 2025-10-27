@@ -85,7 +85,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
   
   // the initial value for the adaptive_scale is set to the negative inverse of 
   // Hessian for the posterior log_kenel for df evaluated at df = 30
-  double  adaptive_scale_init = pow(R::psigamma(15, 1) - 29 * pow(28, -2), -1) / (T / M);
+  double  adaptive_scale_init = pow(R::psigamma(15, 1)/4 - 29 * pow(28, -2), -1) / (T / M);
   mat     adaptive_scale(N, M, fill::value(adaptive_scale_init));
   
   const int   S     = floor(SS / thin);
@@ -164,9 +164,17 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
       }
     }
     if ( studentt ) {
-      aux_xi          = sample_Markov_process_studentt(Z, aux_xi, aux_PR_TR, aux_pi_0, aux_df, finiteM);
+      try {
+        aux_xi          = sample_Markov_process_studentt(Z, aux_xi, aux_PR_TR, aux_pi_0, aux_df, finiteM);
+      } catch (std::runtime_error &e) {
+        Rcout << "   sample_Markov_process_studentt failure " << endl;
+      }
     } else {
-      aux_xi          = sample_Markov_process(Z, aux_xi, aux_PR_TR, aux_pi_0, finiteM);
+      try {
+        aux_xi          = sample_Markov_process(Z, aux_xi, aux_PR_TR, aux_pi_0, finiteM);
+      } catch (std::runtime_error &e) {
+        Rcout << "   sample_Markov_process failure " << endl;
+      }
     }    
     
     // sample aux_PR_TR and aux_pi_0
@@ -179,7 +187,11 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     Rcout<<" sample aux_hyper"<<endl;
     if ( hyper_select == 1 ) {
 
-      aux_hyper       = sample_hyperparameter_mss_s4_horseshoe(aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
+      try {
+        aux_hyper       = sample_hyperparameter_mss_s4_horseshoe(aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
+      } catch (std::logic_error &e) {
+        Rcout << "   sample_hyperparameter_mss_s4_horseshoe failure " << endl;
+      }
       precisionB      = hyper2precisionB_mss_horseshoe(aux_hyper);
       precisionA      = hyper2precisionA_horseshoe(aux_hyper);
 
@@ -257,7 +269,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
       
     } // END if( sv_select != 3 )
     
-    Rcout<<" save in posterior"<<endl;
+    // Rcout<<" save in posterior"<<endl;
     if (ss % thin == 0) {
       posterior_B(s)                = aux_B;
       posterior_A.slice(s)          = aux_A;

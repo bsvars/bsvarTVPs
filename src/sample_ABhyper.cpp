@@ -897,6 +897,7 @@ Rcpp::List sample_hyperparameters_mssa_s4_boost (
 ) {
   // the function changes the value of aux_hyper by reference
   mat       aux_hyper = as<mat>(aux_hyper_list["aux_hyper"]); 
+  
   const int N = aux_B.n_rows;
   const int M = aux_B.n_slices;
   const int K = aux_A.n_cols;
@@ -934,7 +935,6 @@ Rcpp::List sample_hyperparameters_mssa_s4_boost (
   if ( hyper_boost ) {
     aux_hyper(2 * N, 1) = AA_scale_tmp / R::rchisq(AA_shape_tmp);
   }
-  
   for (int n=0; n<N; n++) {
     
     // count unrestricted elements of aux_B's row
@@ -1213,6 +1213,8 @@ Rcpp::List sample_hyperparameter_mss_s4_horseshoe (
   double    aux_hyper_inv_deltaA = as<double>(aux_hyper_list["aux_hyper_inv_deltaA"]);
   double    aux_hyper_inv_dA = as<double>(aux_hyper_list["aux_hyper_inv_dA"]);
   
+  const double eps = 1e-10;
+  
   const int N = aux_B.n_rows;
   const int K = aux_A.n_cols;
   const int M = aux_B.n_slices;
@@ -1241,13 +1243,14 @@ Rcpp::List sample_hyperparameter_mss_s4_horseshoe (
     aux_hyper_inv_dB(m)       = rig_inv1(1, 1 + aux_hyper_inv_deltaB(m));
     aux_hyper_inv_deltaB(m)   = rig_inv1( 
       (KB + 1) / 2, 
-      aux_hyper_inv_dB(m) + 0.5 * accu(square(aux_B.slice(m)) % aux_hyper_inv_gammaB.slice(m))
+      eps + aux_hyper_inv_dB(m) + 0.5 * accu(square(aux_B.slice(m)) % aux_hyper_inv_gammaB.slice(m))
     );
   }
+  
   aux_hyper_inv_dA            = rig_inv1(1, 1 + aux_hyper_inv_deltaA);
   aux_hyper_inv_deltaA        = rig_inv1( 
     (K * N + 1) / 2, 
-    aux_hyper_inv_dA + 0.5 * accu(square(aux_A - prior_A) % aux_hyper_inv_gammaA)
+    eps + aux_hyper_inv_dA + 0.5 * accu(square(aux_A - prior_A) % aux_hyper_inv_gammaA)
   );
   
   // sample other aux_hyper_inv_*
@@ -1269,7 +1272,7 @@ Rcpp::List sample_hyperparameter_mss_s4_horseshoe (
           // sample aux_hyper_inv_gammaB
           aux_hyper_inv_gammaB(n, i, m) = rig_inv1(
             1, 
-            aux_hyper_inv_gB(n, i, m) + 0.5 * pow(aux_B(n, i, m), 2) * aux_hyper_inv_deltaB(m)
+            eps + aux_hyper_inv_gB(n, i, m) + 0.5 * pow(aux_B(n, i, m), 2) * aux_hyper_inv_deltaB(m)
           );
         } // END m loop
       }
@@ -1283,7 +1286,7 @@ Rcpp::List sample_hyperparameter_mss_s4_horseshoe (
       // sample aux_hyper_inv_gammaA
       aux_hyper_inv_gammaA(n, k)    = rig_inv1(
         1, 
-        aux_hyper_inv_gA(n, k) + 0.5 * pow(aux_A(n, k) - prior_A(n, k), 2) * aux_hyper_inv_deltaA
+        eps + aux_hyper_inv_gA(n, k) + 0.5 * pow(aux_A(n, k) - prior_A(n, k), 2) * aux_hyper_inv_deltaA
       );
     } // END k loop
   } // END n loop
@@ -1436,7 +1439,8 @@ arma::field<arma::mat> hyper2precisionA_boost (
   
   mat         aux_hyper     = as<mat>(aux_hyper_list["aux_hyper"]); 
   mat         prior_A_V_inv = as<mat>(prior["A_V_inv"]);
-  int         N             = prior_A_V_inv.n_rows; 
+  mat         prior_A       = as<mat>(prior["A"]);
+  int         N             = prior_A.n_rows; 
   field<mat>  precisionA(N);
   
   for (int n=0; n<N; n++) {
@@ -1474,12 +1478,12 @@ arma::field<arma::mat> hyper2precisionA_msa_boost (
     Rcpp::List              aux_hyper_list,
     const Rcpp::List&       prior
 ) {
-  
   mat         aux_hyper     = as<mat>(aux_hyper_list["aux_hyper"]); 
   mat         prior_A_V_inv = as<mat>(prior["A_V_inv"]);
+  mat         prior_A       = as<mat>(prior["A"]);
   mat         prior_PR_TR   = as<mat>(prior["PR_TR"]);
   
-  int         N             = prior_A_V_inv.n_rows; 
+  int         N             = prior_A.n_rows; 
   int         M             = prior_PR_TR.n_rows;
   field<mat>  precisionA(N, M);
   

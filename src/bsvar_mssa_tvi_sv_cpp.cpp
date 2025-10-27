@@ -123,7 +123,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
   int   s = 0;
   
   for (int ss=0; ss<SS; ss++) {
-    
+  
     // Increment progress bar
     if (any(prog_rep_points == ss)) p.increment();
     // Check for user interrupts
@@ -164,13 +164,13 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     }
     
     // sample aux_PR_TR and aux_pi_0
-    try {
+    // try {
       PR_TR_tmp         = sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
       aux_PR_TR         = as<mat>(PR_TR_tmp["aux_PR_TR"]);
       aux_pi_0          = as<vec>(PR_TR_tmp["aux_pi_0"]);
-    } catch (std::runtime_error &e) {
-      Rcout << "   sample_transition_probabilities failure " << endl;
-    }
+    // } catch (std::runtime_error &e) {
+    //   Rcout << "   sample_transition_probabilities failure " << endl;
+    // }
     
     // sample aux_hyper
     if ( hyper_select == 1 ) {
@@ -194,20 +194,20 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     }
     
     // sample aux_B
-    try {
+    // try {
       BSL               = sample_B_mssa_s4(aux_B, aux_SL, aux_A, precisionB, aux_hetero, aux_xi, Y, X, prior, VB);
       aux_B             = as<cube>(BSL["aux_B"]);
       aux_SL            = as<imat>(BSL["aux_SL"]);
-    } catch (std::runtime_error &e) {
-      Rcout << "  sample_B_mssa_s4_boost failure " << endl;
-    }
+    // } catch (std::runtime_error &e) {
+    //   Rcout << "  sample_B_mssa_s4_boost failure " << endl;
+    // }
     
     // sample aux_A
-    try {
+    // try {
       aux_A             = sample_A_heterosk1_mssa(aux_A, aux_B, aux_xi, precisionA, aux_hetero, Y, X, prior);
-    } catch (std::runtime_error &e) {
-      Rcout << "  sample_A_heterosk1_mssa_boost failure " << endl;
-    }
+    // } catch (std::runtime_error &e) {
+    //   Rcout << "  sample_A_heterosk1_mssa_boost failure " << endl;
+    // }
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
     if ( sv_select != 3 ) {
