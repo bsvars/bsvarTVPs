@@ -1,91 +1,179 @@
 
-#' @title Bayesian estimation of Structural Vector Autoregressions with TVI and 
-#' Markov-Switching in the Structural Matrix
+
+
+#' @title Bayesian estimation of Markov-Switching Structural Vector Autoregressions 
+#' with time-varying parameters and time-varying identification.
 #'
-#' @description Estimates a Structural Vector Autoregressions with Stochastic Volatility
+#' @description Estimates a model proposed by Camehl & Woźniak (2025), namely, 
+#' the Structural Vector Autoregressions with Stochastic Volatility
 #' heteroskedasticity and Markov-switching and time-varying identification 
-#' in the structural matrix
-#' and a three-level local-global prior hierarchical prior structure for the structural and autoregressive matrices
+#' in the structural matrix and a three-level local-global prior hierarchical 
+#' prior structure for the structural and autoregressive matrices.
 #' 
-#' @param SS a positive integer, the number of posterior draws to be generated
-#' @param Y a \code{NxT} matrix with dependent variables
-#' @param X a \code{KxT} matrix with regressors
-#' @param prior a list containing the prior specification
-#' @param VB a list providing the structural matrix specification
-#' @param starting_values a list providing starting values to the estimated parameters
-#' @param thin a positive integer determining MCMC thinning
-#' @param sv_select an integer choosing th type of volatility model: 
-#' \code{1} - non-centred SV, \code{2} - centred SV, \code{3} - homoskedastic.
-#' @param hyper_select an integer choosing th type of hyper-parameter hierarchy: 
-#' \code{1} - horseshoe prior, \code{2} - 3-level hierarchy, \code{3} - fixed hyper-parameters.
-#' @param finiteM a logical value, if \code{TRUE} a stationary Markov-switching 
-#' model is estimated, if \code{FALSE} an over-fitting Markov-switching model is used
-#' @param studentt a logical value, if \code{TRUE} the model is estimated with 
-#' t-distributed structural shocks, if \code{FALSE} the shocks are Gaussian
+#' @details 
+#' The heteroskedastic Markov-switching SVAR model is given by the reduced form equation:
+#' \deqn{Y = A(s_t)X + E}
+#' where \eqn{Y} is an \code{NxT} matrix of dependent variables, \eqn{X} is a 
+#' \code{KxT} matrix of explanatory variables, \eqn{E} is an \code{NxT} matrix 
+#' of reduced form error terms, and \eqn{A(s_t)} is an \code{NxK} matrix of 
+#' autoregressive slope coefficients and parameters on deterministic terms in \code{X}.
+#' The matrix \eqn{A(s_t)} may be specified as time-varying and include Markov switching
+#' or be constant over time.
 #' 
-#' @return An object of class \code{PosteriorBSVARSVMSTVI} - a list containing the Bayesian estimation output in two elements:
+#' The structural equation is given by:
+#' \deqn{B(s_t, kappa(s_t))E = U}
+#' where \eqn{U} is an \code{NxT} matrix of structural form error terms, and
+#' \eqn{B} is an \code{NxN} matrix of contemporaneous relationships.
 #' 
-#' \code{posterior} a list with a collection of \code{S} draws from the posterior distribution 
-#' generated via Gibbs sampler containing many arrays and vectors whose selection depends on 
-#' the model specification.
-#' \code{last_draw} a list with the last draw of the current MCMC run as the starting value 
-#' to be passed to the continuation of the MCMC estimation. 
+#' Finally, the structural shocks, \eqn{U}, are temporally and contemporaneously 
+#' independent and jointly distributed with zero mean.
+#' The structural shocks can be either normally or Student-t distributed, where in 
+#' the latter case the shock-specific degrees of freedom parameters are estimated.
+#' 
+#' Two alternative specifications of the conditional variance of the \code{n}th 
+#' shock at time \code{t} can be chosen: non-centred Stochastic Volatility by 
+#' Lütkepohl, Shang, Uzeda, and Woźniak (2025) or homoskedastic.
+#' 
+#' @param specification an object of class BSVARTVP generated using the \code{specify_bsvarTVP$new()} function.
+#' @param S a positive integer, the number of posterior draws to be generated
+#' @param thin a positive integer, specifying the frequency of MCMC output thinning
+#' @param show_progress a logical value, if \code{TRUE} the estimation progress bar is visible
+#' 
+#' @return An object of class PosteriorBSVARTVP containing the Bayesian estimation output and containing two elements:
+#' 
+#'  \code{posterior} a list with a collection of \code{S} draws from the posterior 
+#'  distribution generated via Gibbs sampler containing:
+#'  \describe{
+#'  \item{A}{an \code{NxKxS} array with the posterior draws for matrix \eqn{A}}
+#'  \item{B}{an \code{NxNxS} array with the posterior draws for matrix \eqn{B}}
+#'  \item{hyper}{a \code{5xS} matrix with the posterior draws for the hyper-parameters of the hierarchical prior distribution}
+#'  \item{sigma2}{an \code{NxMxS} array with the posterior draws for the structural shocks conditional variances}
+#'  \item{PR_TR}{an \code{MxMxS} array with the posterior draws for the transition matrix.}
+#'  \item{xi}{an \code{MxTxS} array with the posterior draws for the regime allocation matrix.}
+#'  \item{pi_0}{an \code{MxS} matrix with the posterior draws for the initial state probabilities}
+#'  \item{sigma}{an \code{NxTxS} array with the posterior draws for the structural shocks conditional standard deviations' series over the sample period}
+#' }
+#' 
+#' \code{last_draw} an object of class BSVARTVP with the last draw of the current 
+#' MCMC run as the starting value to be passed to the continuation of the MCMC 
+#' estimation using \code{estimate()}. 
+#' 
+#' @seealso \code{\link{specify_bsvarTVP}}
 #'
 #' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
 #' 
-#' @references
-#' Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, <doi:10.48550/arXiv.2502.19659>.
+#' @references 
 #' 
+#' Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, 
+#' <doi:10.48550/arXiv.2502.19659>.
+#' 
+#' Lütkepohl, H., Shang, F., Uzeda, L., and Woźniak, T. (2025) 
+#' Partial identification of structural vector autoregressions with non-centred stochastic volatility. 
+#' \emph{Journal of Econometrics}, 1--18, \doi{10.1016/j.jeconom.2025.106107}.
+#' 
+#' @method estimate BSVARTVP
+#' 
+#' @examples
+#' # simple workflow
+#' ############################################################
+#' # specify the model
+#' specification  = specify_bsvarTVP$new(us_fiscal_lsuw)
+#' 
+#' # run the burn-in
+#' burn_in        = estimate(specification, 5)
+#' 
+#' # estimate the model
+#' posterior      = estimate(burn_in, 10)
+#' 
+#' # workflow with the pipe |>
+#' ############################################################
+#' us_fiscal_lsuw |>
+#'   specify_bsvarTVP$new() |>
+#'   estimate(S = 5) |> 
+#'   estimate(S = 10) -> posterior
+#'   
 #' @export
-bsvar_mss_tvi_sv <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, sv_select = 1, hyper_select = 1, finiteM = TRUE, studentt = TRUE) {
-  output          = .Call(`_bsvarTVPs_bsvar_mss_tvi_sv_cpp`, SS, Y, X, prior, VB, starting_values, thin, sv_select, hyper_select, finiteM, studentt)
-  class(output)   = "PosteriorBSVARSVMSTVI"
+estimate.BSVARTVP <- function(specification, S, thin = 1, show_progress = TRUE) {
+  
+  prior               = specification$prior$get_prior()
+  VB                  = specification$identification$VB
+  starting_values     = specification$starting_values$get_starting_values()
+  data_matrices       = specification$data_matrices$get_data_matrices()
+  
+  if (specification$get_sv()) {
+    sv_select         = 1
+  } else {
+    sv_select         = 3
+  }
+  if (specification$get_estimate_hyper()) {
+    hyper_select      = 2
+  } else {
+    hyper_select      = 3
+  }
+  finiteM             = specification$get_finiteM() 
+  studentt            = !specification$get_normal()
+  
+  if (specification$get_msa()) {
+    output            = .Call(`_bsvarTVPs_bsvar_mssa_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, starting_values, thin, sv_select, hyper_select, finiteM, studentt, show_progress)
+    A                 = autoregressive_to_array(output)
+    output$posterior$A = A
+  } else {
+    output            = .Call(`_bsvarTVPs_bsvar_mss_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, starting_values, thin, sv_select, hyper_select, finiteM, studentt, show_progress)
+  }
+  
+  B                   = structural_to_array(output)
+  output$posterior$B  = B
+
+  specification$starting_values$set_starting_values(output$last_draw)
+  output              = specify_posterior_bsvarTVP$new(specification, output$posterior)
+  
   return(output)
 }
 
 
 
-#' @title Bayesian estimation of Structural Vector Autoregressions with
-#' Markov-Switching in the Structural and Autoregressive Matrices and TVI
-#'
-#' @description Estimates a Structural Vector Autoregressions with Stochastic Volatility
-#' heteroskedasticity and Markov-switching in the structural and autoregressive 
-#' matrices and with time-varying identification, and a three-level local-global 
-#' prior hierarchical prior structure for the structural and autoregressive matrices
+#' @inherit estimate.BSVARTVP
 #' 
-#' @param SS a positive integer, the number of posterior draws to be generated
-#' @param Y a \code{NxT} matrix with dependent variables
-#' @param X a \code{KxT} matrix with regressors
-#' @param prior a list containing the prior specification
-#' @param VB a list providing the structural matrix specification
-#' @param starting_values a list providing starting values to the estimated parameters
-#' @param thin a positive integer determining MCMC thinning
-#' @param sv_select an integer choosing th type of volatility model: 
-#' \code{1} - non-centred SV, \code{2} - centred SV, \code{3} - homoskedastic.
-#' @param hyper_select an integer choosing th type of hyper-parameter hierarchy: 
-#' \code{1} - horseshoe prior, \code{2} - 3-level hierarchy, \code{3} - fixed hyper-parameters.
-#' @param finiteM a logical value, if \code{TRUE} a stationary Markov-switching 
-#' model is estimated, if \code{FALSE} an over-fitting Markov-switching model is used
-#' @param studentt a logical value, if \code{TRUE} the model is estimated with 
-#' t-distributed structural shocks, if \code{FALSE} the shocks are Gaussian
+#' @method estimate PosteriorBSVARTVP
 #' 
-#' @return An object of class \code{PosteriorBSVARSVMSATVI} - a list containing the Bayesian estimation output in two elements:
-#' 
-#' \code{posterior} a list with a collection of \code{S} draws from the posterior distribution 
-#' generated via Gibbs sampler containing many arrays and vectors whose selection depends on 
-#' the model specification.
-#' \code{last_draw} a list with the last draw of the current MCMC run as the starting value 
-#' to be passed to the continuation of the MCMC estimation. 
-#'
-#' @author Tomasz Woźniak \email{wozniak.tom@pm.me}
-#' 
-#' @references
-#' Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, <doi:10.48550/arXiv.2502.19659>.
+#' @param specification an object of class PosteriorBSVARTVP generated using the 
+#' \code{estimate.BSVARTVP()} function. This setup facilitates the continuation of 
+#' the MCMC sampling starting from the last draw of the previous run.
 #' 
 #' @export
-bsvar_mssa_tvi_sv <- function(SS, Y, X, prior, VB, starting_values, thin = 100L, sv_select = 1, hyper_select = 1, finiteM = TRUE, studentt = TRUE) {
-  output          = .Call(`_bsvarTVPs_bsvar_mssa_tvi_sv_cpp`, SS, Y, X, prior, VB, starting_values, thin, sv_select, hyper_select, finiteM, studentt)
-  class(output)   = "PosteriorBSVARSVMSATVI"
+estimate.PosteriorBSVARTVP <- function(specification, S, thin = 1, show_progress = TRUE) {
+  
+  prior               = specification$last_draw$prior$get_prior()
+  VB                  = specification$last_draw$identification$VB
+  starting_values     = specification$last_draw$starting_values$get_starting_values()
+  data_matrices       = specification$last_draw$data_matrices$get_data_matrices()
+  
+  if (specification$last_draw$get_sv()) {
+    sv_select         = 1
+  } else {
+    sv_select         = 3
+  }
+  if (specification$last_draw$get_estimate_hyper()) {
+    hyper_select      = 2
+  } else {
+    hyper_select      = 3
+  }
+  finiteM             = specification$last_draw$get_finiteM() 
+  studentt            = !specification$last_draw$get_normal()
+  
+  if (specification$last_draw$get_msa()) {
+    output            = .Call(`_bsvarTVPs_bsvar_mssa_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, starting_values, thin, sv_select, hyper_select, finiteM, studentt, show_progress)
+    A                 = autoregressive_to_array(output)
+    output$posterior$A = A
+  } else {
+    output            = .Call(`_bsvarTVPs_bsvar_mss_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, starting_values, thin, sv_select, hyper_select, finiteM, studentt, show_progress)
+  }
+  
+  B                   = structural_to_array(output)
+  output$posterior$B  = B
+  
+  specification$last_draw$starting_values$set_starting_values(output$last_draw)
+  output              = specify_posterior_bsvarTVP$new(specification$last_draw, output$posterior)
+  
   return(output)
 }
-
