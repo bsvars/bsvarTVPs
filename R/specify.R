@@ -140,7 +140,7 @@ specify_prior_bsvarTVP = R6::R6Class(
     }, # END initialize
     
     #' @description
-    #' Returns the elements of the prior specification PriorBSVAR as a \code{list}.
+    #' Returns the elements of the prior specification PriorBSVARTVP as a \code{list}.
     #' 
     #' @examples 
     #' # a prior for 3-variable example
@@ -178,7 +178,7 @@ specify_prior_bsvarTVP = R6::R6Class(
 #' R6 Class Representing StartingValuesBSVARTVPMS
 #'
 #' @description
-#' The class StartingValuesBSVARTVPMS presents starting values for the homoskedastic bsvar model.
+#' The class StartingValuesBSVARTVPMS presents starting values for the bsvarTVP model.
 #' 
 #' @examples 
 #' # starting values for a model for a 3-variable system
@@ -265,6 +265,10 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
     #' @param T a positive integer - the number of time periods in the data.
     #' @param p a positive integer - the autoregressive lag order of the SVAR model.
     #' @param d a positive integer - the number of \code{exogenous} variables in the model.
+    #' @param finiteM a logical value - if true a stationary Markov switching 
+    #' model is estimated. Otherwise, a sparse Markov switching model is estimated 
+    #' in which \code{M=20} and the number of visited states is estimated. The 
+    #' value of \code{M} can be modified.
     #' @return Starting values StartingValuesBSVARTVPMS
     #' @examples 
     #' # starting values for a model with 4 lags for a 3-variable system
@@ -272,13 +276,21 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
     #' B = matrix(TRUE, 3, 3)
     #' sv = specify_starting_values_bsvarTVPms$new(A = A, B = B, N = 3, M = 2, T = 120, p = 1)
     #' 
-    initialize = function(A, B, N, M, T, p, d = 0){
+    initialize = function(A, B, N, M, T, p, d = 0, finiteM = TRUE) {
       stopifnot("Argument N must be a positive integer number." = N > 0 & N %% 1 == 0)
       stopifnot("Argument M must be a positive integer number." = M > 0 & M %% 1 == 0)
       stopifnot("Argument T must be a positive integer number." = T > 0 & T %% 1 == 0)
       stopifnot("Argument p must be a positive integer number." = p > 0 & p %% 1 == 0)
       stopifnot("Argument d must be a non-negative integer number." = d >= 0 & d %% 1 == 0)
-
+      stopifnot(
+        "Argument finiteM must be a logical value." = 
+          is.logical(finiteM) & length(finiteM) == 1
+      )
+      
+      if (!finiteM) {
+        M = 20
+      }
+      
       K                   = N * p + 1 + d
       self$B              = array(0, c(N, N, M))
       for (m in 1:M) {
@@ -386,7 +398,7 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
 #' R6 Class Representing StartingValuesBSVARTVPMSA
 #'
 #' @description
-#' The class StartingValuesBSVARTVPMSA presents starting values for the homoskedastic bsvar model.
+#' The class StartingValuesBSVARTVPMSA presents starting values for the bsvarTVP model.
 #' 
 #' @examples 
 #' # starting values for a homoskedastic bsvar for a 3-variable system
@@ -419,6 +431,10 @@ specify_starting_values_bsvarTVPmsa = R6::R6Class(
     #' @param T a positive integer - the number of time periods in the data.
     #' @param p a positive integer - the autoregressive lag order of the SVAR model.
     #' @param d a positive integer - the number of \code{exogenous} variables in the model.
+    #' @param finiteM a logical value - if true a stationary Markov switching 
+    #' model is estimated. Otherwise, a sparse Markov switching model is estimated 
+    #' in which \code{M=20} and the number of visited states is estimated. The 
+    #' value of \code{M} can be modified.
     #' @return Starting values StartingValuesBSVARTVPMSA
     #' @examples 
     #' # starting values for a homoskedastic bsvar with 4 lags for a 3-variable system
@@ -426,16 +442,20 @@ specify_starting_values_bsvarTVPmsa = R6::R6Class(
     #' B = matrix(TRUE, 3, 3)
     #' sv = specify_starting_values_bsvarTVPmsa$new(A = A, B = B, N = 3, M = 2, T = 120, p = 1)
     #' 
-    initialize = function(A, B, N, M, T, p, d = 0){
+    initialize = function(A, B, N, M, T, p, d = 0, finiteM = TRUE) {
       stopifnot("Argument N must be a positive integer number." = N > 0 & N %% 1 == 0)
       stopifnot("Argument M must be a positive integer number." = M > 0 & M %% 1 == 0)
       stopifnot("Argument T must be a positive integer number." = T > 0 & T %% 1 == 0)
       stopifnot("Argument p must be a positive integer number." = p > 0 & p %% 1 == 0)
       stopifnot("Argument d must be a non-negative integer number." = d >= 0 & d %% 1 == 0)
+      stopifnot(
+        "Argument finiteM must be a logical value." = 
+          is.logical(finiteM) & length(finiteM) == 1
+      )
       
       K                   = N * p + 1 + d
       
-      super$initialize(A, B, N, M, T, p, d)
+      super$initialize(A, B, N, M, T, p, d, finiteM)
       
       self$A              = array(0, c(N, K, M))
       for (m in 1:M) {
@@ -458,7 +478,8 @@ specify_starting_values_bsvarTVPmsa = R6::R6Class(
 #' R6 Class Representing IdentificationBSVARTVIs
 #'
 #' @description
-#' The class IdentificationBSVARTVIs presents the identifying restrictions for the bsvar models.
+#' The class IdentificationBSVARTVIs presents the identifying restrictions for 
+#' the bsvarTVP models.
 #' 
 #' @examples 
 #' specify_identification_bsvarsTVI$new(N = 3, K = 4) # recursive specification for a 3-variable system
@@ -593,7 +614,7 @@ specify_identification_bsvarsTVI = R6::R6Class(
       for (i in V:C) {
         self$VB[[i + 1]] = self$VB[[i]]
       }
-      self$VB[[C]] = matrix( diag(N)[restriction,], ncol = N)
+      self$VB[[C + 1]] = matrix( diag(N)[restriction,], ncol = N)
       self$VB[[V + 1]][shock] = self$VB[[V + 1]][shock] + 1
     } # END get_normal
     
@@ -604,33 +625,27 @@ specify_identification_bsvarsTVI = R6::R6Class(
 
 
 
-#' R6 Class representing the specification of the homoskedastic BSVAR model
+#' R6 Class representing the specification of the BSVARTVP model
 #'
 #' @description
-#' The class BSVAR presents complete specification for the homoskedastic bsvar model.
+#' The class BSVARTVP presents complete specification for the bsvarTVP model.
 #' 
 #' @examples 
-#' spec = specify_bsvarTVP$new(
-#'    data = us_fiscal_lsuw,
-#'    p = 4
-#' )
+#' spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 #' 
 #' @export
 specify_bsvarTVP = R6::R6Class(
   "BSVARTVP",
   
   private = list(
-    normal = TRUE,    # if TRUE - normal shocks, if FALSE - Student-t shocks
-    msa    = FALSE    # if TRUE - MSSA, if FALSE - MSS
+    normal = TRUE,      # if TRUE - normal shocks, if FALSE - Student-t shocks
+    msa    = FALSE,     # if TRUE - MSSA, if FALSE - MSS
+    p      = 1,         # a non-negative integer specifying the autoregressive lag order of the model. 
+    M      = 2,         # positive integer specifying the number of Markov regimes in the model.
+    finiteM = TRUE      # if true a stationary Markov switching, if FALSE a sparse Markov switching model is estimated
   ), # END private
   
   public = list(
-    
-    #' @field p a non-negative integer specifying the autoregressive lag order of the model. 
-    p                      = numeric(),
-    
-    #' @field M a positive integer specifying the number of Markov regimes in the model. 
-    M                      = numeric(),
     
     #' @field identification an object IdentificationBSVARTVIs with the identifying restrictions. 
     identification         = list(),
@@ -646,7 +661,7 @@ specify_bsvarTVP = R6::R6Class(
     starting_values        = list(),
     
     #' @description
-    #' Create a new specification of the homoskedastic bsvar model BSVAR.
+    #' Create a new specification of the bsvarTVP model.
     #' @param data a \code{(T+p)xN} matrix with time series data.
     #' @param p a positive integer providing model's autoregressive lag order.
     #' @param M a positive integer specifying the number of Markov regimes.
@@ -667,7 +682,10 @@ specify_bsvarTVP = R6::R6Class(
     #' @param stationary an \code{N} logical vector - its element set to \code{FALSE} sets 
     #' the prior mean for the autoregressive parameters of the \code{N}th equation to the white noise process, 
     #' otherwise to random walk.
-    #' @return A new complete specification for the homoskedastic bsvar model BSVAR.
+    #' @param finiteM a logical value - if true a stationary Markov switching 
+    #' model is estimated. Otherwise, a sparse Markov switching model is estimated 
+    #' in which \code{M=20} and the number of visited states is estimated.
+    #' @return A new complete specification for the bsvarTVP model.
     initialize = function(
     data,
     p = 1L,
@@ -678,13 +696,14 @@ specify_bsvarTVP = R6::R6Class(
     distribution = c("norm","t"),
     ms4A = FALSE,
     exogenous = NULL,
-    stationary = rep(FALSE, ncol(data))
+    stationary = rep(FALSE, ncol(data)),
+    finiteM = TRUE
     ) {
       stopifnot("Argument p has to be a positive integer." = ((p %% 1) == 0 & p > 0))
-      self$p     = p
+      private$p     = p
       
       stopifnot("Argument M has to be a positive integer." = ((M %% 1) == 0 & M > 0))
-      self$M     = M
+      private$M     = M
       
       stopifnot("Argument train_data has to be a positive integer." = ((train_data %% 1) == 0 & train_data >= 0))
       stopifnot("Argument train_data has to much less than the data size." = train_data < nrow(data) / 2)
@@ -693,7 +712,7 @@ specify_bsvarTVP = R6::R6Class(
       distribution  = match.arg(distribution)
       
       TT            = nrow(data)
-      T             = TT - self$p
+      T             = TT - p
       N             = ncol(data)
       d             = 0
       if (!is.null(exogenous)) {
@@ -701,6 +720,14 @@ specify_bsvarTVP = R6::R6Class(
         exogenous   = exogenous[-(1:train_data),]
       }
       K             = N * p + 1 + d
+      
+      if (!finiteM) {
+        if ( M < 20 ) {
+          M = 20L
+          message("In the sparse Markov switching model the value of M is overwritten and set to 20.")
+        }
+      }
+      private$finiteM  = finiteM
       
       if (missing(B)) {
         message("The identification is set to the default option of lower-triangular structural matrix.")
@@ -729,9 +756,9 @@ specify_bsvarTVP = R6::R6Class(
       self$identification  = specify_identification_bsvarsTVI$new(B, A, N, K)
       self$prior           = specify_prior_bsvarTVP$new(data_train, N, M, p, d, stationary)
       if ( ms4A ) {
-        self$starting_values = specify_starting_values_bsvarTVPmsa$new(A, B, N, M, T, p, d)
+        self$starting_values = specify_starting_values_bsvarTVPmsa$new(A, B, N, M, T, p, d, finiteM)
       } else {
-        self$starting_values = specify_starting_values_bsvarTVPms$new(A, B, N, M, T, p, d)
+        self$starting_values = specify_starting_values_bsvarTVPms$new(A, B, N, M, T, p, d, finiteM)
       }
     }, # END initialize
     
@@ -747,7 +774,7 @@ specify_bsvarTVP = R6::R6Class(
     #' spec$add_restriction(c(TRUE, FALSE, TRUE), shock = 2)
     add_restriction = function(restriction, shock) {
       self$identification$add_restriction(restriction, shock)
-    }, # END get_normal
+    }, # END add_restriction
     
     #' @description
     #' Returns the logical value of whether the conditional shock distribution is normal.
@@ -760,13 +787,51 @@ specify_bsvarTVP = R6::R6Class(
     }, # END get_normal
     
     #' @description
+    #' Returns the number of Markov switching regimes.
+    #' 
+    #' @examples 
+    #' spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+    #' spec$get_M()
+    get_M = function() {
+      private$M
+    }, # END get_M
+    
+    #' @description
+    #' Returns the autoregressive lag order of the model.
+    #' 
+    #' @examples 
+    #' spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+    #' spec$get_p()
+    get_p = function() {
+      private$p
+    }, # END get_p
+    
+    #' @description
+    #' Returns the logical value of whether autoregressive matrix follows Markov switching.
+    #' 
+    #' @examples 
+    #' spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+    #' spec$get_msa()
+    get_msa = function() {
+      private$msa
+    }, # END get_msa
+    
+    #' @description
+    #' Returns the logical value of whether Markov switching is stationary 
+    #' (sparse is the alternative).
+    #' 
+    #' @examples 
+    #' spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+    #' spec$get_finiteM()
+    get_finiteM = function() {
+      private$finiteM
+    }, # END get_finiteM
+    
+    #' @description
     #' Returns the data matrices as the DataMatricesBSVAR object.
     #' 
     #' @examples 
-    #' spec = specify_bsvarTVP$new(
-    #'    data = us_fiscal_lsuw,
-    #'    p = 4
-    #' )
+    #' spec = specify_bsvarTVP$new(us_fiscal_lsuw)
     #' spec$get_data_matrices()
     get_data_matrices = function() {
       self$data_matrices$clone()
@@ -776,10 +841,7 @@ specify_bsvarTVP = R6::R6Class(
     #' Returns the identifying restrictions as the IdentificationBSVARTVIs object.
     #' 
     #' @examples 
-    #' spec = specify_bsvarTVP$new(
-    #'    data = us_fiscal_lsuw,
-    #'    p = 4
-    #' )
+    #' spec = specify_bsvarTVP$new(us_fiscal_lsuw)
     #' spec$get_identification()
     get_identification = function() {
       self$identification$clone()
@@ -789,10 +851,7 @@ specify_bsvarTVP = R6::R6Class(
     #' Returns the prior specification as the PriorBSVARTVP object.
     #' 
     #' @examples 
-    #' spec = specify_bsvarTVP$new(
-    #'    data = us_fiscal_lsuw,
-    #'    p = 4
-    #' )
+    #' spec = specify_bsvarTVP$new(us_fiscal_lsuw)
     #' spec$get_prior()
     get_prior = function() {
       self$prior$clone()
@@ -802,10 +861,7 @@ specify_bsvarTVP = R6::R6Class(
     #' Returns the starting values as the StartingValuesBSVAR object.
     #' 
     #' @examples 
-    #' spec = specify_bsvarTVP$new(
-    #'    data = us_fiscal_lsuw,
-    #'    p = 4
-    #' )
+    #' spec = specify_bsvarTVP$new(us_fiscal_lsuw)
     #' spec$get_starting_values()
     get_starting_values = function() {
       self$starting_values$clone()
@@ -816,14 +872,145 @@ specify_bsvarTVP = R6::R6Class(
 
 
 
-
-
-
-
-
-
-
-
+#' R6 Class Representing PosteriorBSVARTVP
+#'
+#' @description
+#' The class PosteriorBSVARTVP contains posterior output and the specification including 
+#' the last MCMC draw for the bsvarTVP model. 
+#' Note that due to the thinning of the MCMC output the starting value in element \code{last_draw}
+#' might not be equal to the last draw provided in element \code{posterior}.
+#' 
+#' @seealso \code{estimate}, \code{\link{specify_bsvarTVP}}
+#' 
+#' @examples 
+#' # This is a function that is used within estimate()
+#' specification  = specify_bsvarTVP$new(us_fiscal_lsuw)
+#' #posterior      = estimate(specification, 10)
+#' #class(posterior)
+#' 
+#' @export
+specify_posterior_bsvarTVP = R6::R6Class(
+  "PosteriorBSVARTVP",
+  
+  private = list(
+    normalised = FALSE
+  ), # END private
+  
+  public = list(
+    
+    #' @field last_draw an object of class BSVARTVP with the last draw of the current MCMC run as 
+    #' the starting value to be passed to the continuation of the MCMC estimation using \code{estimate()}. 
+    last_draw = list(),
+    
+    #' @field posterior a list containing Bayesian estimation output.
+    posterior = list(),
+    
+    #' @description
+    #' Create a new posterior output PosteriorBSVARTVP
+    #' @param specification_bsvar an object of class BSVARTVP with the last draw of the current 
+    #' MCMC run as the starting value.
+    #' @param posterior_bsvar a list containing Bayesian estimation output.
+    #' @return A posterior output PosteriorBSVARTVP
+    initialize = function(specification_bsvar, posterior_bsvar) {
+      
+      stopifnot("Argument specification_bsvar must be of class BSVARTVP." = any(class(specification_bsvar) == "BSVARTVP"))
+      stopifnot("Argument posterior_bsvar must must contain MCMC output." = is.list(posterior_bsvar) & is.array(posterior_bsvar$B) & is.array(posterior_bsvar$lambda) & is.array(posterior_bsvar$hyper))
+      
+      self$last_draw    = specification_bsvar
+      self$posterior    = posterior_bsvar
+    }, # END initialize
+    
+    #' @description
+    #' Returns a list containing Bayesian estimation output.
+    #' 
+    #' @examples 
+    #' specification  = specify_bsvarTVP$new(us_fiscal_lsuw)
+    #' #posterior      = estimate(specification, 10)
+    #' #posterior$get_posterior()
+    #' 
+    get_posterior       = function(){
+      self$posterior
+    }, # END get_posterior
+    
+    #' @description
+    #' Returns an object of class BSVARTVP with the last draw of the current MCMC run as 
+    #' the starting value to be passed to the continuation of the MCMC estimation using \code{estimate()}.
+    #' 
+    #' @examples
+    #' # specify the model
+    #' specification  = specify_bsvarTVP$new(us_fiscal_lsuw)
+    #' 
+    #' # run the burn-in
+    #' #burn_in        = estimate(specification, 10)
+    #' 
+    #' # estimate the model
+    #' #posterior      = estimate(burn_in, 10)
+    #' 
+    get_last_draw      = function(){
+      self$last_draw$clone()
+    }, # END get_last_draw
+    
+    #' @description
+    #' Returns \code{TRUE} if the posterior has been normalised using \code{normalise_posterior()} 
+    #' and \code{FALSE} otherwise.
+    #' 
+    #' @examples
+    #' # specify the model
+    #' specification  = specify_bsvarTVP$new(us_fiscal_lsuw)
+    #' 
+    #' # estimate the model
+    #' #posterior      = estimate(specification, 10, thin = 1)
+    #' 
+    #' # check normalisation status beforehand
+    #' #posterior$is_normalised()
+    #' 
+    #' # normalise the posterior
+    #' #BB            = posterior$last_draw$starting_values$B      # get the last draw of B
+    #' #B_hat         = diag((-1) * sign(diag(BB))) %*% BB         # set negative diagonal elements
+    #' #normalise_posterior(posterior, B_hat)                      # draws in posterior are normalised
+    #' 
+    #' # check normalisation status afterwards
+    #' #posterior$is_normalised()
+    #' 
+    is_normalised      = function(){
+      private$normalised
+    }, # END is_normalised
+    
+    #' @description
+    #' Sets the private indicator \code{normalised} to TRUE.
+    #' @param value (optional) a logical value to be passed to indicator \code{normalised}.
+    #' 
+    #' @examples
+    #' # This is an internal function that is run while executing normalise_posterior()
+    #' # Observe its working by analysing the workflow:
+    #' 
+    #' # specify the model
+    #' specification  = specify_bsvarTVP$new(us_fiscal_lsuw)
+    #' 
+    #' # estimate the model
+    #' #posterior      = estimate(specification, 10, thin = 1)
+    #' 
+    #' # check normalisation status beforehand
+    #' #posterior$is_normalised()
+    #' 
+    #' # normalise the posterior
+    #' #BB            = posterior$last_draw$starting_values$B      # get the last draw of B
+    #' #B_hat         = diag(sign(diag(BB))) %*% BB                # set positive diagonal elements
+    #' #normalise_posterior(posterior, B_hat)                      # draws in posterior are normalised
+    #' 
+    #' # check normalisation status afterwards
+    #' #posterior$is_normalised()
+    #' 
+    set_normalised     = function(value){
+      if (missing(value)) {
+        private$normalised <- TRUE
+      } else {
+        private$normalised <- value
+      }
+    } # END set_normalised
+    
+  ) # END public
+) # END specify_posterior_bsvarTVP
 
 
 
