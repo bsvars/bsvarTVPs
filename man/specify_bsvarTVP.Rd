@@ -25,11 +25,32 @@ spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_normal()
 
 ## ------------------------------------------------
+## Method `specify_bsvarTVP$get_sv`
+## ------------------------------------------------
+
+spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$get_sv()
+
+## ------------------------------------------------
 ## Method `specify_bsvarTVP$get_M`
 ## ------------------------------------------------
 
 spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_M()
+
+## ------------------------------------------------
+## Method `specify_bsvarTVP$get_estimate_hyper`
+## ------------------------------------------------
+
+spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$get_estimate_hyper()
+
+## ------------------------------------------------
+## Method `specify_bsvarTVP$get_finiteM`
+## ------------------------------------------------
+
+spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$get_finiteM()
 
 ## ------------------------------------------------
 ## Method `specify_bsvarTVP$get_p`
@@ -44,13 +65,6 @@ spec$get_p()
 
 spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_msa()
-
-## ------------------------------------------------
-## Method `specify_bsvarTVP$get_finiteM`
-## ------------------------------------------------
-
-spec = specify_bsvarTVP$new(us_fiscal_lsuw)
-spec$get_finiteM()
 
 ## ------------------------------------------------
 ## Method `specify_bsvarTVP$get_data_matrices`
@@ -100,10 +114,12 @@ StartingValuesBSVARTVPMSA with the starting values.}
 \item \href{#method-BSVARTVP-new}{\code{specify_bsvarTVP$new()}}
 \item \href{#method-BSVARTVP-add_restriction}{\code{specify_bsvarTVP$add_restriction()}}
 \item \href{#method-BSVARTVP-get_normal}{\code{specify_bsvarTVP$get_normal()}}
+\item \href{#method-BSVARTVP-get_sv}{\code{specify_bsvarTVP$get_sv()}}
 \item \href{#method-BSVARTVP-get_M}{\code{specify_bsvarTVP$get_M()}}
+\item \href{#method-BSVARTVP-get_estimate_hyper}{\code{specify_bsvarTVP$get_estimate_hyper()}}
+\item \href{#method-BSVARTVP-get_finiteM}{\code{specify_bsvarTVP$get_finiteM()}}
 \item \href{#method-BSVARTVP-get_p}{\code{specify_bsvarTVP$get_p()}}
 \item \href{#method-BSVARTVP-get_msa}{\code{specify_bsvarTVP$get_msa()}}
-\item \href{#method-BSVARTVP-get_finiteM}{\code{specify_bsvarTVP$get_finiteM()}}
 \item \href{#method-BSVARTVP-get_data_matrices}{\code{specify_bsvarTVP$get_data_matrices()}}
 \item \href{#method-BSVARTVP-get_identification}{\code{specify_bsvarTVP$get_identification()}}
 \item \href{#method-BSVARTVP-get_prior}{\code{specify_bsvarTVP$get_prior()}}
@@ -122,10 +138,11 @@ Create a new specification of the bsvarTVP model.
   p = 1L,
   M = 2L,
   B,
-  A,
   train_data = 0L,
   distribution = c("norm", "t"),
-  ms4A = FALSE,
+  volatility = c("SV", "homoskedastic"),
+  ms4ar = FALSE,
+  estimate_hyper = TRUE,
   exogenous = NULL,
   stationary = rep(FALSE, ncol(data)),
   finiteM = TRUE
@@ -145,10 +162,6 @@ Create a new specification of the bsvarTVP model.
 the structural matrix \eqn{B} to be estimated and value \code{FALSE} for exclusion restrictions 
 to be set to zero.}
 
-\item{\code{A}}{a logical \code{NxK} matrix containing value \code{TRUE} for the elements of 
-the autoregressive matrix \eqn{A} to be estimated and value \code{FALSE} for exclusion restrictions 
-to be set to zero.}
-
 \item{\code{train_data}}{a positive integer specifying the number of initial observations
 to be used as training sample to be used to train the prior distribution for \eqn{B}.}
 
@@ -156,8 +169,15 @@ to be used as training sample to be used to train the prior distribution for \eq
 of structural shocks. Value \code{"norm"} sets it to the normal distribution, 
 while value \code{"t"} sets the Student-t distribution.}
 
-\item{\code{ms4A}}{a logical value - if \code{TRUE} the Markov switching is implemented
+\item{\code{volatility}}{a character string specifying the process for conditional variances 
+of structural shocks. Value \code{"SV"} sets it to the non-centred Stochastic Volatility model, 
+while value \code{"homoskedastic"} sets it to time invariant specification.}
+
+\item{\code{ms4ar}}{a logical value - if \code{TRUE} the Markov switching is implemented
 in both matrices \eqn{A} and \eqn{B}, otherwise only in matrix \eqn{B}.}
+
+\item{\code{estimate_hyper}}{a logical value - if \code{TRUE} the hyper-parameters for the prior of \eqn{A} and \eqn{B}
+are estimated, otherwise they are fixed.}
 
 \item{\code{exogenous}}{a \code{(T+p)xd} matrix of exogenous variables.}
 
@@ -226,6 +246,26 @@ spec$get_normal()
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BSVARTVP-get_sv"></a>}}
+\if{latex}{\out{\hypertarget{method-BSVARTVP-get_sv}{}}}
+\subsection{Method \code{get_sv()}}{
+Returns the logical value of whether the shock conditional variances should 
+follow non-centred SV of be constant.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_sv()}\if{html}{\out{</div>}}
+}
+
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$get_sv()
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BSVARTVP-get_M"></a>}}
 \if{latex}{\out{\hypertarget{method-BSVARTVP-get_M}{}}}
 \subsection{Method \code{get_M()}}{
@@ -238,6 +278,46 @@ Returns the number of Markov switching regimes.
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_M()
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BSVARTVP-get_estimate_hyper"></a>}}
+\if{latex}{\out{\hypertarget{method-BSVARTVP-get_estimate_hyper}{}}}
+\subsection{Method \code{get_estimate_hyper()}}{
+Returns the logical value of whether to estimate the hyper-parameters
+(fixing them is the alternative).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_estimate_hyper()}\if{html}{\out{</div>}}
+}
+
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$get_estimate_hyper()
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BSVARTVP-get_finiteM"></a>}}
+\if{latex}{\out{\hypertarget{method-BSVARTVP-get_finiteM}{}}}
+\subsection{Method \code{get_finiteM()}}{
+Returns the logical value of whether Markov switching is stationary 
+(sparse is the alternative).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_finiteM()}\if{html}{\out{</div>}}
+}
+
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$get_finiteM()
 }
 \if{html}{\out{</div>}}
 
@@ -276,26 +356,6 @@ Returns the logical value of whether autoregressive matrix follows Markov switch
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_msa()
-}
-\if{html}{\out{</div>}}
-
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-BSVARTVP-get_finiteM"></a>}}
-\if{latex}{\out{\hypertarget{method-BSVARTVP-get_finiteM}{}}}
-\subsection{Method \code{get_finiteM()}}{
-Returns the logical value of whether Markov switching is stationary 
-(sparse is the alternative).
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_finiteM()}\if{html}{\out{</div>}}
-}
-
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
-spec$get_finiteM()
 }
 \if{html}{\out{</div>}}
 

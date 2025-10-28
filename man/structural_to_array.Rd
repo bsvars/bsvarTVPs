@@ -2,7 +2,8 @@
 % Please edit documentation in R/bsvarTVPTOOLs.R
 \name{structural_to_array}
 \alias{structural_to_array}
-\title{Extracts the posterior draws of the structural matrix \eqn{B} and returns the as an \code{array}}
+\title{Extracts the posterior draws of the structural matrix \eqn{B} and 
+returns the as an \code{array}}
 \usage{
 structural_to_array(posterior)
 }
@@ -13,11 +14,6 @@ structural_to_array(posterior)
 An array containing the posterior draws of the structural matrix \eqn{B}
 }
 \description{
-Extracts the posterior draws of the structural matrix \eqn{B} and returns the as an \code{array}
-}
-\references{
-Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, <doi:10.48550/arXiv.2502.19659>.
-}
-\author{
-Tomasz Woźniak \email{wozniak.tom@pm.me}
+Extracts the posterior draws of the structural matrix \eqn{B} 
+and returns the as an \code{array}
 }
