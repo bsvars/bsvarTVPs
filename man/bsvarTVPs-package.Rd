@@ -56,13 +56,16 @@ burn_in        = estimate(specification, 5)
 # estimate the model
 posterior      = estimate(burn_in, 10)
 
+# forecast 2 periods ahead
+forecasts      = forecast(posterior, horizon = 2)
+
 # workflow with the pipe |>
 ############################################################
 us_fiscal_lsuw |>
   specify_bsvarTVP$new() |>
   estimate(S = 5) |> 
   estimate(S = 10) -> posterior
-  
+posterior |> forecast(horizon = 2) -> forecasts
 }
 \references{
 Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, 
