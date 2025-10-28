@@ -18,6 +18,7 @@ LinkingTo:
     RcppProgress, 
     RcppTN
 Imports: 
+    generics,
     GIGrvg,
     HDInterval,
     R6,

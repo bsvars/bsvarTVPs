@@ -61,7 +61,8 @@
 #' @aliases bsvarTVPs-package bsvarTVPs
 #' @useDynLib bsvarTVPs, .registration = TRUE
 #' 
-#' @importFrom bsvars specify_data_matrices estimate forecast compute_impulse_responses compute_fitted_values compute_historical_decompositions compute_structural_shocks compute_variance_decompositions compute_regime_probabilities compute_conditional_sd
+#' @importFrom bsvars specify_data_matrices estimate compute_impulse_responses compute_fitted_values compute_historical_decompositions compute_structural_shocks compute_variance_decompositions compute_regime_probabilities compute_conditional_sd
+#' @importFrom generics forecast
 #' @importFrom HDInterval hdi
 #' @importFrom GIGrvg rgig
 #' @importFrom R6 R6Class
@@ -104,11 +105,14 @@
 #' # estimate the model
 #' posterior      = estimate(burn_in, 10)
 #' 
+#' # forecast 2 periods ahead
+#' forecasts      = forecast(posterior, horizon = 2)
+#' 
 #' # workflow with the pipe |>
 #' ############################################################
 #' us_fiscal_lsuw |>
 #'   specify_bsvarTVP$new() |>
 #'   estimate(S = 5) |> 
 #'   estimate(S = 10) -> posterior
-#'   
+#' posterior |> forecast(horizon = 2) -> forecasts
 NULL
