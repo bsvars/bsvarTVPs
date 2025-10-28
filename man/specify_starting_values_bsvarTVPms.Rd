@@ -4,7 +4,7 @@
 \alias{specify_starting_values_bsvarTVPms}
 \title{R6 Class Representing StartingValuesBSVARTVPMS}
 \description{
-The class StartingValuesBSVARTVPMS presents starting values for the homoskedastic bsvar model.
+The class StartingValuesBSVARTVPMS presents starting values for the bsvarTVP model.
 }
 \examples{
 # starting values for a model for a 3-variable system
@@ -112,7 +112,7 @@ the Student-t conditional distribution of structural shocks.}
 \subsection{Method \code{new()}}{
 Create new starting values StartingValuesBSVARTVPMS.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_starting_values_bsvarTVPms$new(A, B, N, M, T, p, d = 0)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{specify_starting_values_bsvarTVPms$new(A, B, N, M, T, p, d = 0, finiteM = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -135,6 +135,11 @@ to be set to zero.}
 \item{\code{p}}{a positive integer - the autoregressive lag order of the SVAR model.}
 
 \item{\code{d}}{a positive integer - the number of \code{exogenous} variables in the model.}
+
+\item{\code{finiteM}}{a logical value - if true a stationary Markov switching 
+model is estimated. Otherwise, a sparse Markov switching model is estimated 
+in which \code{M=20} and the number of visited states is estimated. The 
+value of \code{M} can be modified.}
 }
 \if{html}{\out{</div>}}
 }

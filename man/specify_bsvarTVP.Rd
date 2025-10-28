@@ -2,15 +2,12 @@
 % Please edit documentation in R/specify.R
 \name{specify_bsvarTVP}
 \alias{specify_bsvarTVP}
-\title{R6 Class representing the specification of the homoskedastic BSVAR model}
+\title{R6 Class representing the specification of the BSVARTVP model}
 \description{
-The class BSVAR presents complete specification for the homoskedastic bsvar model.
+The class BSVARTVP presents complete specification for the bsvarTVP model.
 }
 \examples{
-spec = specify_bsvarTVP$new(
-   data = us_fiscal_lsuw,
-   p = 4
-)
+spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 
 
 ## ------------------------------------------------
@@ -28,52 +25,64 @@ spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_normal()
 
 ## ------------------------------------------------
+## Method `specify_bsvarTVP$get_M`
+## ------------------------------------------------
+
+spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$get_M()
+
+## ------------------------------------------------
+## Method `specify_bsvarTVP$get_p`
+## ------------------------------------------------
+
+spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$get_p()
+
+## ------------------------------------------------
+## Method `specify_bsvarTVP$get_msa`
+## ------------------------------------------------
+
+spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$get_msa()
+
+## ------------------------------------------------
+## Method `specify_bsvarTVP$get_finiteM`
+## ------------------------------------------------
+
+spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$get_finiteM()
+
+## ------------------------------------------------
 ## Method `specify_bsvarTVP$get_data_matrices`
 ## ------------------------------------------------
 
-spec = specify_bsvarTVP$new(
-   data = us_fiscal_lsuw,
-   p = 4
-)
+spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_data_matrices()
 
 ## ------------------------------------------------
 ## Method `specify_bsvarTVP$get_identification`
 ## ------------------------------------------------
 
-spec = specify_bsvarTVP$new(
-   data = us_fiscal_lsuw,
-   p = 4
-)
+spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_identification()
 
 ## ------------------------------------------------
 ## Method `specify_bsvarTVP$get_prior`
 ## ------------------------------------------------
 
-spec = specify_bsvarTVP$new(
-   data = us_fiscal_lsuw,
-   p = 4
-)
+spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_prior()
 
 ## ------------------------------------------------
 ## Method `specify_bsvarTVP$get_starting_values`
 ## ------------------------------------------------
 
-spec = specify_bsvarTVP$new(
-   data = us_fiscal_lsuw,
-   p = 4
-)
+spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_starting_values()
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{p}}{a non-negative integer specifying the autoregressive lag order of the model.}
-
-\item{\code{M}}{a positive integer specifying the number of Markov regimes in the model.}
-
 \item{\code{identification}}{an object IdentificationBSVARTVIs with the identifying restrictions.}
 
 \item{\code{prior}}{an object PriorBSVARTVP with the prior specification.}
@@ -91,6 +100,10 @@ StartingValuesBSVARTVPMSA with the starting values.}
 \item \href{#method-BSVARTVP-new}{\code{specify_bsvarTVP$new()}}
 \item \href{#method-BSVARTVP-add_restriction}{\code{specify_bsvarTVP$add_restriction()}}
 \item \href{#method-BSVARTVP-get_normal}{\code{specify_bsvarTVP$get_normal()}}
+\item \href{#method-BSVARTVP-get_M}{\code{specify_bsvarTVP$get_M()}}
+\item \href{#method-BSVARTVP-get_p}{\code{specify_bsvarTVP$get_p()}}
+\item \href{#method-BSVARTVP-get_msa}{\code{specify_bsvarTVP$get_msa()}}
+\item \href{#method-BSVARTVP-get_finiteM}{\code{specify_bsvarTVP$get_finiteM()}}
 \item \href{#method-BSVARTVP-get_data_matrices}{\code{specify_bsvarTVP$get_data_matrices()}}
 \item \href{#method-BSVARTVP-get_identification}{\code{specify_bsvarTVP$get_identification()}}
 \item \href{#method-BSVARTVP-get_prior}{\code{specify_bsvarTVP$get_prior()}}
@@ -102,7 +115,7 @@ StartingValuesBSVARTVPMSA with the starting values.}
 \if{html}{\out{<a id="method-BSVARTVP-new"></a>}}
 \if{latex}{\out{\hypertarget{method-BSVARTVP-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new specification of the homoskedastic bsvar model BSVAR.
+Create a new specification of the bsvarTVP model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$new(
   data,
@@ -114,7 +127,8 @@ Create a new specification of the homoskedastic bsvar model BSVAR.
   distribution = c("norm", "t"),
   ms4A = FALSE,
   exogenous = NULL,
-  stationary = rep(FALSE, ncol(data))
+  stationary = rep(FALSE, ncol(data)),
+  finiteM = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -150,11 +164,15 @@ in both matrices \eqn{A} and \eqn{B}, otherwise only in matrix \eqn{B}.}
 \item{\code{stationary}}{an \code{N} logical vector - its element set to \code{FALSE} sets 
 the prior mean for the autoregressive parameters of the \code{N}th equation to the white noise process, 
 otherwise to random walk.}
+
+\item{\code{finiteM}}{a logical value - if true a stationary Markov switching 
+model is estimated. Otherwise, a sparse Markov switching model is estimated 
+in which \code{M=20} and the number of visited states is estimated.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new complete specification for the homoskedastic bsvar model BSVAR.
+A new complete specification for the bsvarTVP model.
 }
 }
 \if{html}{\out{<hr>}}
@@ -208,6 +226,83 @@ spec$get_normal()
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BSVARTVP-get_M"></a>}}
+\if{latex}{\out{\hypertarget{method-BSVARTVP-get_M}{}}}
+\subsection{Method \code{get_M()}}{
+Returns the number of Markov switching regimes.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_M()}\if{html}{\out{</div>}}
+}
+
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$get_M()
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BSVARTVP-get_p"></a>}}
+\if{latex}{\out{\hypertarget{method-BSVARTVP-get_p}{}}}
+\subsection{Method \code{get_p()}}{
+Returns the autoregressive lag order of the model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_p()}\if{html}{\out{</div>}}
+}
+
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$get_p()
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BSVARTVP-get_msa"></a>}}
+\if{latex}{\out{\hypertarget{method-BSVARTVP-get_msa}{}}}
+\subsection{Method \code{get_msa()}}{
+Returns the logical value of whether autoregressive matrix follows Markov switching.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_msa()}\if{html}{\out{</div>}}
+}
+
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$get_msa()
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BSVARTVP-get_finiteM"></a>}}
+\if{latex}{\out{\hypertarget{method-BSVARTVP-get_finiteM}{}}}
+\subsection{Method \code{get_finiteM()}}{
+Returns the logical value of whether Markov switching is stationary 
+(sparse is the alternative).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_finiteM()}\if{html}{\out{</div>}}
+}
+
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$get_finiteM()
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BSVARTVP-get_data_matrices"></a>}}
 \if{latex}{\out{\hypertarget{method-BSVARTVP-get_data_matrices}{}}}
 \subsection{Method \code{get_data_matrices()}}{
@@ -218,10 +313,7 @@ Returns the data matrices as the DataMatricesBSVAR object.
 
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{spec = specify_bsvarTVP$new(
-   data = us_fiscal_lsuw,
-   p = 4
-)
+\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_data_matrices()
 }
 \if{html}{\out{</div>}}
@@ -240,10 +332,7 @@ Returns the identifying restrictions as the IdentificationBSVARTVIs object.
 
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{spec = specify_bsvarTVP$new(
-   data = us_fiscal_lsuw,
-   p = 4
-)
+\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_identification()
 }
 \if{html}{\out{</div>}}
@@ -262,10 +351,7 @@ Returns the prior specification as the PriorBSVARTVP object.
 
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{spec = specify_bsvarTVP$new(
-   data = us_fiscal_lsuw,
-   p = 4
-)
+\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_prior()
 }
 \if{html}{\out{</div>}}
@@ -284,10 +370,7 @@ Returns the starting values as the StartingValuesBSVAR object.
 
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{spec = specify_bsvarTVP$new(
-   data = us_fiscal_lsuw,
-   p = 4
-)
+\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_starting_values()
 }
 \if{html}{\out{</div>}}

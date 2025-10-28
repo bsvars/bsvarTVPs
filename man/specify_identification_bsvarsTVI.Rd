@@ -4,7 +4,8 @@
 \alias{specify_identification_bsvarsTVI}
 \title{R6 Class Representing IdentificationBSVARTVIs}
 \description{
-The class IdentificationBSVARTVIs presents the identifying restrictions for the bsvar models.
+The class IdentificationBSVARTVIs presents the identifying restrictions for 
+the bsvarTVP models.
 }
 \examples{
 specify_identification_bsvarsTVI$new(N = 3, K = 4) # recursive specification for a 3-variable system

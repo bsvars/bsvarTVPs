@@ -148,7 +148,7 @@ prior$A # show autoregressive prior mean
 \if{html}{\out{<a id="method-PriorBSVARTVP-get_prior"></a>}}
 \if{latex}{\out{\hypertarget{method-PriorBSVARTVP-get_prior}{}}}
 \subsection{Method \code{get_prior()}}{
-Returns the elements of the prior specification PriorBSVAR as a \code{list}.
+Returns the elements of the prior specification PriorBSVARTVP as a \code{list}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{specify_prior_bsvarTVP$get_prior()}\if{html}{\out{</div>}}
 }
