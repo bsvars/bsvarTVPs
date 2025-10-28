@@ -96,23 +96,16 @@
 #' @examples
 #' # simple workflow
 #' ############################################################
-#' # specify the model
-#' specification  = specify_bsvarTVP$new(us_fiscal_lsuw)
-#' 
-#' # run the burn-in
-#' burn_in        = estimate(specification, 5)
-#' 
-#' # estimate the model
-#' posterior      = estimate(burn_in, 10)
-#' 
-#' # forecast 2 periods ahead
-#' forecasts      = forecast(posterior, horizon = 2)
+#' spec   = specify_bsvarTVP$new(us_fiscal_lsuw)    # specify the model
+#' burn   = estimate(spec, 5)                       # run the burn-in for convergence
+#' post   = estimate(burn, 10)                      # estimate the model
+#' fore   = forecast(post, horizon = 2)             # forecast 2 periods ahead
 #' 
 #' # workflow with the pipe |>
 #' ############################################################
 #' us_fiscal_lsuw |>
 #'   specify_bsvarTVP$new() |>
 #'   estimate(S = 5) |> 
-#'   estimate(S = 10) -> posterior
-#' posterior |> forecast(horizon = 2) -> forecasts
+#'   estimate(S = 10) -> post
+#' post |> forecast(horizon = 2) -> fore
 NULL

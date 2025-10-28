@@ -72,21 +72,16 @@ Lütkepohl, Shang, Uzeda, and Woźniak (2025) or homoskedastic.
 \examples{
 # simple workflow
 ############################################################
-# specify the model
-specification  = specify_bsvarTVP$new(us_fiscal_lsuw)
-
-# run the burn-in
-burn_in        = estimate(specification, 5)
-
-# estimate the model
-posterior      = estimate(burn_in, 10)
+spec   = specify_bsvarTVP$new(us_fiscal_lsuw)    # specify the model
+burn   = estimate(spec, 5)                       # run the burn-in for convergence
+post   = estimate(burn, 10)                      # estimate the model
 
 # workflow with the pipe |>
 ############################################################
 us_fiscal_lsuw |>
   specify_bsvarTVP$new() |>
   estimate(S = 5) |> 
-  estimate(S = 10) -> posterior
+  estimate(S = 10) -> post
   
 }
 \references{
