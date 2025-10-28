@@ -1,6 +1,7 @@
 
 #include <RcppArmadillo.h>
 #include "progress.hpp"
+#include "bsvars.h"
 
 #include "sample_ABhyper.h"
 #include "sample_sv_ms.h"
@@ -23,28 +24,28 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     const int                     sv_select = 1,        // {1 - non-centred, 2 - centred, 3 - homoskedastic};
     const int                     hyper_select = 1,     // {1 - horseshoe, 2 - boost, 3 - fixed}
     const bool                    finiteM = true,       // {true - stationary MS, false - overfitted};
-    const bool                    studentt = false      // {true - normal, false - Student-t};
+    const bool                    studentt = false,     // {true - normal, false - Student-t};
+    const bool                    show_progress = true
 ) {
   
   // Progress bar setup
   vec prog_rep_points = arma::round(arma::linspace(0, SS, 50));
-  Rcout << "**************************************************|" << endl;
-  Rcout << "bsvarTVPs: Bayesian Structural VARs with          |" << endl;
-  Rcout << "  Markov-Switching, Time-Varying Identification   |" << endl;
-  Rcout << "  and Stochastic Volatility                       |" << endl;
-  Rcout << "**************************************************|" << endl;
-  Rcout << " Gibbs sampler for the SVAR-SV model              |" << endl;
-  Rcout << "    with Markov-switching and regime-specific     |" << endl;
-  Rcout << "    time-varying identification                   |" << endl;
-  Rcout << "    for the structural matrix                     |" << endl;
-  if ( studentt ) {
-  Rcout << "    and Student-t structural shocks               |" << endl;
+  
+  std::string oo = "";
+  if ( thin != 1 ) {
+    oo      = bsvars::ordinal(thin) + " ";
   }
-  Rcout << "**************************************************|" << endl;
-  Rcout << " Progress of the MCMC simulation for " << SS << " draws" << endl;
-  Rcout << "    Every " << thin << "th draw is saved via MCMC thinning" << endl;
-  Rcout << " Press Esc to interrupt the computations" << endl;
-  Rcout << "**************************************************|" << endl;
+  
+  if (show_progress) {
+    Rcout << "**************************************************|" << endl;
+    Rcout << " bsvarTVPs: Bayesian Structural VARs              |" << endl;
+    Rcout << "            with Time-Varying Identification      |" << endl;
+    Rcout << "**************************************************|" << endl;
+    Rcout << " Progress of the MCMC simulation for " << SS << " draws" << endl;
+    Rcout << "    Every " << oo << "draw is saved via MCMC thinning" << endl;
+    Rcout << " Press Esc to interrupt the computations" << endl;
+    Rcout << "**************************************************|" << endl;
+  }
   Progress p(50, true);
   
   const int   T     = Y.n_cols;
@@ -55,7 +56,6 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
   // aux_lambda_sqrt = sqrt(aux_lambda)
   // aux_sigma - contains time-varying sds
   // aux_hetero - contains the diagonal of the covariance of conditional normal aux_hetero = aux_sigma * aux_lambda_sqrt
-  
   cube  aux_B       = as<cube>(starting_values["B"]);
   mat   aux_A       = as<mat>(starting_values["A"]);
   List  aux_hyper   = as<List>(starting_values["hyper"]);  // (2*N+1)x2 (gamma_0, gamma_+, s_0, s_+, s_)
@@ -126,14 +126,14 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
   int   s = 0;
   
   for (int ss=0; ss<SS; ss++) {
-    Rcout<<" s: "<<s<<endl;
+    // Rcout<<" s: "<<s<<endl;
     // Increment progress bar
     if (any(prog_rep_points == ss)) p.increment();
     // Check for user interrupts
     if (ss % 200 == 0) checkUserInterrupt();
     
     // sample aux_lambda and aux_df
-    Rcout<<" sample aux_lambda and aux_df"<<endl;
+    // Rcout<<" sample aux_lambda and aux_df"<<endl;
     mat E             = (Y - aux_A * X);
     if ( studentt ) {
       
@@ -154,7 +154,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     } // END studentt
     
     // sample aux_xi
-    Rcout<<" sample aux_xi"<<endl;
+    // Rcout<<" sample aux_xi"<<endl;
     cube Z(N, T, M);
     for (int m=0; m<M; m++) {
       Z.slice(m)        = aux_B.slice(m) * (Y - aux_A * X);
@@ -178,13 +178,13 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     }    
     
     // sample aux_PR_TR and aux_pi_0
-    Rcout<<" sample aux_PR_TR and aux_pi_0"<<endl;
+    // Rcout<<" sample aux_PR_TR and aux_pi_0"<<endl;
     PR_TR_tmp         = sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
     aux_PR_TR         = as<mat>(PR_TR_tmp["aux_PR_TR"]);
     aux_pi_0          = as<vec>(PR_TR_tmp["aux_pi_0"]);
     
     // sample aux_hyper
-    Rcout<<" sample aux_hyper"<<endl;
+    // Rcout<<" sample aux_hyper"<<endl;
     if ( hyper_select == 1 ) {
 
       try {
@@ -202,7 +202,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
       precisionA      = hyper2precisionA_boost(aux_hyper, prior);
 
     } else if ( hyper_select == 3 ) {
-
+  
       aux_hyper       = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, false);
       precisionB      = hyper2precisionB_mss_boost(aux_hyper, prior);
       precisionA      = hyper2precisionA_boost(aux_hyper, prior);
@@ -210,17 +210,17 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     }
     
     // sample aux_B
-    Rcout<<" sample aux_B"<<endl;
+    // Rcout<<" sample aux_B"<<endl;
     BSL               = sample_B_mss_s4(aux_B, aux_SL, aux_A, precisionB, aux_hetero, aux_xi, Y, X, prior, VB);
     aux_B             = as<cube>(BSL["aux_B"]);
     aux_SL            = as<imat>(BSL["aux_SL"]);
     
     // sample aux_A
-    Rcout<<" sample aux_A"<<endl;
+    // Rcout<<" sample aux_A"<<endl;
     aux_A             = sample_A_heterosk1_mss(aux_A, aux_B, aux_xi, precisionA, aux_hetero, Y, X, prior);
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
-    Rcout<<" sample aux_h, aux_omega and aux_S, aux_sigma2_omega"<<endl;
+    // Rcout<<" sample aux_h, aux_omega and aux_S, aux_sigma2_omega"<<endl;
     if ( sv_select != 3 ) {
       
       mat U(N, T);
@@ -313,7 +313,8 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
       _["df"]       = aux_df
     ),
     _["posterior"]  = List::create(
-      _["B"]        = posterior_B,
+      _["B_cpp"]    = posterior_B,
+      _["A_cpp"]    = posterior_A,
       _["A"]        = posterior_A,
       _["hyper"]    = posterior_hyper,
       _["PR_TR"]    = posterior_PR_TR,

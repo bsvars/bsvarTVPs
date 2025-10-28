@@ -1,6 +1,7 @@
 
 #include <RcppArmadillo.h>
 #include "progress.hpp"
+#include "bsvars.h"
 
 #include "sample_ABhyper.h"
 #include "sample_sv_ms.h"
@@ -23,28 +24,27 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     const int                     sv_select = 1,        // {1 - non-centred, 2 - centred, 3 - homoskedastic};
     const int                     hyper_select = 1,     // {1 - horseshoe, 2 - boost, 3 - fixed}
     const bool                    finiteM = true,       // {true - stationary MS, false - overfitted};
-    const bool                    studentt = false      // {true - normal, false - Student-t};
+    const bool                    studentt = false,     // {true - normal, false - Student-t};
+    const bool                    show_progress = true
 ) {
   // // Progress bar setup
   vec prog_rep_points = arma::round(arma::linspace(0, SS, 50));
-  Rcout << "**************************************************|" << endl;
-  Rcout << "bsvarTVPs: Bayesian Structural VARs with          |" << endl;
-  Rcout << "  Markov-Switching, Time-Varying Identification   |" << endl;
-  Rcout << "  and Stochastic Volatility                       |" << endl;
-  Rcout << "**************************************************|" << endl;
-  Rcout << " Gibbs sampler for the SVAR-SV model              |" << endl;
-  Rcout << "    with Markov-switching in autoregressive and   |" << endl;
-  Rcout << "    structural matrices and with regime-specific  |" << endl;
-  Rcout << "    time-varying identification                   |" << endl;
-  Rcout << "    for the structural matrix                     |" << endl;
-  if ( studentt ) {
-    Rcout << "    and Student-t structural shocks               |" << endl;
+  
+  std::string oo = "";
+  if ( thin != 1 ) {
+    oo      = bsvars::ordinal(thin) + " ";
   }
-  Rcout << "**************************************************|" << endl;
-  Rcout << " Progress of the MCMC simulation for " << SS << " draws" << endl;
-  Rcout << "    Every " << thin << "th draw is saved via MCMC thinning" << endl;
-  Rcout << " Press Esc to interrupt the computations" << endl;
-  Rcout << "**************************************************|" << endl;
+  
+  if (show_progress) {
+    Rcout << "**************************************************|" << endl;
+    Rcout << " bsvarTVPs: Bayesian Structural VARs              |" << endl;
+    Rcout << "            with Time-Varying Identification      |" << endl;
+    Rcout << "**************************************************|" << endl;
+    Rcout << " Progress of the MCMC simulation for " << SS << " draws" << endl;
+    Rcout << "    Every " << oo << "draw is saved via MCMC thinning" << endl;
+    Rcout << " Press Esc to interrupt the computations" << endl;
+    Rcout << "**************************************************|" << endl;
+  }
   Progress p(50, true);
   
   const int   T     = Y.n_cols;
@@ -297,8 +297,8 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
       _["df"]       = aux_df
     ),
     _["posterior"]  = List::create(
-      _["B"]        = posterior_B,
-      _["A"]        = posterior_A,
+      _["B_cpp"]    = posterior_B,
+      _["A_cpp"]    = posterior_A,
       _["hyper"]    = posterior_hyper,
       _["PR_TR"]    = posterior_PR_TR,
       _["pi_0"]     = posterior_pi_0,
