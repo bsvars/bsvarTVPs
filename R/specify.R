@@ -291,6 +291,12 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
         M = 20
       }
       
+      if (M > 1) {
+        xi    = diag(M)[,sample(1:M, T, replace = TRUE)]
+      } else {
+        xi    = matrix(1, M, T)
+      }
+      
       K                   = N * p + 1 + d
       self$B              = array(0, c(N, N, M))
       for (m in 1:M) {
@@ -316,7 +322,7 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
       self$s_             = rep(0.05, N)
       
       self$PR_TR          = matrix(0.1 / M, M, M) + 0.9 * diag(M)
-      self$xi             = diag(M)[,sample(1:M, T, replace = TRUE)]
+      self$xi             = xi
       self$pi_0           = rep(1/M, M)
     }, # END initialize
     
