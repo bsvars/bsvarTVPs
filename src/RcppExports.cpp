@@ -755,8 +755,8 @@ RcppExport SEXP _bsvarTVPs_bsvar_mssa_tvi_sv_cpp(SEXP SSSEXP, SEXP YSEXP, SEXP X
     return rcpp_result_gen;
 }
 // forecast_mssa_sv
-Rcpp::List forecast_mssa_sv(arma::field<arma::cube>& posterior_B, arma::field<arma::cube>& posterior_A, arma::cube& posterior_PR_TR, arma::mat& posterior_xi_T, arma::mat& posterior_h_T, arma::mat& posterior_rho, arma::cube& posterior_omega, arma::vec& X_T, const int& horizon, const bool non_explosive);
-static SEXP _bsvarTVPs_forecast_mssa_sv_try(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP posterior_PR_TRSEXP, SEXP posterior_xi_TSEXP, SEXP posterior_h_TSEXP, SEXP posterior_rhoSEXP, SEXP posterior_omegaSEXP, SEXP X_TSEXP, SEXP horizonSEXP, SEXP non_explosiveSEXP) {
+Rcpp::List forecast_mssa_sv(arma::field<arma::cube>& posterior_B, arma::field<arma::cube>& posterior_A, arma::cube& posterior_PR_TR, arma::mat& posterior_xi_T, arma::mat& posterior_h_T, arma::mat& posterior_rho, arma::cube& posterior_omega, arma::cube& posterior_df, arma::vec& X_T, arma::mat& exogenous_forecast, const int& horizon, const int sv_select, const bool studentt);
+static SEXP _bsvarTVPs_forecast_mssa_sv_try(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP posterior_PR_TRSEXP, SEXP posterior_xi_TSEXP, SEXP posterior_h_TSEXP, SEXP posterior_rhoSEXP, SEXP posterior_omegaSEXP, SEXP posterior_dfSEXP, SEXP X_TSEXP, SEXP exogenous_forecastSEXP, SEXP horizonSEXP, SEXP sv_selectSEXP, SEXP studenttSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< arma::field<arma::cube>& >::type posterior_B(posterior_BSEXP);
@@ -766,18 +766,21 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat& >::type posterior_h_T(posterior_h_TSEXP);
     Rcpp::traits::input_parameter< arma::mat& >::type posterior_rho(posterior_rhoSEXP);
     Rcpp::traits::input_parameter< arma::cube& >::type posterior_omega(posterior_omegaSEXP);
+    Rcpp::traits::input_parameter< arma::cube& >::type posterior_df(posterior_dfSEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type X_T(X_TSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type exogenous_forecast(exogenous_forecastSEXP);
     Rcpp::traits::input_parameter< const int& >::type horizon(horizonSEXP);
-    Rcpp::traits::input_parameter< const bool >::type non_explosive(non_explosiveSEXP);
-    rcpp_result_gen = Rcpp::wrap(forecast_mssa_sv(posterior_B, posterior_A, posterior_PR_TR, posterior_xi_T, posterior_h_T, posterior_rho, posterior_omega, X_T, horizon, non_explosive));
+    Rcpp::traits::input_parameter< const int >::type sv_select(sv_selectSEXP);
+    Rcpp::traits::input_parameter< const bool >::type studentt(studenttSEXP);
+    rcpp_result_gen = Rcpp::wrap(forecast_mssa_sv(posterior_B, posterior_A, posterior_PR_TR, posterior_xi_T, posterior_h_T, posterior_rho, posterior_omega, posterior_df, X_T, exogenous_forecast, horizon, sv_select, studentt));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _bsvarTVPs_forecast_mssa_sv(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP posterior_PR_TRSEXP, SEXP posterior_xi_TSEXP, SEXP posterior_h_TSEXP, SEXP posterior_rhoSEXP, SEXP posterior_omegaSEXP, SEXP X_TSEXP, SEXP horizonSEXP, SEXP non_explosiveSEXP) {
+RcppExport SEXP _bsvarTVPs_forecast_mssa_sv(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP posterior_PR_TRSEXP, SEXP posterior_xi_TSEXP, SEXP posterior_h_TSEXP, SEXP posterior_rhoSEXP, SEXP posterior_omegaSEXP, SEXP posterior_dfSEXP, SEXP X_TSEXP, SEXP exogenous_forecastSEXP, SEXP horizonSEXP, SEXP sv_selectSEXP, SEXP studenttSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_forecast_mssa_sv_try(posterior_BSEXP, posterior_ASEXP, posterior_PR_TRSEXP, posterior_xi_TSEXP, posterior_h_TSEXP, posterior_rhoSEXP, posterior_omegaSEXP, X_TSEXP, horizonSEXP, non_explosiveSEXP));
+        rcpp_result_gen = PROTECT(_bsvarTVPs_forecast_mssa_sv_try(posterior_BSEXP, posterior_ASEXP, posterior_PR_TRSEXP, posterior_xi_TSEXP, posterior_h_TSEXP, posterior_rhoSEXP, posterior_omegaSEXP, posterior_dfSEXP, X_TSEXP, exogenous_forecastSEXP, horizonSEXP, sv_selectSEXP, studenttSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -798,8 +801,8 @@ RcppExport SEXP _bsvarTVPs_forecast_mssa_sv(SEXP posterior_BSEXP, SEXP posterior
     return rcpp_result_gen;
 }
 // forecast_mss_sv
-Rcpp::List forecast_mss_sv(arma::field<arma::cube>& posterior_B, arma::cube& posterior_A, arma::cube& posterior_PR_TR, arma::mat& posterior_xi_T, arma::mat& posterior_h_T, arma::mat& posterior_rho, arma::cube& posterior_omega, arma::vec& X_T, const int& horizon, const bool non_explosive);
-static SEXP _bsvarTVPs_forecast_mss_sv_try(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP posterior_PR_TRSEXP, SEXP posterior_xi_TSEXP, SEXP posterior_h_TSEXP, SEXP posterior_rhoSEXP, SEXP posterior_omegaSEXP, SEXP X_TSEXP, SEXP horizonSEXP, SEXP non_explosiveSEXP) {
+Rcpp::List forecast_mss_sv(arma::field<arma::cube>& posterior_B, arma::cube& posterior_A, arma::cube& posterior_PR_TR, arma::mat& posterior_xi_T, arma::mat& posterior_h_T, arma::mat& posterior_rho, arma::cube& posterior_omega, arma::cube& posterior_df, arma::vec& X_T, arma::mat& exogenous_forecast, const int& horizon, const int sv_select, const bool studentt);
+static SEXP _bsvarTVPs_forecast_mss_sv_try(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP posterior_PR_TRSEXP, SEXP posterior_xi_TSEXP, SEXP posterior_h_TSEXP, SEXP posterior_rhoSEXP, SEXP posterior_omegaSEXP, SEXP posterior_dfSEXP, SEXP X_TSEXP, SEXP exogenous_forecastSEXP, SEXP horizonSEXP, SEXP sv_selectSEXP, SEXP studenttSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< arma::field<arma::cube>& >::type posterior_B(posterior_BSEXP);
@@ -809,18 +812,21 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat& >::type posterior_h_T(posterior_h_TSEXP);
     Rcpp::traits::input_parameter< arma::mat& >::type posterior_rho(posterior_rhoSEXP);
     Rcpp::traits::input_parameter< arma::cube& >::type posterior_omega(posterior_omegaSEXP);
+    Rcpp::traits::input_parameter< arma::cube& >::type posterior_df(posterior_dfSEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type X_T(X_TSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type exogenous_forecast(exogenous_forecastSEXP);
     Rcpp::traits::input_parameter< const int& >::type horizon(horizonSEXP);
-    Rcpp::traits::input_parameter< const bool >::type non_explosive(non_explosiveSEXP);
-    rcpp_result_gen = Rcpp::wrap(forecast_mss_sv(posterior_B, posterior_A, posterior_PR_TR, posterior_xi_T, posterior_h_T, posterior_rho, posterior_omega, X_T, horizon, non_explosive));
+    Rcpp::traits::input_parameter< const int >::type sv_select(sv_selectSEXP);
+    Rcpp::traits::input_parameter< const bool >::type studentt(studenttSEXP);
+    rcpp_result_gen = Rcpp::wrap(forecast_mss_sv(posterior_B, posterior_A, posterior_PR_TR, posterior_xi_T, posterior_h_T, posterior_rho, posterior_omega, posterior_df, X_T, exogenous_forecast, horizon, sv_select, studentt));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _bsvarTVPs_forecast_mss_sv(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP posterior_PR_TRSEXP, SEXP posterior_xi_TSEXP, SEXP posterior_h_TSEXP, SEXP posterior_rhoSEXP, SEXP posterior_omegaSEXP, SEXP X_TSEXP, SEXP horizonSEXP, SEXP non_explosiveSEXP) {
+RcppExport SEXP _bsvarTVPs_forecast_mss_sv(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP posterior_PR_TRSEXP, SEXP posterior_xi_TSEXP, SEXP posterior_h_TSEXP, SEXP posterior_rhoSEXP, SEXP posterior_omegaSEXP, SEXP posterior_dfSEXP, SEXP X_TSEXP, SEXP exogenous_forecastSEXP, SEXP horizonSEXP, SEXP sv_selectSEXP, SEXP studenttSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_forecast_mss_sv_try(posterior_BSEXP, posterior_ASEXP, posterior_PR_TRSEXP, posterior_xi_TSEXP, posterior_h_TSEXP, posterior_rhoSEXP, posterior_omegaSEXP, X_TSEXP, horizonSEXP, non_explosiveSEXP));
+        rcpp_result_gen = PROTECT(_bsvarTVPs_forecast_mss_sv_try(posterior_BSEXP, posterior_ASEXP, posterior_PR_TRSEXP, posterior_xi_TSEXP, posterior_h_TSEXP, posterior_rhoSEXP, posterior_omegaSEXP, posterior_dfSEXP, X_TSEXP, exogenous_forecastSEXP, horizonSEXP, sv_selectSEXP, studenttSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -2438,8 +2444,8 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
         signatures.insert("arma::vec(*bsvars_normalisation_wz20031_diag)(arma::mat,const arma::mat&)");
         signatures.insert("Rcpp::List(*bsvar_mss_tvi_sv_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int,const int,const int,const bool,const bool,const bool)");
         signatures.insert("Rcpp::List(*bsvar_mssa_tvi_sv_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int,const int,const int,const bool,const bool,const bool)");
-        signatures.insert("Rcpp::List(*forecast_mssa_sv)(arma::field<arma::cube>&,arma::field<arma::cube>&,arma::cube&,arma::mat&,arma::mat&,arma::mat&,arma::cube&,arma::vec&,const int&,const bool)");
-        signatures.insert("Rcpp::List(*forecast_mss_sv)(arma::field<arma::cube>&,arma::cube&,arma::cube&,arma::mat&,arma::mat&,arma::mat&,arma::cube&,arma::vec&,const int&,const bool)");
+        signatures.insert("Rcpp::List(*forecast_mssa_sv)(arma::field<arma::cube>&,arma::field<arma::cube>&,arma::cube&,arma::mat&,arma::mat&,arma::mat&,arma::cube&,arma::cube&,arma::vec&,arma::mat&,const int&,const int,const bool)");
+        signatures.insert("Rcpp::List(*forecast_mss_sv)(arma::field<arma::cube>&,arma::cube&,arma::cube&,arma::mat&,arma::mat&,arma::mat&,arma::cube&,arma::cube&,arma::vec&,arma::mat&,const int&,const int,const bool)");
         signatures.insert("arma::mat(*orthogonal_complement_matrix_TW)(const arma::mat&)");
         signatures.insert("arma::mat(*sample_B_heterosk1)(arma::mat,const arma::mat&,arma::field<arma::mat>,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
         signatures.insert("Rcpp::List(*sample_B_heterosk1_s4)(arma::mat,arma::ivec,const arma::mat&,arma::field<arma::mat>,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
@@ -2575,8 +2581,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bsvarTVPs_bsvars_normalisation_wz20031_diag", (DL_FUNC) &_bsvarTVPs_bsvars_normalisation_wz20031_diag, 2},
     {"_bsvarTVPs_bsvar_mss_tvi_sv_cpp", (DL_FUNC) &_bsvarTVPs_bsvar_mss_tvi_sv_cpp, 12},
     {"_bsvarTVPs_bsvar_mssa_tvi_sv_cpp", (DL_FUNC) &_bsvarTVPs_bsvar_mssa_tvi_sv_cpp, 12},
-    {"_bsvarTVPs_forecast_mssa_sv", (DL_FUNC) &_bsvarTVPs_forecast_mssa_sv, 10},
-    {"_bsvarTVPs_forecast_mss_sv", (DL_FUNC) &_bsvarTVPs_forecast_mss_sv, 10},
+    {"_bsvarTVPs_forecast_mssa_sv", (DL_FUNC) &_bsvarTVPs_forecast_mssa_sv, 13},
+    {"_bsvarTVPs_forecast_mss_sv", (DL_FUNC) &_bsvarTVPs_forecast_mss_sv, 13},
     {"_bsvarTVPs_orthogonal_complement_matrix_TW", (DL_FUNC) &_bsvarTVPs_orthogonal_complement_matrix_TW, 1},
     {"_bsvarTVPs_sample_B_heterosk1", (DL_FUNC) &_bsvarTVPs_sample_B_heterosk1, 8},
     {"_bsvarTVPs_sample_B_heterosk1_s4", (DL_FUNC) &_bsvarTVPs_sample_B_heterosk1_s4, 9},
