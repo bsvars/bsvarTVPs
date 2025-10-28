@@ -298,8 +298,9 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
       }
       self$A              = matrix(0, N, K)
       diag(self$A)[diag(A[,1:N])] = runif(sum(diag(A[,1:N])))
-      self$hyper          = matrix(10, 2 * N + 1, 2)
-      
+      self$hyper          = list(
+        aux_hyper = matrix(10, 2 * N + 1, 2)
+      )
       self$S4_indicator   = matrix(1, N, M) 
       self$sigma          = matrix(1, N, T)
       
@@ -308,13 +309,13 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
       
       self$h              = matrix(rnorm(N * T, sd = .01), N, T)
       self$rho            = rep(.5, N)
-      self$omega          = rep(.1, N)
-      self$sigma2v        = rep(.1^2, N)
+      self$omega          = matrix(.1, N, M)
+      self$sigma2v        = matrix(.1^2, N, M)
       self$S              = matrix(1, N, T)
       self$sigma2_omega   = rep(1, N)
       self$s_             = rep(0.05, N)
       
-      self$PR_TR          = diag(M)
+      self$PR_TR          = matrix(0.1 / M, M, M) + 0.9 * diag(M)
       self$xi             = diag(M)[,sample(1:M, T, replace = TRUE)]
       self$pi_0           = rep(1/M, M)
     }, # END initialize
@@ -639,10 +640,12 @@ specify_bsvarTVP = R6::R6Class(
   
   private = list(
     normal = TRUE,      # if TRUE - normal shocks, if FALSE - Student-t shocks
+    sv     = TRUE,      # if TRUE - non-centred SV, if FALSE - homoskedasticity
     msa    = FALSE,     # if TRUE - MSSA, if FALSE - MSS
+    estimate_hyper = TRUE,  # if TRUE - estimate hyper-parameters, if FALSE - fix them
+    finiteM = TRUE,     # if true a stationary Markov switching, if FALSE a sparse Markov switching model is estimated
     p      = 1,         # a non-negative integer specifying the autoregressive lag order of the model. 
-    M      = 2,         # positive integer specifying the number of Markov regimes in the model.
-    finiteM = TRUE      # if true a stationary Markov switching, if FALSE a sparse Markov switching model is estimated
+    M      = 2          # positive integer specifying the number of Markov regimes in the model.
   ), # END private
   
   public = list(
@@ -668,16 +671,18 @@ specify_bsvarTVP = R6::R6Class(
     #' @param B a logical \code{NxN} matrix containing value \code{TRUE} for the elements of 
     #' the structural matrix \eqn{B} to be estimated and value \code{FALSE} for exclusion restrictions 
     #' to be set to zero.
-    #' @param A a logical \code{NxK} matrix containing value \code{TRUE} for the elements of 
-    #' the autoregressive matrix \eqn{A} to be estimated and value \code{FALSE} for exclusion restrictions 
-    #' to be set to zero.
     #' @param train_data a positive integer specifying the number of initial observations
     #' to be used as training sample to be used to train the prior distribution for \eqn{B}.
     #' @param distribution a character string specifying the conditional distribution 
     #' of structural shocks. Value \code{"norm"} sets it to the normal distribution, 
     #' while value \code{"t"} sets the Student-t distribution.
-    #' @param ms4A a logical value - if \code{TRUE} the Markov switching is implemented
+    #' @param volatility a character string specifying the process for conditional variances 
+    #' of structural shocks. Value \code{"SV"} sets it to the non-centred Stochastic Volatility model, 
+    #' while value \code{"homoskedastic"} sets it to time invariant specification.
+    #' @param ms4ar a logical value - if \code{TRUE} the Markov switching is implemented
     #' in both matrices \eqn{A} and \eqn{B}, otherwise only in matrix \eqn{B}.
+    #' @param estimate_hyper a logical value - if \code{TRUE} the hyper-parameters for the prior of \eqn{A} and \eqn{B}
+    #' are estimated, otherwise they are fixed.
     #' @param exogenous a \code{(T+p)xd} matrix of exogenous variables. 
     #' @param stationary an \code{N} logical vector - its element set to \code{FALSE} sets 
     #' the prior mean for the autoregressive parameters of the \code{N}th equation to the white noise process, 
@@ -691,10 +696,11 @@ specify_bsvarTVP = R6::R6Class(
     p = 1L,
     M = 2L,
     B,
-    A,
     train_data = 0L,
     distribution = c("norm","t"),
-    ms4A = FALSE,
+    volatility = c("SV","homoskedastic"),
+    ms4ar = FALSE,
+    estimate_hyper = TRUE,
     exogenous = NULL,
     stationary = rep(FALSE, ncol(data)),
     finiteM = TRUE
@@ -707,12 +713,26 @@ specify_bsvarTVP = R6::R6Class(
       
       stopifnot("Argument train_data has to be a positive integer." = ((train_data %% 1) == 0 & train_data >= 0))
       stopifnot("Argument train_data has to much less than the data size." = train_data < nrow(data) / 2)
-      stopifnot("Argument ms4A has to be a logical value." = is.logical(ms4A) & length(ms4A) == 1)
+      stopifnot("Argument ms4A has to be a logical value." = is.logical(ms4ar) & length(ms4ar) == 1)
       
       distribution  = match.arg(distribution)
+      if (distribution == "t") {
+        private$normal = FALSE
+      }
       
-      TT            = nrow(data)
-      T             = TT - p
+      volatility    = match.arg(volatility)
+      if (distribution == "SV") {
+        private$sv = TRUE
+      }
+      
+      if (ms4ar) {
+        private$msa = TRUE
+      }
+      
+      if (!estimate_hyper) {
+        private$estimate_hyper = FALSE
+      }
+      
       N             = ncol(data)
       d             = 0
       if (!is.null(exogenous)) {
@@ -735,14 +755,6 @@ specify_bsvarTVP = R6::R6Class(
         B[lower.tri(B, diag = TRUE)] = TRUE
       }
       stopifnot("Incorrectly specified argument B." = (is.matrix(B) & is.logical(B)) | (length(B) == 1 & is.na(B)))
-      if (missing(A)) {
-        A     = matrix(TRUE, N, K)
-      }
-      stopifnot("Incorrectly specified argument A." = (is.matrix(A) & is.logical(A)))
-      
-      if (distribution == "t") {
-        private$normal = FALSE
-      }
       
       if (train_data == 0) {
         data_train    = NULL
@@ -751,11 +763,14 @@ specify_bsvarTVP = R6::R6Class(
         data_train    = data[1:train_data,]
         data_estimate = data[-(1:train_data),]
       }
+      TT            = nrow(data_estimate)
+      T             = TT - p
+      A             = matrix(TRUE, N, K)
       
       self$data_matrices   = specify_data_matrices$new(data_estimate, p, exogenous)
       self$identification  = specify_identification_bsvarsTVI$new(B, A, N, K)
       self$prior           = specify_prior_bsvarTVP$new(data_train, N, M, p, d, stationary)
-      if ( ms4A ) {
+      if ( ms4ar ) {
         self$starting_values = specify_starting_values_bsvarTVPmsa$new(A, B, N, M, T, p, d, finiteM)
       } else {
         self$starting_values = specify_starting_values_bsvarTVPms$new(A, B, N, M, T, p, d, finiteM)
@@ -787,6 +802,17 @@ specify_bsvarTVP = R6::R6Class(
     }, # END get_normal
     
     #' @description
+    #' Returns the logical value of whether the shock conditional variances should 
+    #' follow non-centred SV of be constant.
+    #' 
+    #' @examples 
+    #' spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+    #' spec$get_sv()
+    get_sv = function() {
+      private$sv
+    }, # END get_normal
+    
+    #' @description
     #' Returns the number of Markov switching regimes.
     #' 
     #' @examples 
@@ -795,6 +821,28 @@ specify_bsvarTVP = R6::R6Class(
     get_M = function() {
       private$M
     }, # END get_M
+    
+    #' @description
+    #' Returns the logical value of whether to estimate the hyper-parameters
+    #' (fixing them is the alternative).
+    #' 
+    #' @examples 
+    #' spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+    #' spec$get_estimate_hyper()
+    get_estimate_hyper = function() {
+      private$estimate_hyper
+    }, # END get_estimate_hyper
+    
+    #' @description
+    #' Returns the logical value of whether Markov switching is stationary 
+    #' (sparse is the alternative).
+    #' 
+    #' @examples 
+    #' spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+    #' spec$get_finiteM()
+    get_finiteM = function() {
+      private$finiteM
+    }, # END get_finiteM
     
     #' @description
     #' Returns the autoregressive lag order of the model.
@@ -815,17 +863,6 @@ specify_bsvarTVP = R6::R6Class(
     get_msa = function() {
       private$msa
     }, # END get_msa
-    
-    #' @description
-    #' Returns the logical value of whether Markov switching is stationary 
-    #' (sparse is the alternative).
-    #' 
-    #' @examples 
-    #' spec = specify_bsvarTVP$new(us_fiscal_lsuw)
-    #' spec$get_finiteM()
-    get_finiteM = function() {
-      private$finiteM
-    }, # END get_finiteM
     
     #' @description
     #' Returns the data matrices as the DataMatricesBSVAR object.
@@ -914,7 +951,7 @@ specify_posterior_bsvarTVP = R6::R6Class(
     initialize = function(specification_bsvar, posterior_bsvar) {
       
       stopifnot("Argument specification_bsvar must be of class BSVARTVP." = any(class(specification_bsvar) == "BSVARTVP"))
-      stopifnot("Argument posterior_bsvar must must contain MCMC output." = is.list(posterior_bsvar) & is.array(posterior_bsvar$B) & is.array(posterior_bsvar$lambda) & is.array(posterior_bsvar$hyper))
+      stopifnot("Argument posterior_bsvarTVP must must contain MCMC output." = is.list(posterior_bsvar) & is.array(posterior_bsvar$B) & is.array(posterior_bsvar$lambda))
       
       self$last_draw    = specification_bsvar
       self$posterior    = posterior_bsvar
