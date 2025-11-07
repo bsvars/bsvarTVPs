@@ -144,7 +144,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
       }
       U              /= aux_sigma;
       
-      aux_lambda      = sample_lambda_ms(aux_df, aux_xi, U);
+      aux_lambda      = sample_lambda_ms(aux_df, aux_xi);
       aux_lambda_sqrt = sqrt(aux_lambda);
       aux_hetero      = aux_sigma % aux_lambda_sqrt;
       
