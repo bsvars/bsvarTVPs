@@ -1563,22 +1563,21 @@ RcppExport SEXP _bsvarTVPs_sample_hyperparameter_mssa_s4_horseshoe(SEXP aux_hype
     return rcpp_result_gen;
 }
 // sample_lambda_ms
-arma::mat sample_lambda_ms(const arma::mat& aux_df, const arma::mat& aux_xi, const arma::mat& U);
-static SEXP _bsvarTVPs_sample_lambda_ms_try(SEXP aux_dfSEXP, SEXP aux_xiSEXP, SEXP USEXP) {
+arma::mat sample_lambda_ms(const arma::mat& aux_df, const arma::mat& aux_xi);
+static SEXP _bsvarTVPs_sample_lambda_ms_try(SEXP aux_dfSEXP, SEXP aux_xiSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< const arma::mat& >::type aux_df(aux_dfSEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type aux_xi(aux_xiSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type U(USEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_lambda_ms(aux_df, aux_xi, U));
+    rcpp_result_gen = Rcpp::wrap(sample_lambda_ms(aux_df, aux_xi));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _bsvarTVPs_sample_lambda_ms(SEXP aux_dfSEXP, SEXP aux_xiSEXP, SEXP USEXP) {
+RcppExport SEXP _bsvarTVPs_sample_lambda_ms(SEXP aux_dfSEXP, SEXP aux_xiSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_sample_lambda_ms_try(aux_dfSEXP, aux_xiSEXP, USEXP));
+        rcpp_result_gen = PROTECT(_bsvarTVPs_sample_lambda_ms_try(aux_dfSEXP, aux_xiSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -2464,7 +2463,7 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
         signatures.insert("Rcpp::List(*sample_hyperparameter_mss_horseshoe)(Rcpp::List&,const arma::cube&,const arma::mat&,const arma::field<arma::mat>&,const Rcpp::List&)");
         signatures.insert("Rcpp::List(*sample_hyperparameter_mss_s4_horseshoe)(Rcpp::List&,const arma::cube&,const arma::mat&,const arma::field<arma::mat>&,const arma::imat&,const Rcpp::List&)");
         signatures.insert("Rcpp::List(*sample_hyperparameter_mssa_s4_horseshoe)(Rcpp::List&,const arma::cube&,const arma::cube&,const arma::field<arma::mat>&,const arma::imat&,const Rcpp::List&)");
-        signatures.insert("arma::mat(*sample_lambda_ms)(const arma::mat&,const arma::mat&,const arma::mat&)");
+        signatures.insert("arma::mat(*sample_lambda_ms)(const arma::mat&,const arma::mat&)");
         signatures.insert("double(*log_kernel_df_ms_nm)(const double&,const arma::rowvec&,const double&)");
         signatures.insert("Rcpp::List(*sample_df_ms)(arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const int&,arma::mat&,const arma::vec&)");
         signatures.insert("int(*csample_num1)(Rcpp::NumericVector,Rcpp::NumericVector)");
@@ -2601,7 +2600,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bsvarTVPs_sample_hyperparameter_mss_horseshoe", (DL_FUNC) &_bsvarTVPs_sample_hyperparameter_mss_horseshoe, 5},
     {"_bsvarTVPs_sample_hyperparameter_mss_s4_horseshoe", (DL_FUNC) &_bsvarTVPs_sample_hyperparameter_mss_s4_horseshoe, 6},
     {"_bsvarTVPs_sample_hyperparameter_mssa_s4_horseshoe", (DL_FUNC) &_bsvarTVPs_sample_hyperparameter_mssa_s4_horseshoe, 6},
-    {"_bsvarTVPs_sample_lambda_ms", (DL_FUNC) &_bsvarTVPs_sample_lambda_ms, 3},
+    {"_bsvarTVPs_sample_lambda_ms", (DL_FUNC) &_bsvarTVPs_sample_lambda_ms, 2},
     {"_bsvarTVPs_log_kernel_df_ms_nm", (DL_FUNC) &_bsvarTVPs_log_kernel_df_ms_nm, 3},
     {"_bsvarTVPs_sample_df_ms", (DL_FUNC) &_bsvarTVPs_sample_df_ms, 8},
     {"_bsvarTVPs_csample_num1", (DL_FUNC) &_bsvarTVPs_csample_num1, 2},

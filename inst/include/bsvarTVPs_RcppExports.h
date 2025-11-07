@@ -865,17 +865,17 @@ namespace bsvarTVPs {
         return Rcpp::as<Rcpp::List >(rcpp_result_gen);
     }
 
-    inline arma::mat sample_lambda_ms(const arma::mat& aux_df, const arma::mat& aux_xi, const arma::mat& U) {
-        typedef SEXP(*Ptr_sample_lambda_ms)(SEXP,SEXP,SEXP);
+    inline arma::mat sample_lambda_ms(const arma::mat& aux_df, const arma::mat& aux_xi) {
+        typedef SEXP(*Ptr_sample_lambda_ms)(SEXP,SEXP);
         static Ptr_sample_lambda_ms p_sample_lambda_ms = NULL;
         if (p_sample_lambda_ms == NULL) {
-            validateSignature("arma::mat(*sample_lambda_ms)(const arma::mat&,const arma::mat&,const arma::mat&)");
+            validateSignature("arma::mat(*sample_lambda_ms)(const arma::mat&,const arma::mat&)");
             p_sample_lambda_ms = (Ptr_sample_lambda_ms)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_lambda_ms");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_sample_lambda_ms(Shield<SEXP>(Rcpp::wrap(aux_df)), Shield<SEXP>(Rcpp::wrap(aux_xi)), Shield<SEXP>(Rcpp::wrap(U)));
+            rcpp_result_gen = p_sample_lambda_ms(Shield<SEXP>(Rcpp::wrap(aux_df)), Shield<SEXP>(Rcpp::wrap(aux_xi)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
