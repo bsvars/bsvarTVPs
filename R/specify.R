@@ -305,8 +305,10 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
       self$A              = matrix(0, N, K)
       diag(self$A)[diag(A[,1:N])] = runif(sum(diag(A[,1:N])))
       self$hyper          = list(
-        aux_hyper = matrix(10, 2 * N + 1, 2)
+        aux_hyper = matrix(20, 2 * N + 1, 2)
       )
+      self$hyper$aux_hyper[,2] = 0.05
+      
       self$S4_indicator   = matrix(1, N, M) 
       self$sigma          = matrix(1, N, T)
       
