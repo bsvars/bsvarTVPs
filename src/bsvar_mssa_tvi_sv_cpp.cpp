@@ -84,7 +84,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
   
   // the initial value for the adaptive_scale is set to the negative inverse of 
   // Hessian for the posterior log_kenel for df evaluated at df = 30
-  double  adaptive_scale_init = pow(R::psigamma(15, 1) - 29 * pow(28, -2), -1) / (T / M);
+  double  adaptive_scale_init = abs(pow(R::psigamma(15, 1) - 29 * pow(28, -2), -1) / (T / M));
   mat     adaptive_scale(N, M, fill::value(adaptive_scale_init));
 
   const int   S     = floor(SS / thin);
