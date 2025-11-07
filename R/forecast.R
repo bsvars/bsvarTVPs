@@ -58,6 +58,8 @@ forecast.PosteriorBSVARTVP <- function(
     ...
 ) {
   
+  stopifnot("Argument horizon must be a positive integer number." = horizon > 0 & horizon %% 1 == 0)
+  
   T               = dim(object$posterior$h)[2]
   N               = dim(object$posterior$h)[1]
   S               = dim(object$posterior$h)[3]
