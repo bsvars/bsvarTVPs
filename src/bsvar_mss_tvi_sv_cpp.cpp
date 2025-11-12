@@ -28,7 +28,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     const bool                    show_progress = true
 ) {
   
-  const bool debug = true;
+  const bool debug = false;
   if ( debug ) Rcout << " start!" << endl;
   
   // Progress bar setup

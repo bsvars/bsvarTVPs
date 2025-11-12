@@ -27,6 +27,10 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     const bool                    studentt = false,     // {true - normal, false - Student-t};
     const bool                    show_progress = true
 ) {
+  
+  const bool debug = false;
+  if ( debug ) Rcout << " " << endl;
+  
   // // Progress bar setup
   vec prog_rep_points = arma::round(arma::linspace(0, SS, 50));
   
@@ -124,12 +128,15 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
   
   for (int ss=0; ss<SS; ss++) {
   
+    if ( debug ) Rcout << " s: " << s << endl;
+    
     // Increment progress bar
     if (any(prog_rep_points == ss)) p.increment();
     // Check for user interrupts
     if (ss % 200 == 0) checkUserInterrupt();
     
     // sample aux_lambda and aux_df
+    if ( debug ) Rcout << " sample aux_lambda and aux_df" << endl;
     mat U(N, T);
     if ( studentt ) {
       
@@ -153,6 +160,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     } // END studentt
     
     // sample aux_xi
+    if ( debug ) Rcout << " sample aux_xi" << endl;
     cube Z(N, T, M);
     for (int m=0; m<M; m++) {
       Z.slice(m)        = aux_B.slice(m) * (Y - aux_A.slice(m) * X);
@@ -172,6 +180,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     }
     
     // sample aux_PR_TR and aux_pi_0
+    if ( debug ) Rcout << " sample aux_PR_TR and aux_pi_0" << endl;
     try {
       PR_TR_tmp         = sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
       aux_PR_TR         = as<mat>(PR_TR_tmp["aux_PR_TR"]);
@@ -179,6 +188,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     } catch (std::runtime_error &e) {}
     
     // sample aux_hyper
+    if ( debug ) Rcout << " sample aux_hyper" << endl;
     if ( hyper_select == 1 ) {
       
       try {
@@ -204,6 +214,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     }
     
     // sample aux_B
+    if ( debug ) Rcout << " sample aux_B" << endl;
     try {
       BSL               = sample_B_mssa_s4(aux_B, aux_SL, aux_A, precisionB, aux_hetero, aux_xi, Y, X, prior, VB);
       aux_B             = as<cube>(BSL["aux_B"]);
@@ -211,11 +222,13 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     } catch (std::runtime_error &e) {}
     
     // sample aux_A
+    if ( debug ) Rcout << " sample aux_A" << endl;
     try {
       aux_A             = sample_A_heterosk1_mssa(aux_A, aux_B, aux_xi, precisionA, aux_hetero, Y, X, prior);
     } catch (std::runtime_error &e) {}
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
+    if ( debug ) Rcout << " sample aux_h, aux_omega and aux_S, aux_sigma2_omega" << endl;
     if ( sv_select != 3 ) {
       
       for (int m=0; m<M; m++) {
@@ -264,6 +277,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
       
     } // END if( sv_select != 3 )
     
+    if ( debug ) Rcout << " saving posterior" << endl;
     if (ss % thin == 0) {
       posterior_B(s)                = aux_B;
       posterior_A(s)                = aux_A;
