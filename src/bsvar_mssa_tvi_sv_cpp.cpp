@@ -252,11 +252,15 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
         if ( sv_select == 2 ) {
           try {
             sv_n              = svar_ce1_mss( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior);
-          } catch (std::runtime_error &e) {}
+          } 
+          catch (std::runtime_error &e) {}
+          catch (std::logic_error &e) {}
         } else if ( sv_select == 1 ) {
           try {
             sv_n              = svar_nc1_mss( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior);
-          } catch (std::runtime_error &e) {}
+          } 
+          catch (std::runtime_error &e) {}
+          catch (std::logic_error &e) {}
         }
         
         aux_h.row(n)      = as<rowvec>(sv_n["aux_h_n"]);
