@@ -40,7 +40,9 @@ Rcpp::List forecast_mssa_sv (
   cube        out_forecast(N, horizon, S);
   cube        out_forecast_mean(N, horizon, S);
   field<cube> out_forecast_cov(S);
-    
+  
+  vec         draw(N);  
+  
   NumericVector zeroM = wrap(seq_len(M) - 1);
   
   for (int s=0; s<S; s++) {
@@ -87,7 +89,11 @@ Rcpp::List forecast_mssa_sv (
       SigmaT.slice(h) = 0.5 * (Sigma_tmp + Sigma_tmp.t());
       out_forecast_mean.slice(s).col(h) = posterior_A(s).slice(ST) * Xt;
       
-      vec draw    = mvnrnd( out_forecast_mean.slice(s).col(h), SigmaT.slice(h) );
+      try {
+        draw        = mvnrnd( out_forecast_mean.slice(s).col(h), SigmaT.slice(h) );
+      } catch (std::logic_error &e) {
+        continue;
+      }
       out_forecast.slice(s).col(h) = draw;
       
       // create Xs
@@ -149,6 +155,8 @@ Rcpp::List forecast_mss_sv (
   cube        out_forecast_mean(N, horizon, S);
   field<cube> out_forecast_cov(S);
   
+  vec         draw(N);  
+  
   NumericVector zeroM = wrap(seq_len(M) - 1);
   
   for (int s=0; s<S; s++) {
@@ -196,7 +204,11 @@ Rcpp::List forecast_mss_sv (
       SigmaT.slice(h) = Sigma_tmp;
       out_forecast_mean.slice(s).col(h) = posterior_A.slice(s) * Xt;
       
-      vec draw    = mvnrnd( out_forecast_mean.slice(s).col(h), Sigma_tmp );
+      try {
+        draw        = mvnrnd( out_forecast_mean.slice(s).col(h), Sigma_tmp );
+      } catch (std::logic_error &e) {
+        continue;
+      }
       out_forecast.slice(s).col(h) = draw;
       
       // create Xs
