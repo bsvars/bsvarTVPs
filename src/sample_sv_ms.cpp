@@ -103,6 +103,16 @@ double do_rgig1(
     double psi
 ) { 
   SEXP (*fun)(int, double, double, double) = NULL;
+  
+  if ( 
+      !(isfinite(lambda) && isfinite(chi) && isfinite(psi)) ||
+       (chi <  0. || psi < 0)      || 
+       (chi == 0. && lambda <= 0.) ||
+       (psi == 0. && lambda >= 0.) 
+    ) {
+    throw std::logic_error("do_rgig1 invalid input.");
+  }
+  
   if (!fun) fun = (SEXP(*)(int, double, double, double)) R_GetCCallable("GIGrvg", "do_rgig");
   return as<double>(fun(1, lambda, chi, psi));
 } // END do_rgig1
@@ -204,8 +214,7 @@ Rcpp::List svar_nc1 (
     double          aux_s_n,             // scale of IG2 prior for aux_sigma2_omega_n
     arma::urowvec   aux_S_n,            // 1xT
     const arma::rowvec&   u,                  // 1xT
-    const Rcpp::List&     prior,
-    bool            sample_s_ = true
+    const Rcpp::List&     prior
 ) {
   // sampler for the non-centred parameterisation of the SV process
   
@@ -238,10 +247,8 @@ Rcpp::List svar_nc1 (
   }
   
   // sample aux_s_n
-  if ( sample_s_ ) {
-    aux_s_n               = (prior_sv_s_ + 2 * aux_sigma2_omega_n)/chi2rnd(3 + 2 * prior_sv_a_);
-  }
-  
+  aux_s_n               = (prior_sv_s_ + 2 * aux_sigma2_omega_n)/chi2rnd(3 + 2 * prior_sv_a_);
+
   // sample aux_sigma2_omega
   aux_sigma2_omega_n    = do_rgig1( prior_sv_a_-0.5, pow(aux_omega_n,2), 2/aux_s_n );
   
@@ -309,8 +316,7 @@ Rcpp::List svar_nc1_mss (
     arma::urowvec&        aux_S_n,            // 1xT
     const arma::mat&      aux_xi,             // MxT
     const arma::rowvec&   u,                  // 1xT
-    const Rcpp::List&     prior,
-    bool                  sample_s_ = true
+    const Rcpp::List&     prior
 ) {
   // fixed values for auxiliary mixture
   const NumericVector alpha_s = NumericVector::create(1.92677,1.34744,0.73504,0.02266,0-0.85173,-1.97278,-3.46788,-5.55246,-8.68384,-14.65000);
@@ -350,9 +356,7 @@ Rcpp::List svar_nc1_mss (
   }
   
   // sample aux_s_n
-  if ( sample_s_ ) {
-    aux_s_n               = (prior_sv_s_ + 2 * aux_sigma2_omega_n)/R::rchisq(3 + 2 * prior_sv_a_);
-  }
+  aux_s_n               = (prior_sv_s_ + 2 * aux_sigma2_omega_n)/R::rchisq(3 + 2 * prior_sv_a_);
   
   // sample aux_sigma2_omega
   aux_sigma2_omega_n    = do_rgig1( prior_sv_a_ - 0.5 * M, accu(square(aux_omega_n)), 2/aux_s_n );
@@ -371,6 +375,7 @@ Rcpp::List svar_nc1_mss (
   
   // sample aux_omega
   for (int m=0; m<M; m++) {
+
     rowvec  aux_h_n_m(Tm(m));
     rowvec  U_m(Tm(m));
     rowvec  alpha_S_m(Tm(m));
@@ -386,8 +391,15 @@ Rcpp::List svar_nc1_mss (
         ii++;
       }
     }
-    double    V_omega_inv = 1/( as_scalar(aux_h_n_m * diagmat(sigma_S_inv_m) * aux_h_n_m.t()) + pow(aux_sigma2_omega_n, -1) );
-    double    omega_bar   = as_scalar(aux_h_n_m * diagmat(sigma_S_inv_m) * (U_m - alpha_S_m).t());
+    double vo = pow(aux_sigma2_omega_n, -1);
+    double mo = 0; 
+    
+    if ( Tm(m) != 0 ) {
+      vo += as_scalar(aux_h_n_m * diagmat(sigma_S_inv_m) * aux_h_n_m.t());
+      mo += as_scalar(aux_h_n_m * diagmat(sigma_S_inv_m) * (U_m - alpha_S_m).t());
+    }
+    double    V_omega_inv = 1/vo;
+    double    omega_bar   = mo;
     omega_aux(m)          = R::rnorm(V_omega_inv*omega_bar, sqrt(V_omega_inv) );
   } // END m loop
   
@@ -450,7 +462,7 @@ Rcpp::List svar_nc1_mss (
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
 Rcpp::List svar_ce1 (
-    arma::rowvec&       aux_h_n,            // 1xT
+    arma::rowvec&       aux_h_tilde,            // 1xT
     double&             aux_rho_n,
     double&             aux_omega_n,
     double&             aux_sigma2v_n,
@@ -458,10 +470,10 @@ Rcpp::List svar_ce1 (
     double&             aux_s_n,             // scale of IG2 prior for aux_sigma2_omega_n
     arma::urowvec&      aux_S_n,            // 1xT
     const arma::rowvec& u,                  // 1xT
-    const Rcpp::List&   prior,
-    bool                sample_s_ = true
+    const Rcpp::List&   prior
 ) {
   // sampler for the centred parameterisation of the SV process
+  rowvec aux_h_n  = aux_omega_n * aux_h_tilde;
   
   // fixed values for auxiliary mixture
   const NumericVector alpha_s = NumericVector::create(1.92677,1.34744,0.73504,0.02266,0-0.85173,-1.97278,-3.46788,-5.55246,-8.68384,-14.65000);
@@ -492,9 +504,7 @@ Rcpp::List svar_ce1 (
   }
   
   // sample aux_s_n
-  if ( sample_s_ ) {
-    aux_s_n               = (1 + 2 * aux_sigma2_omega_n) / chi2rnd(3 + 2 * prior_sv_a_);
-  }
+  aux_s_n               = (1 + 2 * aux_sigma2_omega_n) / chi2rnd(3 + 2 * prior_sv_a_);
   
   // sample aux_sigma2_omega
   aux_sigma2_omega_n    = randg( distr_param(1 + 0.5 * prior_sv_a_, pow(pow(prior_sv_s_,-1) + pow(2 * aux_sigma2v_n,-1), -1)  ) );
@@ -512,15 +522,16 @@ Rcpp::List svar_ce1 (
   
   // sample aux_sigma2v
   aux_sigma2v_n         = (aux_sigma2_omega_n + as_scalar(aux_h_n * HH_rho * aux_h_n.t())) / chi2rnd( 3 + T );
-  aux_omega_n           = pow(aux_sigma2v_n, 0.5);
+  aux_omega_n           = sqrt(aux_sigma2v_n);
   
   // sample aux_h
   mat       V_h         = diagmat(sigma_S_inv) + (HH_rho / aux_sigma2v_n);
   vec       h_bar       = diagmat(sigma_S_inv) * (U - alpha_S).t();
   aux_h_n               = trans(precision_sampler_ar1( V_h.diag(), V_h(1, 0), h_bar));
+  aux_h_tilde           = aux_h_n / aux_omega_n;
   
   return List::create(
-    _["aux_h_n"]              = aux_h_n,
+    _["aux_h_n"]              = aux_h_tilde,
     _["aux_rho_n"]            = aux_rho_n,
     _["aux_omega_n"]          = aux_omega_n,
     _["aux_sigma2v_n"]        = aux_sigma2v_n,
@@ -535,7 +546,7 @@ Rcpp::List svar_ce1 (
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
 Rcpp::List svar_ce1_mss (
-    arma::rowvec&       aux_h_n,            // 1xT
+    arma::rowvec&       aux_h_tilde,            // 1xT
     double&             aux_rho_n,
     arma::rowvec&       aux_omega_n,        // 1xM nth equation regime-dependent omegas
     arma::rowvec&       aux_sigma2v_n,      // 1xM nth equation regime-dependent omegas^2
@@ -544,8 +555,7 @@ Rcpp::List svar_ce1_mss (
     arma::urowvec&      aux_S_n,            // 1xT
     const arma::mat&    aux_xi,             // MxT
     const arma::rowvec& u,                  // 1xT
-    const Rcpp::List&   prior,
-    bool                sample_s_ = true
+    const Rcpp::List&   prior
 ) {
   // sampler for the centred parameterisation of the SV process
   
@@ -572,6 +582,7 @@ Rcpp::List svar_ce1_mss (
   for (int t=0; t<T; t++) {
     sigma2v_T_inv(t)          = pow( aux_sigma2v_n(aux_xi.col(t).index_max()), -1);
   }
+  rowvec  aux_h_n = aux_h_tilde % sqrt(sigma2v_T_inv);
   
   // sample auxiliary mixture states aux_S
   const vec   mixprob   = find_mixture_indicator_cdf(trans(U - aux_h_n));
@@ -585,9 +596,7 @@ Rcpp::List svar_ce1_mss (
   }
   
   // sample aux_s_n
-  if ( sample_s_ ) {
-    aux_s_n               = (prior_sv_s_ + 2 * aux_sigma2_omega_n)/R::rchisq(3 + 2 * prior_sv_a_);
-  }
+  aux_s_n               = (prior_sv_s_ + 2 * aux_sigma2_omega_n)/R::rchisq(3 + 2 * prior_sv_a_);
   
   // sample aux_sigma2_omega
   aux_sigma2_omega_n    = randg( distr_param(1 + 0.5 * prior_sv_a_, pow(pow(prior_sv_s_,-1) + accu(pow(2 * aux_sigma2v_n,-1)), -1)  ) );
@@ -597,7 +606,7 @@ Rcpp::List svar_ce1_mss (
   mat       sigma_v2_inv_diag = diagmat(sigma2v_T_inv.cols(0,T-2));
   double    aux_rho_var = as_scalar(pow( hm1 * sigma_v2_inv_diag * hm1.t(), -1));
   double    aux_rho_mean = as_scalar(aux_rho_var * (hm1 * sigma_v2_inv_diag * aux_h_n.cols(1,T-1).t() ) );
-  aux_rho_n             = RcppTN::rtn1(aux_rho_mean, pow(aux_rho_var, 0.5),-1,1);
+  aux_rho_n             = RcppTN::rtn1(aux_rho_mean, sqrt(aux_rho_var),-1,1);
   
   mat       H_rho_new(T, T, fill::eye);
   H_rho_new.diag(-1)   -= aux_rho_n;
@@ -615,11 +624,14 @@ Rcpp::List svar_ce1_mss (
         ii++;
       }
     }
-    
-    aux_sigma2v_n(m)      = (aux_sigma2_omega_n + as_scalar(aux_h_n_m * HH_rho.submat(0,0,Tm(m)-1,Tm(m)-1) * aux_h_n_m.t())) / chi2rnd( 3 + Tm(m) );
+    double ss = aux_sigma2_omega_n;
+    if ( Tm(m) != 0 ) {
+      ss += as_scalar(aux_h_n_m * HH_rho.submat(0,0,Tm(m)-1,Tm(m)-1) * aux_h_n_m.t());
+    }
+    aux_sigma2v_n(m)      = ss / chi2rnd( 3 + Tm(m) );
   } // END m loop
   
-  aux_omega_n        = pow(aux_sigma2v_n, 0.5);
+  aux_omega_n        = sqrt(aux_sigma2v_n);
   for (int t=0; t<T; t++) {
     sigma2v_T_inv(t)          = pow( aux_sigma2v_n(aux_xi.col(t).index_max()), -1);
   }
@@ -631,6 +643,8 @@ Rcpp::List svar_ce1_mss (
   
   if (aux_h_n_tmp.has_nan()) throw std::runtime_error("Error: aux_h_n_tmp contains missing observations, nan.");
   aux_h_n               = aux_h_n_tmp.t();
+  
+  aux_h_tilde           = aux_h_n / sqrt(sigma2v_T_inv);
   
   return List::create(
     _["aux_h_n"]              = aux_h_n,
@@ -721,6 +735,57 @@ arma::mat filtering (
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
+arma::mat filtering_studentt (
+    const arma::cube& Z,                  // NxTxM state-specific standardised residuals
+    const arma::mat&  aux_PR_TR,          // MxM
+    const arma::vec&  pi_0,               // Mx1
+    const arma::mat&  aux_df              // NxM
+) {
+  
+  // filtered probabilities for a model with MS structural matrix of SVAR-MSS-SV model
+  
+  const int   T = Z.n_cols;
+  const int   N = Z.n_rows;
+  const int   M = aux_PR_TR.n_rows;
+  
+  mat         eta_t(M, T);
+  mat         xi_t_t(M, T);
+  rowvec      log_d(T);
+  
+  // This loop evaluates Student-t pdf at Z being 
+  for (int m=0; m<M; m++) {
+    
+    mat lk_tmp  = -0.5 * log( 1 + square(Z.slice(m)) ); // NxT
+    lk_tmp.each_col() %= (1 + aux_df.col(m));
+    log_d          = sum(lk_tmp, 0);
+    log_d         += -0.5 * N * log(M_PI);
+    log_d         -= accu(lgamma( 0.5 * aux_df.col(m) ));
+    log_d         += accu(lgamma( 0.5 * (aux_df.col(m) + 1) ));
+    
+    NumericVector   exp_log_d   = wrap(exp(log_d));
+    exp_log_d[exp_log_d==0]     = 1e-300;
+    eta_t.row(m)    = as<rowvec>(exp_log_d);
+    
+  } // END m loop
+  
+  vec xi_tm1_tm1    = pi_0;
+  
+  for (int t=0; t<T; t++) {
+    vec     num     = eta_t.col(t) % (aux_PR_TR.t() * xi_tm1_tm1);
+    double  den     = sum(num);
+    xi_t_t.col(t)   = num/den;
+    xi_tm1_tm1      = xi_t_t.col(t);
+  } // END t loop
+  
+  return xi_t_t;
+} // END filtering_studentt
+
+
+
+
+
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
 arma::mat smoothing (
     const arma::mat&  filtered,           // MxT
     const arma::mat&  aux_PR_TR           // MxM
@@ -750,41 +815,29 @@ arma::mat smoothing (
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
-arma::mat sample_Markov_process_mss (
+arma::mat sample_Markov_process (
+    const arma::cube& Z,                  // NxTxM
     arma::mat         aux_xi,             // MxT
-    const arma::mat&  E,                  // NxT
-    const arma::cube& aux_B,              // NxNxM
-    const arma::mat&  aux_sigma,          // NxM
     const arma::mat&  aux_PR_TR,          // MxM
     const arma::vec&  aux_pi_0,           // Mx1
     const bool        finiteM = true
 ) {
   
-  int minimum_regime_occurrences = 10;
-  int max_iterations = 50;
+  int minimum_regime_occurrences = 0;
+  int max_iterations = 1;
   if ( finiteM ) {
-    minimum_regime_occurrences = 10;
-    max_iterations = 50;
+    minimum_regime_occurrences = 2;
+    max_iterations = 10;
   }
   
-  const int   T   = E.n_cols;
-  const int   N   = E.n_rows;
+  const int   T   = Z.n_cols;
   const int   M   = aux_PR_TR.n_rows;
   mat aux_xi_tmp = aux_xi;
   mat aux_xi_out = aux_xi;
   
-  cube  Z(N, T, M);
-  for (int m=0; m<M; m++) {
-    Z.slice(m)    = pow(aux_sigma, -1) % (aux_B.slice(m) * E);
-  }
-  
   mat filtered    = filtering(Z, aux_PR_TR, aux_pi_0);
   mat smoothed    = smoothing(filtered, aux_PR_TR);
   mat    aj       = eye(M, M);
-  
-  // Rcout << "aux_xi: " << aux_xi << endl;
-  // Rcout << "aux_B: " << aux_B << endl;
-  // Rcout << " smoothed.col(T-1): " << smoothed.col(T-1) << endl;
   
   mat xi(M, T);
   int draw        = csample_num1(wrap(seq_len(M)), wrap(smoothed.col(T-1)));
@@ -814,7 +867,8 @@ arma::mat sample_Markov_process_mss (
   }
   
   return aux_xi_out;
-} // END sample_Markov_process_mss
+} // END sample_Markov_process
+
 
 
 
@@ -822,37 +876,28 @@ arma::mat sample_Markov_process_mss (
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
-arma::mat sample_Markov_process_mssa (
+arma::mat sample_Markov_process_studentt (
+    const arma::cube& Z,                  // NxTxM
     arma::mat         aux_xi,             // MxT
-    const arma::cube& aux_B,              // NxNxM
-    const arma::cube& aux_A,              // NxKxM
-    const arma::mat&  Y,
-    const arma::mat&  X,
-    const arma::mat&  aux_sigma,          // NxM
     const arma::mat&  aux_PR_TR,          // MxM
     const arma::vec&  aux_pi_0,           // Mx1
+    const arma::mat&  aux_df,             // NxM
     const bool        finiteM = true
 ) {
   
-  int minimum_regime_occurrences = 10;
-  int max_iterations = 50;
+  int minimum_regime_occurrences = 0;
+  int max_iterations = 1;
   if ( finiteM ) {
-    minimum_regime_occurrences = 10;
-    max_iterations = 50;
+    minimum_regime_occurrences = 2;
+    max_iterations = 10;
   }
   
-  const int   T   = Y.n_cols;
-  const int   N   = Y.n_rows;
+  const int   T   = Z.n_cols;
   const int   M   = aux_PR_TR.n_rows;
   mat aux_xi_tmp = aux_xi;
   mat aux_xi_out = aux_xi;
   
-  cube  Z(N, T, M);
-  for (int m=0; m<M; m++) {
-    Z.slice(m)    = pow(aux_sigma, -1) % (aux_B.slice(m) * (Y - aux_A.slice(m) * X));
-  }
-  
-  mat filtered    = filtering(Z, aux_PR_TR, aux_pi_0);
+  mat filtered    = filtering_studentt(Z, aux_PR_TR, aux_pi_0, aux_df);
   mat smoothed    = smoothing(filtered, aux_PR_TR);
   mat    aj       = eye(M, M);
   
@@ -884,21 +929,7 @@ arma::mat sample_Markov_process_mssa (
   }
   
   return aux_xi_out;
-} // END sample_Markov_process_mssa
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+} // END sample_Markov_process_studentt
 
 
 
@@ -947,242 +978,3 @@ Rcpp::List sample_transition_probabilities (
     );
 } // END sample_transition_probabilities
 
-
-// [[Rcpp::interfaces(cpp)]]
-// [[Rcpp::export]]
-arma::mat orthogonal_complement_matrix_TW (const arma::mat& x) {
-  // # x is a mxn matrix and m>n
-  // # the function returns a mx(m-n) matrix, out, that is an orthogonal complement of x, i.e.:
-  // # t(x)%*%out = 0 and det(cbind(x,out))!=0
-  int n_nrow     = x.n_rows;
-  int n_ncol     = x.n_cols;
-  mat Q;
-  mat R;
-  qr(Q, R, x);
-  mat ocm = Q.tail_cols(n_nrow-n_ncol);
-  return ocm;
-} // END orthogonal_complement_matrix_TW
-
-
-
-// [[Rcpp::interfaces(cpp)]]
-// [[Rcpp::export]]
-Rcpp::List sample_B_heterosk1_s4 (
-    arma::mat                     aux_B,          // NxN
-    arma::ivec                    aux_SL,         // Nx1 row-specific S4 indicators
-    const arma::mat&              aux_A,          // NxK
-    const arma::vec&              aux_hyper,      // NxM
-    const arma::mat&              aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&              Y,              // NxT dependent variables
-    const arma::mat&              X,              // KxT dependent variables
-    const Rcpp::List&             prior,          // a list of priors - original dimensions
-    const arma::field<arma::mat>& VBL       // restrictions on B0 in S4 arrangement
-) {
-  // the function draws new values of aux_B and aux_SL
-  
-  const int N           = aux_B.n_rows;
-  const int T           = Y.n_cols;
-  
-  int         Ltmp      = VBL.n_elem - 1;
-  vec         Lm        = VBL(Ltmp);
-  double      L         = accu(Lm);
-  field<mat>  VB        = VBL.rows(0, L-1);
-  
-  const int posterior_nu    = T + N;
-  mat prior_SS_inv          = pow(aux_hyper(0), -1) * as<mat>(prior["B_V_inv"]);
-  mat shocks                = Y - aux_A * X;
-  
-  for (int n=0; n<N; n++) {
-    mat aux_B_nL(Lm(n), N);
-    vec log_posterior_kernel_nL(Lm(n));
-    mat aux_B_tmp           = aux_B;
-    
-    for (int l=0; l<Lm(n); l++) {
-      int ll = 0;
-      if (n == 0) {
-        ll                    = l;
-      } else {
-        vec Lm_cs             = cumsum(Lm);
-        ll                    = Lm_cs(n-1) + l;
-      }
-      
-      // set scale matrix
-      mat shocks_sigma        = shocks.each_row() / aux_sigma.row(n);
-      mat posterior_SS_inv    = prior_SS_inv + shocks_sigma * shocks_sigma.t();
-      mat posterior_S_inv     = VB(ll) * posterior_SS_inv * VB(ll).t();
-      posterior_S_inv         = 0.5*( posterior_S_inv + posterior_S_inv.t() );
-      
-      // sample B
-      mat Un                  = chol(posterior_nu * inv_sympd(posterior_S_inv));
-      mat B_tmp               = aux_B;
-      B_tmp.shed_row(n);
-      rowvec w                = trans(orthogonal_complement_matrix_TW(B_tmp.t()));
-      vec w1_tmp              = trans(w * VB(ll).t() * Un.t());
-      double w1w1_tmp         = as_scalar(sum(pow(w1_tmp, 2)));
-      mat w1                  = w1_tmp.t()/sqrt(w1w1_tmp);
-      mat Wn;
-      int rn                  = VB(ll).n_rows;
-      if (rn==1) {
-        Wn                    = w1;
-      } else {
-        Wn                    = join_rows(w1.t(), orthogonal_complement_matrix_TW(w1.t()));
-      }
-      
-      vec   alpha(rn);
-      vec   u                 = rnorm(posterior_nu+1, 0, pow(posterior_nu, -0.5));
-      alpha(0)                = pow(as_scalar(sum(pow(u,2))), 0.5);
-      if (R::runif(0,1)<0.5) {
-        alpha(0)             *= -1;
-      }
-      if (rn>1){
-        vec nn                = Rcpp::rnorm(rn-1, 0, pow(posterior_nu, -0.5));
-        alpha.rows(1,rn-1)    = nn;
-      }
-      rowvec b0n              = alpha.t() * Wn * Un;
-      aux_B_nL.row(l)         = b0n * VB(ll);
-      
-      // posterior kernel
-      aux_B_tmp.row(n)            = aux_B_nL.row(l);
-      mat std_shocks              = (aux_B_tmp * shocks) / aux_sigma;
-      log_posterior_kernel_nL(l) -= 0.5 * accu(square(std_shocks));                   // likelihood kernel exp part
-      double abs_log_det_B;
-      double sign_;
-      log_det(abs_log_det_B, sign_, aux_B_tmp); 
-      log_posterior_kernel_nL(l) += T * abs_log_det_B;                                // likelihood kernel det part
-      log_posterior_kernel_nL(l) -= 0.5 * as_scalar(b0n * posterior_S_inv * b0n.t()); // prior B kernel
-      log_posterior_kernel_nL(l) += log(1/Lm(n));                                     // prior multinomial - it's flat, so this does not matter
-    } // END loop l
-    
-    // Sample S4 indicator
-    int     index_s4          = 0;
-    if (Lm(n) > 1) {
-      // Compute S4 components probabilities
-      log_posterior_kernel_nL -= log_posterior_kernel_nL.max();
-      vec     pr_s4           = exp(log_posterior_kernel_nL)/accu(exp(log_posterior_kernel_nL));
-      
-      // Sample S4 indicator
-      NumericVector seq_1S    = wrap(seq_len(Lm(n)) - 1);
-      index_s4                = csample_num1(seq_1S, wrap(pr_s4));
-    }
-    aux_SL(n)                 = index_s4;
-    aux_B.row(n)              = aux_B_nL.row(index_s4);
-    
-  } // END n loop
-  
-  return List::create(
-    _["aux_B"]    = aux_B,
-    _["aux_SL"]   = aux_SL
-  );
-} // END sample_B_heterosk1_s4
-
-
-
-// [[Rcpp::interfaces(cpp)]]
-// [[Rcpp::export]]
-Rcpp::List sample_B_heterosk1_s4_boost (
-    arma::mat                     aux_B,          // NxN
-    arma::ivec                    aux_SL,         // Nx1 row-specific S4 indicators
-    const arma::mat&              aux_A,          // NxK
-    const arma::mat&              aux_hyper,      // (2*N+1)x2
-    const arma::mat&              aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&              Y,              // NxT dependent variables
-    const arma::mat&              X,              // KxT dependent variables
-    const Rcpp::List&             prior,          // a list of priors - original dimensions
-    const arma::field<arma::mat>& VBL       // restrictions on B0 in S4 arrangement
-) {
-  // the function draws new values of aux_B and aux_SL
-  
-  const int N           = aux_B.n_rows;
-  const int T           = Y.n_cols;
-  
-  int         Ltmp      = VBL.n_elem - 1;
-  vec         Lm        = VBL(Ltmp);
-  double      L         = accu(Lm);
-  field<mat>  VB        = VBL.rows(0, L-1);
-  
-  const int posterior_nu    = T + N;
-  mat prior_B_V_inv         = as<mat>(prior["B_V_inv"]);
-  mat shocks                = Y - aux_A * X;
-  
-  for (int n=0; n<N; n++) {
-    mat aux_B_nL(Lm(n), N);
-    vec log_posterior_kernel_nL(Lm(n));
-    mat aux_B_tmp           = aux_B;
-    
-    for (int l=0; l<Lm(n); l++) {
-      int ll = 0;
-      if (n == 0) {
-        ll                    = l;
-      } else {
-        vec Lm_cs             = cumsum(Lm);
-        ll                    = Lm_cs(n-1) + l;
-      }
-      
-      // set scale matrix
-      mat shocks_sigma        = shocks.each_row() / aux_sigma.row(n);
-      mat posterior_SS_inv    = pow(aux_hyper(n, 0), -1) * prior_B_V_inv + shocks_sigma * shocks_sigma.t();
-      mat posterior_S_inv     = VB(ll) * posterior_SS_inv * VB(ll).t();
-      posterior_S_inv         = 0.5*( posterior_S_inv + posterior_S_inv.t() );
-      
-      // sample B
-      mat Un                  = chol(posterior_nu * inv_sympd(posterior_S_inv));
-      mat B_tmp               = aux_B;
-      B_tmp.shed_row(n);
-      rowvec w                = trans(orthogonal_complement_matrix_TW(B_tmp.t()));
-      vec w1_tmp              = trans(w * VB(ll).t() * Un.t());
-      double w1w1_tmp         = as_scalar(sum(pow(w1_tmp, 2)));
-      mat w1                  = w1_tmp.t()/sqrt(w1w1_tmp);
-      mat Wn;
-      int rn                  = VB(ll).n_rows;
-      if (rn==1) {
-        Wn                    = w1;
-      } else {
-        Wn                    = join_rows(w1.t(), orthogonal_complement_matrix_TW(w1.t()));
-      }
-      
-      vec   alpha(rn);
-      vec   u                 = rnorm(posterior_nu+1, 0, pow(posterior_nu, -0.5));
-      alpha(0)                = pow(as_scalar(sum(pow(u,2))), 0.5);
-      if (R::runif(0,1)<0.5) {
-        alpha(0)             *= -1;
-      }
-      if (rn>1){
-        vec nn                = Rcpp::rnorm(rn-1, 0, pow(posterior_nu, -0.5));
-        alpha.rows(1,rn-1)    = nn;
-      }
-      rowvec b0n              = alpha.t() * Wn * Un;
-      aux_B_nL.row(l)         = b0n * VB(ll);
-      
-      // posterior kernel
-      aux_B_tmp.row(n)            = aux_B_nL.row(l);
-      mat std_shocks              = (aux_B_tmp * shocks) / aux_sigma;
-      log_posterior_kernel_nL(l) -= 0.5 * accu(square(std_shocks));                   // likelihood kernel exp part
-      double abs_log_det_B;
-      double sign_;
-      log_det(abs_log_det_B, sign_, aux_B_tmp); 
-      log_posterior_kernel_nL(l) += T * abs_log_det_B;                                // likelihood kernel det part
-      log_posterior_kernel_nL(l) -= 0.5 * as_scalar(b0n * posterior_S_inv * b0n.t()); // prior B kernel
-      log_posterior_kernel_nL(l) += log(1/Lm(n));                                     // prior multinomial - it's flat, so this does not matter
-    } // END loop l
-    
-    // Sample S4 indicator
-    int     index_s4          = 0;
-    if (Lm(n) > 1) {
-      // Compute S4 components probabilities
-      log_posterior_kernel_nL -= log_posterior_kernel_nL.max();
-      vec     pr_s4           = exp(log_posterior_kernel_nL)/accu(exp(log_posterior_kernel_nL));
-      
-      // Sample S4 indicator
-      NumericVector seq_1S    = wrap(seq_len(Lm(n)) - 1);
-      index_s4                = csample_num1(seq_1S, wrap(pr_s4));
-    }
-    aux_SL(n)                 = index_s4;
-    aux_B.row(n)              = aux_B_nL.row(index_s4);
-    
-  } // END n loop
-  
-  return List::create(
-    _["aux_B"]    = aux_B,
-    _["aux_SL"]   = aux_SL
-  );
-} // END sample_B_heterosk1_s4_boost

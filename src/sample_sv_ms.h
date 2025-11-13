@@ -65,8 +65,7 @@ Rcpp::List svar_nc1 (
     double          aux_s_n,                  // scale of IG2 prior for aux_sigma2_omega_n
     arma::urowvec   aux_S_n,                  // 1xT
     const arma::rowvec&   u,                  // 1xT
-    const Rcpp::List&     prior,
-    bool            sample_s_ = true
+    const Rcpp::List&     prior
 );
   
 
@@ -80,13 +79,12 @@ Rcpp::List svar_nc1_mss (
     arma::urowvec&        aux_S_n,            // 1xT
     const arma::mat&      aux_xi,             // MxT
     const arma::rowvec&   u,                  // 1xT
-    const Rcpp::List&     prior,
-    bool                  sample_s_ = true
+    const Rcpp::List&     prior
 );
 
 
 Rcpp::List svar_ce1 (
-    arma::rowvec&       aux_h_n,            // 1xT
+    arma::rowvec&       aux_h_tilde,            // 1xT
     double&             aux_rho_n,
     double&             aux_omega_n,
     double&             aux_sigma2v_n,
@@ -94,8 +92,7 @@ Rcpp::List svar_ce1 (
     double&             aux_s_n,             // scale of IG2 prior for aux_sigma2_omega_n
     arma::urowvec&      aux_S_n,            // 1xT
     const arma::rowvec& u,                  // 1xT
-    const Rcpp::List&   prior,
-    bool                sample_s_ = true
+    const Rcpp::List&   prior
 );
 
 
@@ -109,8 +106,7 @@ Rcpp::List svar_ce1_mss (
     arma::urowvec&      aux_S_n,            // 1xT
     const arma::mat&    aux_xi,             // MxT
     const arma::rowvec& u,                  // 1xT
-    const Rcpp::List&   prior,
-    bool                sample_s_ = true
+    const Rcpp::List&   prior
 );
 
 
@@ -131,32 +127,35 @@ arma::mat filtering (
 );
 
 
+arma::mat filtering_studentt (
+    const arma::cube& Z,                  // NxTxM state-specific standardised residuals
+    const arma::mat&  aux_PR_TR,          // MxM
+    const arma::vec&  pi_0,               // Mx1
+    const arma::mat&  aux_df              // NxM
+);
+
+
 arma::mat smoothing (
     const arma::mat&  filtered,           // MxT
     const arma::mat&  aux_PR_TR           // MxM
 );
 
 
-arma::mat sample_Markov_process_mss (
+arma::mat sample_Markov_process (
+    const arma::cube& Z,                  // NxTxM
     arma::mat         aux_xi,             // MxT
-    const arma::mat&  E,                  // NxT
-    const arma::cube& aux_B,              // NxNxM
-    const arma::mat&  aux_sigma,          // NxM
     const arma::mat&  aux_PR_TR,          // MxM
     const arma::vec&  aux_pi_0,           // Mx1
     const bool        finiteM = true
 );
 
 
-arma::mat sample_Markov_process_mssa (
+arma::mat sample_Markov_process_studentt (
+    const arma::cube& Z,                  // NxTxM
     arma::mat         aux_xi,             // MxT
-    const arma::cube& aux_B,              // NxNxM
-    const arma::cube& aux_A,              // NxKxM
-    const arma::mat&  Y,
-    const arma::mat&  X,
-    const arma::mat&  aux_sigma,          // NxM
     const arma::mat&  aux_PR_TR,          // MxM
     const arma::vec&  aux_pi_0,           // Mx1
+    const arma::mat&  aux_df,             // NxM
     const bool        finiteM = true
 );
 
@@ -167,35 +166,6 @@ Rcpp::List sample_transition_probabilities (
     const arma::mat&    aux_xi,       // MxT
     const Rcpp::List&   prior,         // a list of priors - original dimensions
     const bool          MSnotMIX = true
-);
-
-
-arma::mat orthogonal_complement_matrix_TW (const arma::mat& x);
-
-
-Rcpp::List sample_B_heterosk1_s4 (
-    arma::mat                     aux_B,          // NxN
-    arma::ivec                    aux_SL,         // Nx1 row-specific S4 indicators
-    const arma::mat&              aux_A,          // NxK
-    const arma::vec&              aux_hyper,      // NxM
-    const arma::mat&              aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&              Y,              // NxT dependent variables
-    const arma::mat&              X,              // KxT dependent variables
-    const Rcpp::List&             prior,          // a list of priors - original dimensions
-    const arma::field<arma::mat>& VBL       // restrictions on B0 in S4 arrangement
-);
-
-
-Rcpp::List sample_B_heterosk1_s4_boost (
-    arma::mat                     aux_B,          // NxN
-    arma::ivec                    aux_SL,         // Nx1 row-specific S4 indicators
-    const arma::mat&              aux_A,          // NxK
-    const arma::mat&              aux_hyper,      // (2*N+1)x2
-    const arma::mat&              aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&              Y,              // NxT dependent variables
-    const arma::mat&              X,              // KxT dependent variables
-    const Rcpp::List&             prior,          // a list of priors - original dimensions
-    const arma::field<arma::mat>& VBL       // restrictions on B0 in S4 arrangement
 );
 
 
