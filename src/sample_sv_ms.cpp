@@ -103,6 +103,16 @@ double do_rgig1(
     double psi
 ) { 
   SEXP (*fun)(int, double, double, double) = NULL;
+  
+  if ( 
+      !(isfinite(lambda) && isfinite(chi) && isfinite(psi)) ||
+       (chi <  0. || psi < 0)      || 
+       (chi == 0. && lambda <= 0.) ||
+       (psi == 0. && lambda >= 0.) 
+    ) {
+    throw std::logic_error("do_rgig1 invalid input.");
+  }
+  
   if (!fun) fun = (SEXP(*)(int, double, double, double)) R_GetCCallable("GIGrvg", "do_rgig");
   return as<double>(fun(1, lambda, chi, psi));
 } // END do_rgig1
