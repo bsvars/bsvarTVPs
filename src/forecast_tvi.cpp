@@ -92,8 +92,8 @@ Rcpp::List forecast_mssa_sv (
       try {
         draw        = mvnrnd( out_forecast_mean.slice(s).col(h), SigmaT.slice(h) );
       } 
-      catch (std::logic_error &e) {continue;}
-      catch (std::runtime_error &e) {continue;}
+      catch (std::logic_error &e) {break;}
+      catch (std::runtime_error &e) {break;}
       out_forecast.slice(s).col(h) = draw;
       
       // create Xs
@@ -207,8 +207,8 @@ Rcpp::List forecast_mss_sv (
       try {
         draw        = mvnrnd( out_forecast_mean.slice(s).col(h), Sigma_tmp );
       } 
-      catch (std::logic_error &e) {continue;}
-      catch (std::runtime_error &e) {continue;}
+      catch (std::logic_error &e) {break;}
+      catch (std::runtime_error &e) {break;}
       out_forecast.slice(s).col(h) = draw;
       
       // create Xs

@@ -1,6 +1,7 @@
 #ifndef _FORECAST_TVI_H_
 #define _FORECAST_TVI_H_
 
+#include <RcppArmadillo.h>
 
 Rcpp::List forecast_mssa_sv (
     arma::field<arma::cube>&  posterior_B,          // (S)(N,N,M)

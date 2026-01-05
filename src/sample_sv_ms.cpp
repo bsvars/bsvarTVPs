@@ -105,7 +105,7 @@ double do_rgig1(
   SEXP (*fun)(int, double, double, double) = NULL;
   
   if ( 
-      !(isfinite(lambda) && isfinite(chi) && isfinite(psi)) ||
+      !(std::isfinite(lambda) && std::isfinite(chi) && std::isfinite(psi)) ||
        (chi <  0. || psi < 0)      || 
        (chi == 0. && lambda <= 0.) ||
        (psi == 0. && lambda >= 0.) 
