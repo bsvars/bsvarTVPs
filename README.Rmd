@@ -21,9 +21,9 @@ Efficient algorithms for Bayesian estimation of Structural Vector Autoregression
 
 To install the **bsvarTVPs** package just type in **R**:
 ```
-devtools::install_github("donotdespair/bsvarTVPs_res")
+devtools::install_github("bsvars/bsvarTVPs")
 ```
 
 # Checks
 
-[![R-CMD-check](https://github.com/donotdespair/bsvarTVPs_res/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/donotdespair/bsvarTVPs_res/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/bsvars/bsvarTVPs/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/bsvars/bsvarTVPs/actions/workflows/R-CMD-check.yaml)

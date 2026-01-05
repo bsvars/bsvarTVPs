@@ -2,7 +2,8 @@
 % Please edit documentation in R/bsvarTVPTOOLs.R
 \name{autoregressive_to_array}
 \alias{autoregressive_to_array}
-\title{Extracts the posterior draws of the autoregressive matrix \eqn{A} and returns the as an \code{array}}
+\title{Extracts the posterior draws of the autoregressive matrix \eqn{A} and 
+returns the as an \code{array}}
 \usage{
 autoregressive_to_array(posterior)
 }
@@ -13,12 +14,6 @@ autoregressive_to_array(posterior)
 An array containing the posterior draws of the autoregressive matrix \eqn{A}
 }
 \description{
-Extracts the posterior draws of the autoregressive matrix \eqn{A} and returns the as an \code{array}
-}
-\references{
-Camehl, A. & Woźniak, T. (2022) What do Data Say About Time-Variation in 
-Monetary Policy Shock Identification?
-}
-\author{
-Tomasz Woźniak \email{wozniak.tom@pm.me}
+Extracts the posterior draws of the autoregressive matrix \eqn{A} 
+and returns the as an \code{array}
 }
