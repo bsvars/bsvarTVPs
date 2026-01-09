@@ -729,8 +729,8 @@ specify_bsvarTVP = R6::R6Class(
       }
       
       volatility    = match.arg(volatility)
-      if (distribution == "SV") {
-        private$sv = TRUE
+      if (volatility == "homoskedastic") {
+        private$sv = FALSE
       }
       
       if (ms4ar) {
