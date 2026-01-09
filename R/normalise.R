@@ -50,7 +50,8 @@ normalise.PosteriorBSVARTVP <- function(posterior, B_benchmark = NULL) {
   M             = dim(posterior$posterior$xi)[1]
   N             = length(comp)
   
-  if (is.null(B_benchmark)) {
+  set_B_benchmark = is.null(B_benchmark) 
+  if (set_B_benchmark) {
     B_benchmark         = array(NA, c(N, N, M, comp[TVI_equation]))
   }
   
@@ -62,7 +63,7 @@ normalise.PosteriorBSVARTVP <- function(posterior, B_benchmark = NULL) {
       TVI_indices    = which(TVI_indicator[TVI_equation, m, ] == component) #
       if ( length(TVI_indices) == 0 ) next
       
-      if (is.null(B_benchmark)) {
+      if (set_B_benchmark) {
         B_benchmark_tmp               = posterior$posterior$B_cpp[utils::tail(TVI_indices,1),1][[1]][,,m] #
         B_benchmark[,,m,component]    = diag(sign(diag(B_benchmark_tmp))) %*% B_benchmark_tmp
       }
