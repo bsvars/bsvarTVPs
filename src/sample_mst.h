@@ -7,7 +7,8 @@
 
 arma::mat sample_lambda_ms (
     const arma::mat&    aux_df,     // NxM
-    const arma::mat&    aux_xi      // MxT
+    const arma::mat&    aux_xi,      // MxT
+    arma::mat&    U           // NxT
 );
 
 

@@ -10,23 +10,24 @@ using namespace arma;
 // [[Rcpp::export]]
 arma::mat sample_lambda_ms (
     const arma::mat&    aux_df,     // NxM
-    const arma::mat&    aux_xi      // MxT
+    const arma::mat&    aux_xi,      // MxT
+    arma::mat&    U           // NxT
 ) {
   
   const int N           = aux_df.n_rows;
   const int T           = aux_xi.n_cols;
   
+  U.each_col()         /= sum(U, 1);        // normalisation E[u] = 1
+  
   mat       nu_lambda   = aux_df + 1;
-  mat       s_lambda    = aux_df - 1;
+  mat       s_lambda    = square(U) - 2;
   mat       aux_lambda(N, T);
   
   for (int n=0; n<N; n++) {
     for (int t=0; t<T; t++) {
-      
       int     m         = aux_xi.col(t).index_max();
       double  draw      =  chi2rnd(nu_lambda(n, m));
-      aux_lambda(n, t)  = s_lambda(n, m) / draw;
-  
+      aux_lambda(n, t)  = (nu_lambda(n, m) + s_lambda(n, t)) / draw;
     }
   }
   
