@@ -20,11 +20,11 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     const Rcpp::List&             prior,                // a list of priors - original dimensions
     const arma::field<arma::mat>& VB,                   // restrictions on B0
     const Rcpp::List&             starting_values,
+    const arma::uvec              sv_select,            // {1 - non-centred, 2 - centred, 3 - homoskedastic};
+    const bool                    studentt,             // {FALSE - normal, TRUE - Student-t};
     const int                     thin = 100,           // introduce thinning
-    const int                     sv_select = 1,        // {1 - non-centred, 2 - centred, 3 - homoskedastic};
     const int                     hyper_select = 1,     // {1 - horseshoe, 2 - boost, 3 - fixed}
     const bool                    finiteM = true,       // {true - stationary MS, false - overfitted};
-    const bool                    studentt = false,     // {true - normal, false - Student-t};
     const bool                    show_progress = true
 ) {
   
@@ -151,7 +151,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
       U              /= aux_sigma;
       
       try {
-        aux_lambda      = sample_lambda_ms(aux_df, aux_xi);
+        aux_lambda      = sample_lambda_ms(aux_df, aux_xi, U);
         aux_lambda_sqrt = sqrt(aux_lambda);
         aux_hetero      = aux_sigma % aux_lambda_sqrt;
       } catch (std::runtime_error &e) {}
@@ -167,10 +167,12 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     if ( debug ) Rcout<<" sample aux_xi"<<endl;
     cube Z(N, T, M);
     for (int m=0; m<M; m++) {
-      Z.slice(m)        = aux_B.slice(m) * (Y - aux_A * X);
-      if ( sv_select != 3 ) {
-        aux_sigma_tmp_m = exp(0.5 * diagmat(aux_omega.col(m)) * aux_h);
-        Z.slice(m)     /= aux_sigma_tmp_m;
+      Z.slice(m)     = aux_B.slice(m) * (Y - aux_A * X);
+      for (int n=0; n<N; n++) {
+        if ( sv_select(n) != 3 ) {
+          aux_sigma_tmp_m.row(n) = exp(0.5 * aux_omega(n,m) * aux_h.row(n));
+          Z.slice(m).row(n)     /= aux_sigma_tmp_m.row(n);
+        }
       }
     }
     if ( studentt ) {
@@ -237,19 +239,20 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
     if ( debug ) Rcout<<" sample aux_h, aux_omega and aux_S, aux_sigma2_omega"<<endl;
-    if ( sv_select != 3 ) {
-      
-      mat U(N, T);
-      E = Y - aux_A * X;
-      for (int m=0; m<M; m++) {
-        for (int t=0; t<T; t++) {
-          if (aux_xi(m,t)==1) {
-            U.col(t)      = aux_B.slice(m) * E.col(t) / aux_lambda_sqrt.col(t);
-          }
+    mat U(N, T);
+    E = Y - aux_A * X;
+    for (int m=0; m<M; m++) {
+      for (int t=0; t<T; t++) {
+        if (aux_xi(m,t)==1) {
+          U.col(t)      = aux_B.slice(m) * E.col(t) / aux_lambda_sqrt.col(t);
         }
       }
+    }
       
-      for (int n=0; n<N; n++) {
+      
+    for (int n=0; n<N; n++) {
+      if ( sv_select(n) != 3 ) {
+        
         rowvec  h_tmp       = aux_h.row(n);
         double  rho_tmp     = aux_rho(n);
         rowvec  omega_tmp   = aux_omega.row(n);
@@ -259,13 +262,13 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
         double  s2o_tmp     = aux_sigma2_omega(n);
         double  s_n         = aux_s_(n);
         
-        if ( sv_select == 2 ) {
+        if ( sv_select(n) == 2 ) {
           try {
             sv_n            = svar_ce1_mss( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior);
           } 
           catch (std::runtime_error &e) {}
           catch (std::logic_error &e) {}
-        } else if ( sv_select == 1 ) {
+        } else if ( sv_select(n) == 1 ) {
           try {
             sv_n            = svar_nc1_mss( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior);
           } 
@@ -286,10 +289,9 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
         }
         aux_sigma.row(n)    = exp(0.5 * (aux_h.row(n) % omega_T_n));
         
-      } // END n loop
-      aux_hetero            = aux_sigma % aux_lambda_sqrt;
-      
-    } // END if( sv_select != 3 )
+      } // END if( sv_select(n) != 3 )
+    } // END n loop
+    aux_hetero            = aux_sigma % aux_lambda_sqrt;
     
     if ( debug ) Rcout<<" save in posterior"<<endl;
     if (ss % thin == 0) {

@@ -86,11 +86,10 @@ forecast.PosteriorBSVARTVP <- function(
     stopifnot("Argument exogenous cannot include missing values." = sum(is.na(exogenous_forecast)) == 0 )
   }
   
-  if (object$last_draw$get_sv()) {
-    sv_select     = 1
-  } else {
-    sv_select     = 3
-  }
+  volatility          = object$last_draw$get_sv()
+  sv_select           = rep(1, length(volatility))
+  sv_select[!volatility] = 3
+  
   studentt        = !object$last_draw$get_normal()
   
   if (object$last_draw$get_msa()) {

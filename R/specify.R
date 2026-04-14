@@ -648,12 +648,13 @@ specify_bsvarTVP = R6::R6Class(
   
   private = list(
     normal = TRUE,      # if TRUE - normal shocks, if FALSE - Student-t shocks
-    sv     = TRUE,      # if TRUE - non-centred SV, if FALSE - homoskedasticity
+    sv     = logical(), # if TRUE - non-centred SV, if FALSE - homoskedasticity
     msa    = FALSE,     # if TRUE - MSSA, if FALSE - MSS
     estimate_hyper = TRUE,  # if TRUE - estimate hyper-parameters, if FALSE - fix them
     finiteM = TRUE,     # if true a stationary Markov switching, if FALSE a sparse Markov switching model is estimated
     p      = 1,         # a non-negative integer specifying the autoregressive lag order of the model. 
-    M      = 2          # positive integer specifying the number of Markov regimes in the model.
+    M      = 2,         # positive integer specifying the number of Markov regimes in the model.
+    N      = numeric()
   ), # END private
   
   public = list(
@@ -684,9 +685,9 @@ specify_bsvarTVP = R6::R6Class(
     #' @param distribution a character string specifying the conditional distribution 
     #' of structural shocks. Value \code{"norm"} sets it to the normal distribution, 
     #' while value \code{"t"} sets the Student-t distribution.
-    #' @param volatility a character string specifying the process for conditional variances 
-    #' of structural shocks. Value \code{"SV"} sets it to the non-centred Stochastic Volatility model, 
-    #' while value \code{"homoskedastic"} sets it to time invariant specification.
+    #' @param volatility a logical vector specifying the process for conditional variances 
+    #' of structural shocks. Value \code{"TRUE"} sets it to the non-centred Stochastic Volatility model, 
+    #' while value \code{"FALSE"} sets it to time invariant specification.
     #' @param ms4ar a logical value - if \code{TRUE} the Markov switching is implemented
     #' in both matrices \eqn{A} and \eqn{B}, otherwise only in matrix \eqn{B}.
     #' @param estimate_hyper a logical value - if \code{TRUE} the hyper-parameters for the prior of \eqn{A} and \eqn{B}
@@ -706,7 +707,7 @@ specify_bsvarTVP = R6::R6Class(
     B,
     train_data = 0L,
     distribution = c("norm","t"),
-    volatility = c("SV","homoskedastic"),
+    volatility = rep(FALSE, ncol(data)),
     ms4ar = FALSE,
     estimate_hyper = TRUE,
     exogenous = NULL,
@@ -728,10 +729,13 @@ specify_bsvarTVP = R6::R6Class(
         private$normal = FALSE
       }
       
-      volatility    = match.arg(volatility)
-      if (volatility == "homoskedastic") {
-        private$sv = FALSE
+      N             = ncol(data)
+      private$N     = N
+      
+      if (missing(volatility)) {
+        volatility  = rep(TRUE, N)
       }
+      private$sv    = volatility
       
       if (ms4ar) {
         private$msa = TRUE
@@ -741,7 +745,6 @@ specify_bsvarTVP = R6::R6Class(
         private$estimate_hyper = FALSE
       }
       
-      N             = ncol(data)
       d             = 0
       if (!is.null(exogenous)) {
         d           = ncol(exogenous)

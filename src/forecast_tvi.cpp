@@ -17,9 +17,9 @@ Rcpp::List forecast_mssa_sv (
     arma::cube&               posterior_omega,      // (N,M,S)
     arma::cube&               posterior_df,         // (N,M,S)
     arma::vec&                X_T,                  // (K)
-    arma::mat&                exogenous_forecast, // (horizon, d)
+    arma::mat&                exogenous_forecast,   // (horizon, d)
     const int&                horizon,
-    const int                 sv_select = 1,        // {1 - non-centred, 2 - centred, 3 - homoskedastic};
+    const arma::uvec          sv_select,            // {1 - non-centred, 2 - centred, 3 - homoskedastic};
     const bool                studentt = false      // {true - normal, false - Student-t};
 ) {
   const int   N = posterior_h_T.n_rows;
@@ -69,9 +69,11 @@ Rcpp::List forecast_mssa_sv (
       ST          = csample_num1(zeroM, wrap(PR_ST));
       
       // predict SV
-      if (sv_select != 3) {
-        HT          = posterior_omega.slice(s).col(ST) % HT + randn(N);
-        sigma2_tmp  = exp(posterior_omega.slice(s).col(ST) % HT); 
+      for (int n=0; n<N; n++) {
+        if (sv_select(n) != 3) {
+          HT          = posterior_omega.slice(s).col(ST) % HT + randn(N);
+          sigma2_tmp  = exp(posterior_omega.slice(s).col(ST) % HT); 
+        }
       }
       
       // predict Student-t
@@ -133,7 +135,7 @@ Rcpp::List forecast_mss_sv (
     arma::vec&                X_T,                   // (K)
     arma::mat&                exogenous_forecast, // (horizon, d)
     const int&                horizon,
-    const int                 sv_select = 1,        // {1 - non-centred, 2 - centred, 3 - homoskedastic};
+    const arma::uvec          sv_select,            // {1 - non-centred, 2 - centred, 3 - homoskedastic};
     const bool                studentt = false      // {true - normal, false - Student-t};
 ) {
   const int   N = posterior_h_T.n_rows;
@@ -183,9 +185,11 @@ Rcpp::List forecast_mss_sv (
       ST          = csample_num1(zeroM, wrap(PR_ST));
       
       // predict SV
-      if (sv_select != 3) {
-        HT          = posterior_omega.slice(s).col(ST) % HT + randn(N);
-        sigma2_tmp  = exp(posterior_omega.slice(s).col(ST) % HT); 
+      for (int n=0; n<N; n++) {
+        if (sv_select(n) != 3) {
+          HT          = posterior_omega.slice(s).col(ST) % HT + randn(N);
+          sigma2_tmp  = exp(posterior_omega.slice(s).col(ST) % HT); 
+        }
       }
       
       // predict Student-t

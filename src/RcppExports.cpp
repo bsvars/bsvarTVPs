@@ -665,8 +665,8 @@ RcppExport SEXP _bsvarTVPs_bsvars_normalisation_wz20031_diag(SEXP aux_BSEXP, SEX
     return rcpp_result_gen;
 }
 // bsvar_mss_tvi_sv_cpp
-Rcpp::List bsvar_mss_tvi_sv_cpp(const int& SS, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB, const Rcpp::List& starting_values, const int thin, const int sv_select, const int hyper_select, const bool finiteM, const bool studentt, const bool show_progress);
-static SEXP _bsvarTVPs_bsvar_mss_tvi_sv_cpp_try(SEXP SSSEXP, SEXP YSEXP, SEXP XSEXP, SEXP priorSEXP, SEXP VBSEXP, SEXP starting_valuesSEXP, SEXP thinSEXP, SEXP sv_selectSEXP, SEXP hyper_selectSEXP, SEXP finiteMSEXP, SEXP studenttSEXP, SEXP show_progressSEXP) {
+Rcpp::List bsvar_mss_tvi_sv_cpp(const int& SS, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB, const Rcpp::List& starting_values, const arma::uvec sv_select, const bool studentt, const int thin, const int hyper_select, const bool finiteM, const bool show_progress);
+static SEXP _bsvarTVPs_bsvar_mss_tvi_sv_cpp_try(SEXP SSSEXP, SEXP YSEXP, SEXP XSEXP, SEXP priorSEXP, SEXP VBSEXP, SEXP starting_valuesSEXP, SEXP sv_selectSEXP, SEXP studenttSEXP, SEXP thinSEXP, SEXP hyper_selectSEXP, SEXP finiteMSEXP, SEXP show_progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< const int& >::type SS(SSSEXP);
@@ -675,21 +675,21 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Rcpp::List& >::type prior(priorSEXP);
     Rcpp::traits::input_parameter< const arma::field<arma::mat>& >::type VB(VBSEXP);
     Rcpp::traits::input_parameter< const Rcpp::List& >::type starting_values(starting_valuesSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec >::type sv_select(sv_selectSEXP);
+    Rcpp::traits::input_parameter< const bool >::type studentt(studenttSEXP);
     Rcpp::traits::input_parameter< const int >::type thin(thinSEXP);
-    Rcpp::traits::input_parameter< const int >::type sv_select(sv_selectSEXP);
     Rcpp::traits::input_parameter< const int >::type hyper_select(hyper_selectSEXP);
     Rcpp::traits::input_parameter< const bool >::type finiteM(finiteMSEXP);
-    Rcpp::traits::input_parameter< const bool >::type studentt(studenttSEXP);
     Rcpp::traits::input_parameter< const bool >::type show_progress(show_progressSEXP);
-    rcpp_result_gen = Rcpp::wrap(bsvar_mss_tvi_sv_cpp(SS, Y, X, prior, VB, starting_values, thin, sv_select, hyper_select, finiteM, studentt, show_progress));
+    rcpp_result_gen = Rcpp::wrap(bsvar_mss_tvi_sv_cpp(SS, Y, X, prior, VB, starting_values, sv_select, studentt, thin, hyper_select, finiteM, show_progress));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _bsvarTVPs_bsvar_mss_tvi_sv_cpp(SEXP SSSEXP, SEXP YSEXP, SEXP XSEXP, SEXP priorSEXP, SEXP VBSEXP, SEXP starting_valuesSEXP, SEXP thinSEXP, SEXP sv_selectSEXP, SEXP hyper_selectSEXP, SEXP finiteMSEXP, SEXP studenttSEXP, SEXP show_progressSEXP) {
+RcppExport SEXP _bsvarTVPs_bsvar_mss_tvi_sv_cpp(SEXP SSSEXP, SEXP YSEXP, SEXP XSEXP, SEXP priorSEXP, SEXP VBSEXP, SEXP starting_valuesSEXP, SEXP sv_selectSEXP, SEXP studenttSEXP, SEXP thinSEXP, SEXP hyper_selectSEXP, SEXP finiteMSEXP, SEXP show_progressSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvar_mss_tvi_sv_cpp_try(SSSEXP, YSEXP, XSEXP, priorSEXP, VBSEXP, starting_valuesSEXP, thinSEXP, sv_selectSEXP, hyper_selectSEXP, finiteMSEXP, studenttSEXP, show_progressSEXP));
+        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvar_mss_tvi_sv_cpp_try(SSSEXP, YSEXP, XSEXP, priorSEXP, VBSEXP, starting_valuesSEXP, sv_selectSEXP, studenttSEXP, thinSEXP, hyper_selectSEXP, finiteMSEXP, show_progressSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -710,8 +710,8 @@ RcppExport SEXP _bsvarTVPs_bsvar_mss_tvi_sv_cpp(SEXP SSSEXP, SEXP YSEXP, SEXP XS
     return rcpp_result_gen;
 }
 // bsvar_mssa_tvi_sv_cpp
-Rcpp::List bsvar_mssa_tvi_sv_cpp(const int& SS, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB, const Rcpp::List& starting_values, const int thin, const int sv_select, const int hyper_select, const bool finiteM, const bool studentt, const bool show_progress);
-static SEXP _bsvarTVPs_bsvar_mssa_tvi_sv_cpp_try(SEXP SSSEXP, SEXP YSEXP, SEXP XSEXP, SEXP priorSEXP, SEXP VBSEXP, SEXP starting_valuesSEXP, SEXP thinSEXP, SEXP sv_selectSEXP, SEXP hyper_selectSEXP, SEXP finiteMSEXP, SEXP studenttSEXP, SEXP show_progressSEXP) {
+Rcpp::List bsvar_mssa_tvi_sv_cpp(const int& SS, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VB, const Rcpp::List& starting_values, const arma::uvec sv_select, const bool studentt, const int thin, const int hyper_select, const bool finiteM, const bool show_progress);
+static SEXP _bsvarTVPs_bsvar_mssa_tvi_sv_cpp_try(SEXP SSSEXP, SEXP YSEXP, SEXP XSEXP, SEXP priorSEXP, SEXP VBSEXP, SEXP starting_valuesSEXP, SEXP sv_selectSEXP, SEXP studenttSEXP, SEXP thinSEXP, SEXP hyper_selectSEXP, SEXP finiteMSEXP, SEXP show_progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< const int& >::type SS(SSSEXP);
@@ -720,21 +720,21 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Rcpp::List& >::type prior(priorSEXP);
     Rcpp::traits::input_parameter< const arma::field<arma::mat>& >::type VB(VBSEXP);
     Rcpp::traits::input_parameter< const Rcpp::List& >::type starting_values(starting_valuesSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec >::type sv_select(sv_selectSEXP);
+    Rcpp::traits::input_parameter< const bool >::type studentt(studenttSEXP);
     Rcpp::traits::input_parameter< const int >::type thin(thinSEXP);
-    Rcpp::traits::input_parameter< const int >::type sv_select(sv_selectSEXP);
     Rcpp::traits::input_parameter< const int >::type hyper_select(hyper_selectSEXP);
     Rcpp::traits::input_parameter< const bool >::type finiteM(finiteMSEXP);
-    Rcpp::traits::input_parameter< const bool >::type studentt(studenttSEXP);
     Rcpp::traits::input_parameter< const bool >::type show_progress(show_progressSEXP);
-    rcpp_result_gen = Rcpp::wrap(bsvar_mssa_tvi_sv_cpp(SS, Y, X, prior, VB, starting_values, thin, sv_select, hyper_select, finiteM, studentt, show_progress));
+    rcpp_result_gen = Rcpp::wrap(bsvar_mssa_tvi_sv_cpp(SS, Y, X, prior, VB, starting_values, sv_select, studentt, thin, hyper_select, finiteM, show_progress));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _bsvarTVPs_bsvar_mssa_tvi_sv_cpp(SEXP SSSEXP, SEXP YSEXP, SEXP XSEXP, SEXP priorSEXP, SEXP VBSEXP, SEXP starting_valuesSEXP, SEXP thinSEXP, SEXP sv_selectSEXP, SEXP hyper_selectSEXP, SEXP finiteMSEXP, SEXP studenttSEXP, SEXP show_progressSEXP) {
+RcppExport SEXP _bsvarTVPs_bsvar_mssa_tvi_sv_cpp(SEXP SSSEXP, SEXP YSEXP, SEXP XSEXP, SEXP priorSEXP, SEXP VBSEXP, SEXP starting_valuesSEXP, SEXP sv_selectSEXP, SEXP studenttSEXP, SEXP thinSEXP, SEXP hyper_selectSEXP, SEXP finiteMSEXP, SEXP show_progressSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvar_mssa_tvi_sv_cpp_try(SSSEXP, YSEXP, XSEXP, priorSEXP, VBSEXP, starting_valuesSEXP, thinSEXP, sv_selectSEXP, hyper_selectSEXP, finiteMSEXP, studenttSEXP, show_progressSEXP));
+        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvar_mssa_tvi_sv_cpp_try(SSSEXP, YSEXP, XSEXP, priorSEXP, VBSEXP, starting_valuesSEXP, sv_selectSEXP, studenttSEXP, thinSEXP, hyper_selectSEXP, finiteMSEXP, show_progressSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -755,7 +755,7 @@ RcppExport SEXP _bsvarTVPs_bsvar_mssa_tvi_sv_cpp(SEXP SSSEXP, SEXP YSEXP, SEXP X
     return rcpp_result_gen;
 }
 // forecast_mssa_sv
-Rcpp::List forecast_mssa_sv(arma::field<arma::cube>& posterior_B, arma::field<arma::cube>& posterior_A, arma::cube& posterior_PR_TR, arma::mat& posterior_xi_T, arma::mat& posterior_h_T, arma::mat& posterior_rho, arma::cube& posterior_omega, arma::cube& posterior_df, arma::vec& X_T, arma::mat& exogenous_forecast, const int& horizon, const int sv_select, const bool studentt);
+Rcpp::List forecast_mssa_sv(arma::field<arma::cube>& posterior_B, arma::field<arma::cube>& posterior_A, arma::cube& posterior_PR_TR, arma::mat& posterior_xi_T, arma::mat& posterior_h_T, arma::mat& posterior_rho, arma::cube& posterior_omega, arma::cube& posterior_df, arma::vec& X_T, arma::mat& exogenous_forecast, const int& horizon, const arma::uvec sv_select, const bool studentt);
 static SEXP _bsvarTVPs_forecast_mssa_sv_try(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP posterior_PR_TRSEXP, SEXP posterior_xi_TSEXP, SEXP posterior_h_TSEXP, SEXP posterior_rhoSEXP, SEXP posterior_omegaSEXP, SEXP posterior_dfSEXP, SEXP X_TSEXP, SEXP exogenous_forecastSEXP, SEXP horizonSEXP, SEXP sv_selectSEXP, SEXP studenttSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -770,7 +770,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec& >::type X_T(X_TSEXP);
     Rcpp::traits::input_parameter< arma::mat& >::type exogenous_forecast(exogenous_forecastSEXP);
     Rcpp::traits::input_parameter< const int& >::type horizon(horizonSEXP);
-    Rcpp::traits::input_parameter< const int >::type sv_select(sv_selectSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec >::type sv_select(sv_selectSEXP);
     Rcpp::traits::input_parameter< const bool >::type studentt(studenttSEXP);
     rcpp_result_gen = Rcpp::wrap(forecast_mssa_sv(posterior_B, posterior_A, posterior_PR_TR, posterior_xi_T, posterior_h_T, posterior_rho, posterior_omega, posterior_df, X_T, exogenous_forecast, horizon, sv_select, studentt));
     return rcpp_result_gen;
@@ -801,7 +801,7 @@ RcppExport SEXP _bsvarTVPs_forecast_mssa_sv(SEXP posterior_BSEXP, SEXP posterior
     return rcpp_result_gen;
 }
 // forecast_mss_sv
-Rcpp::List forecast_mss_sv(arma::field<arma::cube>& posterior_B, arma::cube& posterior_A, arma::cube& posterior_PR_TR, arma::mat& posterior_xi_T, arma::mat& posterior_h_T, arma::mat& posterior_rho, arma::cube& posterior_omega, arma::cube& posterior_df, arma::vec& X_T, arma::mat& exogenous_forecast, const int& horizon, const int sv_select, const bool studentt);
+Rcpp::List forecast_mss_sv(arma::field<arma::cube>& posterior_B, arma::cube& posterior_A, arma::cube& posterior_PR_TR, arma::mat& posterior_xi_T, arma::mat& posterior_h_T, arma::mat& posterior_rho, arma::cube& posterior_omega, arma::cube& posterior_df, arma::vec& X_T, arma::mat& exogenous_forecast, const int& horizon, const arma::uvec sv_select, const bool studentt);
 static SEXP _bsvarTVPs_forecast_mss_sv_try(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP posterior_PR_TRSEXP, SEXP posterior_xi_TSEXP, SEXP posterior_h_TSEXP, SEXP posterior_rhoSEXP, SEXP posterior_omegaSEXP, SEXP posterior_dfSEXP, SEXP X_TSEXP, SEXP exogenous_forecastSEXP, SEXP horizonSEXP, SEXP sv_selectSEXP, SEXP studenttSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -816,7 +816,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec& >::type X_T(X_TSEXP);
     Rcpp::traits::input_parameter< arma::mat& >::type exogenous_forecast(exogenous_forecastSEXP);
     Rcpp::traits::input_parameter< const int& >::type horizon(horizonSEXP);
-    Rcpp::traits::input_parameter< const int >::type sv_select(sv_selectSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec >::type sv_select(sv_selectSEXP);
     Rcpp::traits::input_parameter< const bool >::type studentt(studenttSEXP);
     rcpp_result_gen = Rcpp::wrap(forecast_mss_sv(posterior_B, posterior_A, posterior_PR_TR, posterior_xi_T, posterior_h_T, posterior_rho, posterior_omega, posterior_df, X_T, exogenous_forecast, horizon, sv_select, studentt));
     return rcpp_result_gen;
@@ -1673,21 +1673,22 @@ RcppExport SEXP _bsvarTVPs_sample_hyperparameter_mssa_s4_horseshoe(SEXP aux_hype
     return rcpp_result_gen;
 }
 // sample_lambda_ms
-arma::mat sample_lambda_ms(const arma::mat& aux_df, const arma::mat& aux_xi);
-static SEXP _bsvarTVPs_sample_lambda_ms_try(SEXP aux_dfSEXP, SEXP aux_xiSEXP) {
+arma::mat sample_lambda_ms(const arma::mat& aux_df, const arma::mat& aux_xi, arma::mat& U);
+static SEXP _bsvarTVPs_sample_lambda_ms_try(SEXP aux_dfSEXP, SEXP aux_xiSEXP, SEXP USEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< const arma::mat& >::type aux_df(aux_dfSEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type aux_xi(aux_xiSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_lambda_ms(aux_df, aux_xi));
+    Rcpp::traits::input_parameter< arma::mat& >::type U(USEXP);
+    rcpp_result_gen = Rcpp::wrap(sample_lambda_ms(aux_df, aux_xi, U));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _bsvarTVPs_sample_lambda_ms(SEXP aux_dfSEXP, SEXP aux_xiSEXP) {
+RcppExport SEXP _bsvarTVPs_sample_lambda_ms(SEXP aux_dfSEXP, SEXP aux_xiSEXP, SEXP USEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_sample_lambda_ms_try(aux_dfSEXP, aux_xiSEXP));
+        rcpp_result_gen = PROTECT(_bsvarTVPs_sample_lambda_ms_try(aux_dfSEXP, aux_xiSEXP, USEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -2551,10 +2552,10 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
         signatures.insert("arma::cube(*bsvars_normalisation_wz2003)(arma::cube,const arma::mat&)");
         signatures.insert("arma::mat(*bsvars_normalisation_wz20031)(arma::mat,const arma::mat&)");
         signatures.insert("arma::vec(*bsvars_normalisation_wz20031_diag)(arma::mat,const arma::mat&)");
-        signatures.insert("Rcpp::List(*bsvar_mss_tvi_sv_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int,const int,const int,const bool,const bool,const bool)");
-        signatures.insert("Rcpp::List(*bsvar_mssa_tvi_sv_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const int,const int,const int,const bool,const bool,const bool)");
-        signatures.insert("Rcpp::List(*forecast_mssa_sv)(arma::field<arma::cube>&,arma::field<arma::cube>&,arma::cube&,arma::mat&,arma::mat&,arma::mat&,arma::cube&,arma::cube&,arma::vec&,arma::mat&,const int&,const int,const bool)");
-        signatures.insert("Rcpp::List(*forecast_mss_sv)(arma::field<arma::cube>&,arma::cube&,arma::cube&,arma::mat&,arma::mat&,arma::mat&,arma::cube&,arma::cube&,arma::vec&,arma::mat&,const int&,const int,const bool)");
+        signatures.insert("Rcpp::List(*bsvar_mss_tvi_sv_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const arma::uvec,const bool,const int,const int,const bool,const bool)");
+        signatures.insert("Rcpp::List(*bsvar_mssa_tvi_sv_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const arma::uvec,const bool,const int,const int,const bool,const bool)");
+        signatures.insert("Rcpp::List(*forecast_mssa_sv)(arma::field<arma::cube>&,arma::field<arma::cube>&,arma::cube&,arma::mat&,arma::mat&,arma::mat&,arma::cube&,arma::cube&,arma::vec&,arma::mat&,const int&,const arma::uvec,const bool)");
+        signatures.insert("Rcpp::List(*forecast_mss_sv)(arma::field<arma::cube>&,arma::cube&,arma::cube&,arma::mat&,arma::mat&,arma::mat&,arma::cube&,arma::cube&,arma::vec&,arma::mat&,const int&,const arma::uvec,const bool)");
         signatures.insert("arma::mat(*orthogonal_complement_matrix_TW)(const arma::mat&)");
         signatures.insert("arma::mat(*sample_B_heterosk1)(arma::mat,const arma::mat&,arma::field<arma::mat>,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
         signatures.insert("Rcpp::List(*sample_B_heterosk1_s4)(arma::mat,arma::ivec,const arma::mat&,arma::field<arma::mat>,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&)");
@@ -2573,7 +2574,7 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
         signatures.insert("Rcpp::List(*sample_hyperparameter_mss_horseshoe)(Rcpp::List&,const arma::cube&,const arma::mat&,const arma::field<arma::mat>&,const Rcpp::List&)");
         signatures.insert("Rcpp::List(*sample_hyperparameter_mss_s4_horseshoe)(Rcpp::List&,const arma::cube&,const arma::mat&,const arma::field<arma::mat>&,const arma::imat&,const Rcpp::List&)");
         signatures.insert("Rcpp::List(*sample_hyperparameter_mssa_s4_horseshoe)(Rcpp::List&,const arma::cube&,const arma::cube&,const arma::field<arma::mat>&,const arma::imat&,const Rcpp::List&)");
-        signatures.insert("arma::mat(*sample_lambda_ms)(const arma::mat&,const arma::mat&)");
+        signatures.insert("arma::mat(*sample_lambda_ms)(const arma::mat&,const arma::mat&,arma::mat&)");
         signatures.insert("double(*log_kernel_df_ms_nm)(const double&,const arma::rowvec&,const double&)");
         signatures.insert("Rcpp::List(*sample_df_ms)(arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const int&,arma::mat&,const arma::vec&)");
         signatures.insert("int(*csample_num1)(Rcpp::NumericVector,Rcpp::NumericVector)");
@@ -2717,7 +2718,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bsvarTVPs_sample_hyperparameter_mss_horseshoe", (DL_FUNC) &_bsvarTVPs_sample_hyperparameter_mss_horseshoe, 5},
     {"_bsvarTVPs_sample_hyperparameter_mss_s4_horseshoe", (DL_FUNC) &_bsvarTVPs_sample_hyperparameter_mss_s4_horseshoe, 6},
     {"_bsvarTVPs_sample_hyperparameter_mssa_s4_horseshoe", (DL_FUNC) &_bsvarTVPs_sample_hyperparameter_mssa_s4_horseshoe, 6},
-    {"_bsvarTVPs_sample_lambda_ms", (DL_FUNC) &_bsvarTVPs_sample_lambda_ms, 2},
+    {"_bsvarTVPs_sample_lambda_ms", (DL_FUNC) &_bsvarTVPs_sample_lambda_ms, 3},
     {"_bsvarTVPs_log_kernel_df_ms_nm", (DL_FUNC) &_bsvarTVPs_log_kernel_df_ms_nm, 3},
     {"_bsvarTVPs_sample_df_ms", (DL_FUNC) &_bsvarTVPs_sample_df_ms, 8},
     {"_bsvarTVPs_csample_num1", (DL_FUNC) &_bsvarTVPs_csample_num1, 2},

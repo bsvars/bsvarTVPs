@@ -95,11 +95,10 @@ estimate.BSVARTVP <- function(specification, S, thin = 1, show_progress = TRUE) 
   starting_values     = specification$starting_values$get_starting_values()
   data_matrices       = specification$data_matrices$get_data_matrices()
   
-  if (specification$get_sv()) {
-    sv_select         = 1
-  } else {
-    sv_select         = 3
-  }
+  volatility          = specification$get_sv()
+  sv_select           = rep(1, length(volatility))
+  sv_select[!volatility] = 3
+  
   if (specification$get_estimate_hyper()) {
     hyper_select      = 2
   } else {
@@ -109,11 +108,11 @@ estimate.BSVARTVP <- function(specification, S, thin = 1, show_progress = TRUE) 
   studentt            = !specification$get_normal()
   
   if (specification$get_msa()) {
-    output            = .Call(`_bsvarTVPs_bsvar_mssa_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, starting_values, thin, sv_select, hyper_select, finiteM, studentt, show_progress)
+    output            = .Call(`_bsvarTVPs_bsvar_mssa_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, starting_values, sv_select, studentt, thin, hyper_select, finiteM, show_progress)
     A                 = autoregressive_to_array(output)
     output$posterior$A = A
   } else {
-    output            = .Call(`_bsvarTVPs_bsvar_mss_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, starting_values, thin, sv_select, hyper_select, finiteM, studentt, show_progress)
+    output            = .Call(`_bsvarTVPs_bsvar_mss_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, starting_values, sv_select, studentt, thin, hyper_select, finiteM, show_progress)
   }
   
   B                   = structural_to_array(output)
@@ -145,11 +144,10 @@ estimate.PosteriorBSVARTVP <- function(specification, S, thin = 1, show_progress
   starting_values     = specification$last_draw$starting_values$get_starting_values()
   data_matrices       = specification$last_draw$data_matrices$get_data_matrices()
   
-  if (specification$last_draw$get_sv()) {
-    sv_select         = 1
-  } else {
-    sv_select         = 3
-  }
+  volatility          = specification$last_draw$get_sv()
+  sv_select           = rep(1, length(volatility))
+  sv_select[!volatility] = 3
+  
   if (specification$last_draw$get_estimate_hyper()) {
     hyper_select      = 2
   } else {
@@ -159,11 +157,11 @@ estimate.PosteriorBSVARTVP <- function(specification, S, thin = 1, show_progress
   studentt            = !specification$last_draw$get_normal()
   
   if (specification$last_draw$get_msa()) {
-    output            = .Call(`_bsvarTVPs_bsvar_mssa_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, starting_values, thin, sv_select, hyper_select, finiteM, studentt, show_progress)
+    output            = .Call(`_bsvarTVPs_bsvar_mssa_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, starting_values, sv_select, studentt, thin, hyper_select, finiteM, show_progress)
     A                 = autoregressive_to_array(output)
     output$posterior$A = A
   } else {
-    output            = .Call(`_bsvarTVPs_bsvar_mss_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, starting_values, thin, sv_select, hyper_select, finiteM, studentt, show_progress)
+    output            = .Call(`_bsvarTVPs_bsvar_mss_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, starting_values, sv_select, studentt, thin, hyper_select, finiteM, show_progress)
   }
   
   B                   = structural_to_array(output)

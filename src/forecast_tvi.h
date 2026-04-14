@@ -13,9 +13,9 @@ Rcpp::List forecast_mssa_sv (
     arma::cube&               posterior_omega,      // (N,M,S)
     arma::cube&               posterior_df,         // (N,M,S)
     arma::vec&                X_T,                  // (K)
-    arma::mat&                exogenous_forecast, // (horizon, d)
+    arma::mat&                exogenous_forecast,   // (horizon, d)
     const int&                horizon,
-    const int                 sv_select = 1,        // {1 - non-centred, 2 - centred, 3 - homoskedastic};
+    const arma::uvec          sv_select,            // {1 - non-centred, 2 - centred, 3 - homoskedastic};
     const bool                studentt = false      // {true - normal, false - Student-t};
 );
 
@@ -32,7 +32,7 @@ Rcpp::List forecast_mss_sv (
     arma::vec&                X_T,                   // (K)
     arma::mat&                exogenous_forecast, // (horizon, d)
     const int&                horizon,
-    const int                 sv_select = 1,        // {1 - non-centred, 2 - centred, 3 - homoskedastic};
+    const arma::uvec          sv_select,            // {1 - non-centred, 2 - centred, 3 - homoskedastic};
     const bool                studentt = false      // {true - normal, false - Student-t};
 );
 

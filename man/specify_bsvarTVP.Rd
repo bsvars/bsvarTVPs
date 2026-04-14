@@ -140,7 +140,7 @@ Create a new specification of the bsvarTVP model.
   B,
   train_data = 0L,
   distribution = c("norm", "t"),
-  volatility = c("SV", "homoskedastic"),
+  volatility = rep(FALSE, ncol(data)),
   ms4ar = FALSE,
   estimate_hyper = TRUE,
   exogenous = NULL,
@@ -169,9 +169,9 @@ to be used as training sample to be used to train the prior distribution for \eq
 of structural shocks. Value \code{"norm"} sets it to the normal distribution, 
 while value \code{"t"} sets the Student-t distribution.}
 
-\item{\code{volatility}}{a character string specifying the process for conditional variances 
-of structural shocks. Value \code{"SV"} sets it to the non-centred Stochastic Volatility model, 
-while value \code{"homoskedastic"} sets it to time invariant specification.}
+\item{\code{volatility}}{a logical vector specifying the process for conditional variances 
+of structural shocks. Value \code{"TRUE"} sets it to the non-centred Stochastic Volatility model, 
+while value \code{"FALSE"} sets it to time invariant specification.}
 
 \item{\code{ms4ar}}{a logical value - if \code{TRUE} the Markov switching is implemented
 in both matrices \eqn{A} and \eqn{B}, otherwise only in matrix \eqn{B}.}
