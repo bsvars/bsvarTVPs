@@ -249,7 +249,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
         }
       }
       
-      for (int n=0; n<N-1; n++) {
+      for (int n=0; n<N; n++) {
         rowvec  h_tmp       = aux_h.row(n);
         double  rho_tmp     = aux_rho(n);
         rowvec  omega_tmp   = aux_omega.row(n);
