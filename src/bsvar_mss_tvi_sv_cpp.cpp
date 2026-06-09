@@ -259,7 +259,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     }
     
     for (int n=0; n<N; n++) {
-      // if ( sv_select(n) != 3 ) {
+      if ( sv_select(n) != 3 ) {
       if ( debug ) Rcout<<" sv n: "<< n << endl;
         rowvec  h_tmp       = aux_h.row(n);
         double  rho_tmp     = aux_rho(n);
@@ -297,7 +297,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
         }
         aux_sigma.row(n)    = exp(0.5 * (aux_h.row(n) % omega_T_n));
         
-      // } // END if( sv_select(n) != 3 )
+      } // END if( sv_select(n) != 3 )
     } // END n loop
     aux_hetero            = aux_sigma % aux_lambda_sqrt;
     
