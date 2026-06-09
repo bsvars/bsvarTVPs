@@ -44,6 +44,13 @@ for the structural matrix \eqn{B}. This precision matrix is equation invariant.}
 \item{\code{B_nu}}{a positive integer greater of equal than \code{N}, a shape parameter of 
 the generalised-normal prior distribution for the structural matrix \eqn{B}.}
 
+\item{\code{VB0}}{an \code{NxN} containing in columns diagonal element of the diagonal 
+covariance matrix of the normal prior distribution 
+for the structural matrix \eqn{\Theta_0}.}
+
+\item{\code{B0}}{an \code{NxN} matrix in columns containing the mean of the normal prior distribution 
+for the structural matrix \eqn{\Theta_0}.}
+
 \item{\code{hyper_nu_B}}{a positive scalar, the shape parameter of the inverted-gamma 2 prior
 for the overall shrinkage parameter for matrix \eqn{B}.}
 

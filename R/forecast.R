@@ -66,7 +66,7 @@ forecast.PosteriorBSVARTVP <- function(
   X_T             = object$last_draw$data_matrices$X[,T]
   K               = length(X_T)
   d               = K - N * object$last_draw$get_p() - 1
-  posterior_B     = object$posterior$B_cpp
+  posterior_B     = object$posterior$structural_cpp
   posterior_A     = object$posterior$A_cpp
   posterior_PR_TR = object$posterior$PR_TR
   posterior_xi_T  = matrix(object$posterior$xi[,T,], ncol = S)

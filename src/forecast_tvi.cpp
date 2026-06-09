@@ -88,6 +88,7 @@ Rcpp::List forecast_mssa_sv (
       // predictive density
       BT_inv_sigma  = solve(posterior_B(s).slice(ST), diagmat(sigmaT));
       mat Sigma_tmp = BT_inv_sigma * BT_inv_sigma.t();
+      Sigma_tmp     = 0.5 * (Sigma_tmp + Sigma_tmp.t());
       SigmaT.slice(h) = 0.5 * (Sigma_tmp + Sigma_tmp.t());
       out_forecast_mean.slice(s).col(h) = posterior_A(s).slice(ST) * Xt;
       

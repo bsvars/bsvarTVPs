@@ -72,4 +72,39 @@ arma::mat sample_Theta0_Hou24_heterosk1 (
 );
 
 
+arma::mat sample_Theta0_Hou24_heterosk1_coln (
+    const int         n,
+    arma::mat&        aux_Theta0,     // NxN
+    const arma::mat&  shocks,         // NxT B(Y-AX)
+    const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+    const Rcpp::List& prior,          // a list of priors - original dimensions
+    const arma::mat&  R_E_n,
+    const arma::mat&  D_E_n,
+    const Rcpp::List& restrictions,   // containing only R_E(n) and D_E(n)
+    const bool        debug = false
+);
+
+
+Rcpp::List sample_Theta0_Hou24_heterosk1_s4 (
+    arma::mat                     aux_Theta0,     // NxN
+    arma::ivec                    aux_SL,         // Nx1 row-specific S4 indicators aux_SL.slice(1).col(m)
+    const arma::mat&              shocks,         // NxT B(Y-AX)
+    const arma::mat&              aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+    const Rcpp::List&             prior,          // a list of priors - original dimensions
+    const Rcpp::List&             restrictions    // output of construct_LR
+);
+
+
+Rcpp::List sample_Theta0_mss_s4 (
+    arma::cube        aux_Theta0,     // NxNxM
+    arma::imat        aux_SL,         // NxM row-specific S4 indicators
+    const arma::cube& aux_B,          // NxNxM
+    const arma::mat&  shocks,         // NxT
+    const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+    const arma::mat&  aux_xi,         // MxT
+    const Rcpp::List& prior,          // a list of priors - original dimensions
+    const Rcpp::List& restrictions
+);
+
+
 #endif

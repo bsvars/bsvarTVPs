@@ -21,34 +21,44 @@ arma::mat sample_B_heterosk1 (
 );
 
 
+arma::mat sample_B_heterosk1_rown (
+    int               n,              // row n of B to be sampled
+    arma::mat         aux_B,          // NxN
+    arma::mat&        shocks,         // NxT conditional STANDARD DEVIATIONS
+    arma::mat&        aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+    arma::mat         prior_precision_n, // (N,N)
+    const Rcpp::List& prior,          // a list of priors - original dimensions
+    arma::mat&        VB_n        // restrictions on B0
+);
+
+
+double log_posterior_kernel_B (
+    arma::mat                     aux_B,          // NxN
+    arma::mat                     aux_Theta0_inv,
+    arma::mat&                    shocks,         // NxT RF error terms
+    arma::mat&                    aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+    arma::field<arma::mat>        prior_precision // (N)(N,N)
+);
+
+
 Rcpp::List sample_B_heterosk1_s4 (
     arma::mat                     aux_B,          // NxN
     arma::ivec                    aux_SL,         // Nx1 row-specific S4 indicators
-    const arma::mat&              aux_A,          // NxK
+    arma::mat                     aux_Theta0,     // NxN
+    arma::mat                     aux_Theta0_inv,
+    arma::mat&                    shocks,         // NxT RF error terms
+    arma::mat&                    aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     arma::field<arma::mat>        prior_precision, // (N)(N,N)
-    const arma::mat&              aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&              Y,              // NxT dependent variables
-    const arma::mat&              X,              // KxT dependent variables
     const Rcpp::List&             prior,          // a list of priors - original dimensions
-    const arma::field<arma::mat>& VBL       // restrictions on B0 in S4 arrangement
+    const arma::field<arma::mat>& VBL             // restrictions on B0 in S4 arrangement
 );
 
-
-arma::cube sample_B_mss (
-    arma::cube        aux_B,          // NxNxM
-    const arma::mat&  aux_A,          // NxK
-    arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
-    const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&  aux_xi,         // MxT
-    const arma::mat&  Y,              // NxT dependent variables
-    const arma::mat&  X,              // KxT dependent variables
-    const Rcpp::List& prior,          // a list of priors - original dimensions
-    const arma::field<arma::mat>& VB        // restrictions on B0
-);
 
 Rcpp::List sample_B_mss_s4 (
     arma::cube        aux_B,          // NxNxM
     arma::imat        aux_SL,         // NxM row-specific S4 indicators
+    arma::cube        aux_Theta0,
+    arma::cube        aux_Theta0_inv,
     const arma::mat&  aux_A,          // NxK
     arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
@@ -63,6 +73,8 @@ Rcpp::List sample_B_mss_s4 (
 Rcpp::List sample_B_mssa_s4 (
     arma::cube        aux_B,          // NxNxM
     arma::imat        aux_SL,         // NxM row-specific S4 indicators
+    arma::cube        aux_Theta0,
+    arma::cube        aux_Theta0_inv,
     const arma::cube& aux_A,          // NxKxM
     arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS

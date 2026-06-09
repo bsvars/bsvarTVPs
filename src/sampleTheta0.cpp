@@ -1,6 +1,6 @@
 
 #include <RcppArmadillo.h>
-// [[Rcpp::depends(RcppArmadillo)]]
+#include "sample_sv_ms.h"
 
 using namespace Rcpp;
 using namespace arma;
@@ -424,41 +424,325 @@ arma::mat sample_Theta0_Hou24_heterosk1 (
 
 
 
-/*** R
+// [[Rcpp::export]]
+arma::mat sample_Theta0_Hou24_heterosk1_coln (
+    const int         n,
+    arma::mat&        aux_Theta0,     // NxN
+    const arma::mat&  shocks,         // NxT B(Y-AX)
+    const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+    const Rcpp::List& prior,          // a list of priors - original dimensions
+    const arma::mat&  R_E_n,
+    const arma::mat&  D_E_n,
+    const Rcpp::List& restrictions,   // containing only R_E(n) and D_E(n)
+    const bool        debug = false
+) {
+  
+  if (debug) {Rcout << "START" << endl;}
+  const int N           = aux_Theta0.n_rows;
+  const int TT          = shocks.n_cols;
+  const double T        = TT;
+  
+  mat prior_VB0         = as<mat>(prior["VB0"]);
+  mat prior_B0          = as<mat>(prior["B0"]);
+  
+  field<mat> R_I        = as<field<mat>>(restrictions["R_I"]);
+  field<mat> U_I        = as<field<mat>>(restrictions["U_I"]);
+  field<mat> L_I        = as<field<mat>>(restrictions["L_I"]);
+  
+  mat Y_XA;
+  
+  if (debug) {Rcout << " iteration: " << n << endl;}
+  
+  Y_XA                = trans(shocks.each_row() / aux_sigma.row(n));
+  
+  mat Bi              = aux_Theta0;
+  mat Sci             = eye(N, N);
+  
+  if (n > 0) {
+    
+    if (n == N - 1) {
+      Sci             = join_horiz(Sci.col(n), Sci.cols(0, n - 1));
+    } else {
+      Sci             = join_horiz(Sci.col(n), Sci.cols(0, n - 1), Sci.cols(n + 1, N - 1));
+    }
+    Bi                = aux_Theta0 * Sci;
+  }
+  
+  int nri             = D_E_n.n_rows;
+  
+  // prior for b1 
+  if (debug) {Rcout << " prior for b1 " << endl;}
+  mat Vb10            = diagmat(prior_VB0.col(n));
+  vec b10             = prior_B0.col(n);
+  
+  // construct T, Btilde, Ytilde, w0 and invVw0, invBtilde22
+  if (debug) {Rcout << " construct T, Btilde, ..." << endl;}
+  mat nullBi_1        = trans( null( trans(Bi.cols(1, N - 1)) ) );
+  mat Ti;
+  
+  if (R_E_n.n_rows == 0) {
+    Ti                = join_vert( nullBi_1, trans(Bi.cols(1, N - 1)) );
+  } else {
+    mat nBR_tmp       = join_vert( nullBi_1, R_E_n );
+    Ti                = join_vert( nullBi_1, trans(null(nBR_tmp)), R_E_n);
+  }
+  mat Btilde          = Ti * Bi;
+  mat Ytilde          = Y_XA * Ti.t();
+  mat CStilde         = kron(Ytilde, eye(N, N));
+  vec w0              = Ti * b10;
+  mat invVw0          = inv_sympd(Ti * Vb10 * Ti.t());
+  mat invBtilde22     = inv(Btilde.submat(1, 1, N - 1, N - 1));
+  
+  // inequality constraints
+  if (debug) {Rcout << " inequality constraints" << endl;}
+  vec l_d, u_d, Rw1_I;
+  mat Rw_11_I;
+  if (R_I(n).n_rows != 0) {
+    mat Rw_I          = R_I(n) * inv(Ti);
+    vec li            = L_I(n);
+    vec ui            = U_I(n);
+    Rw1_I             = Rw_I.col(0);
+    if (N - nri - 1 >= 1) {
+      Rw_11_I           = Rw_I.cols(1, N - nri - 1);
+    }
+    if (N - nri <= N - 1) {
+      mat Rw_12_I     = Rw_I.cols(N - nri, N - 1);
+      l_d             = li - Rw_12_I * D_E_n;
+      u_d             = ui - Rw_12_I * D_E_n;
+    } else {
+      l_d             = li;
+      u_d             = ui;
+    }
+  }
+  
+  // initialize w (w1 and w_1)
+  if (debug) {Rcout << " initialize w (w1 and w_1)" << endl;}
+  vec     w           = Btilde.col(0);
+  double  w1          = w(0);
+  vec     w_1         = w.subvec(1, N - 1);
+  
+  // sample w_1
+  // conditional prior
+  if (debug) {Rcout << " sample w_1 conditional prior" << endl;}
+  vec w_10            = w0.subvec(1, N - 1) - invVw0.submat(1, 1, N - 1, N - 1) * invVw0.submat(1, 0, N - 1, 0) * (w1 - w0(0));
+  mat invVw_10        = invVw0.submat(1, 1, N - 1, N - 1);
+  vec w_110; mat invVw_110;
+  if (R_E_n.n_rows != 0 && N - nri - 2 >= 0) {
+    w_110             = w_10.subvec(0, N - nri - 2) - invVw_10.submat(0, 0, N - nri - 2, N - nri - 2) * invVw_10.submat(0, N - nri - 1, N - nri - 2, N - 2) * (D_E_n - w_10.subvec(N - nri - 1, N - 2));
+    invVw_110         = invVw_10.submat(0, 0, N - nri - 2, N - nri - 2);
+  } else {
+    w_110             = w_10;
+    invVw_110         = invVw_10;
+  }
+  
+  // construct q and Z
+  if (debug) {Rcout << " construct q and Z" << endl;}
+  vec w1w1            = vec(1, fill::value(1 / w1));
+  mat q_w_1           = CStilde * join_vert( w1w1, zeros(N - 1, 1), vectorise( join_vert( zeros(1, N - 1), invBtilde22 ) ) );
+  mat Z_w_1           = CStilde * join_vert( zeros(1, N - 1), invBtilde22 / w1, zeros(N * (N - 1), N - 1) );
+  
+  
+  // construct qtilde and Ztilde
+  if (debug) {Rcout << " construct qtilde and Ztilde" << endl;}
+  mat Z_w11; vec q_w11;
+  if (R_E_n.n_rows != 0 && N - nri - 2 >= 0) {
+    
+    mat S             = eye(N - 1, N - 1);
+    mat S1            = S.cols(0, N - nri - 2);     // others
+    mat S2            = S.cols(N - nri - 1, N - 2); // equality constraints
+    Z_w11             = Z_w_1 * S1;
+    q_w11             = q_w_1 - Z_w_1 * S2 * D_E_n;
+    
+  } else {
+    Z_w11             = Z_w_1;
+    q_w11             = q_w_1;
+  }
+  
+  // sample w_11 (or w_1)    
+  if (debug) {Rcout << " sample w_11 (or w_1)" << endl;}
+  mat Dw_11           = inv_sympd(Z_w11.t() * Z_w11 + invVw_110);
+  Dw_11               = 0.5 * (Dw_11 + Dw_11.t());
+  vec w_11hat         = Dw_11 * (Z_w11.t() * q_w11 + invVw_110 * w_110);
+  vec w_11, neww_11;
+  
+  if (R_I(n).n_rows != 0 && N - nri - 2 >= 0) {
+    
+    // inequality constaints for w11 conditional on w1, i.e., lw_11 < Rw_11_I*w_11 < uw_11 
+    vec lw_11         = l_d - Rw1_I * w1;
+    vec uw_11         = u_d - Rw1_I * w1;
+    w_11              = w_1.subvec(0, N - nri - 2);   
+    
+    // This is quite some change! Not using Botev's algo at all!
+    w_11              = Rodriguez_Yam_2004(w_11hat, Dw_11, Rw_11_I, lw_11, uw_11, w_11);
+    
+  } else {
+    w_11              = w_11hat + chol(Dw_11, "lower") * randn(w_11hat.n_elem);
+  }
+  if (N - nri - 2 >= 0) {
+    w_1                 = join_vert(w_11, D_E_n);
+  } else {
+    w_1                 = D_E_n;
+  }
+  
+  // sample w1
+  // conditional prior 
+  if (debug) {Rcout << " conditional prior" << endl;}
+  double invVw10      = invVw0(0, 0);
+  double w10          = w0(0) - as_scalar(invVw10 * invVw0.submat(0, 1, 0, N - 1) * (w_1 - w0.subvec(1, N - 1)));
+  
+  // construct gam1 and gam2
+  if (debug) {Rcout << " construct gam1 and gam2" << endl;}
+  vec q_w1           = CStilde * join_vert( zeros(N, 1), vectorise( join_vert( zeros(1, N - 1), invBtilde22 ) ) );
+  vec Z_w1           = CStilde * join_vert( vec(1, fill::ones), -invBtilde22 * w_1, zeros(N * ( N - 1), 1) );
+  double gam1        = 2 * as_scalar(Z_w1.t() * q_w1);
+  double gam2        = as_scalar(Z_w1.t() * Z_w1);
+  
+  // sample w1
+  if (debug) {Rcout << " sample w1" << endl;}
+  double w1tilde      = AN ( -0.5 * gam1 / sqrt((T - 2) * gam2), 1/(T - 2) );
+  double neww1        = sqrt(gam2 / (T - 2)) / w1tilde;
+  double logAP        = exact_sampling_w1 ( gam1, gam2, TT, neww1, w1, invVw10, w10 );
+  
+  if (R_I(n).n_rows != 0 && N - nri - 2 >= 0) {
+    // inequality constraint for w1 conditional on w_1, i.e., lw1 < Rw1_I*w1 < uw1
+    vec lw1           = l_d - Rw_11_I * w_11;
+    vec uw1           = u_d - Rw_11_I * w_11;
+    if (log(randu()) < logAP && prod( Rw1_I * neww1 < uw1 ) == 1 && prod( lw1 < Rw1_I * neww1 ) == 1 ) {
+      w1              = neww1;
+    }
+  } else if (log(randu()) < logAP) {
+    w1                = neww1;
+  }
+  vec w1_vec(1); w1_vec(0) = w1;
+  w                   = join_vert(w1_vec, w_1);
+  aux_Theta0.col(n)   = solve(Ti, w);
+  
+  return aux_Theta0;
+} // END sample_Theta0_Hou24_heterosk1_coln
 
-set.seed(123)
-N = 4
-T = 1000
 
-# sign restrictions for B, 0: unrestricted or zero restricted; 1: postive sign; -1: negative sign;
-signB_R = diag(N)
-# signB_R[1:2,1] = c(1,-1)
 
-# zero restrictions for B, 1: unrestricted; 0: zero restricted
-zeroB_R = matrix(1, N, N) # only this works
-zeroB_R[1:2,3:4] = zeroB_R[3,c(1:2,4)] = zeroB_R[4,2:3] =0
-# zeroB_R[upper.tri(zeroB_R)] = 0
 
-restrictions = construct_LR (
-  zeroB_R,
-  signB_R
-)
 
-datas = apply(matrix(4*rnorm(N*T), ncol=N),2,cumsum)
 
-prior = list(
-  VB0 = matrix(1, N, N),
-  B0 = matrix(0, N, N)
-)
 
-sample_Theta0_Hou24_heterosk1 (
-  diag(N),
-  diag(N),
-  matrix(1, N, T - 1),
-  t(datas[2:T,]),
-  t(datas[1:(T-1),]),
-  prior,
-  restrictions
-)
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+Rcpp::List sample_Theta0_Hou24_heterosk1_s4 (
+    arma::mat                     aux_Theta0,     // NxN
+    arma::ivec                    aux_SL,         // Nx1 row-specific S4 indicators aux_SL.slice(1).col(m)
+    const arma::mat&              shocks,         // NxT B(Y-AX)
+    const arma::mat&              aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+    const Rcpp::List&             prior,          // a list of priors - original dimensions
+    const Rcpp::List&             restrictions    // output of construct_LR
+) {
+  // the function draws new values of aux_Theta0 and aux_SL
+  
+  field<mat> R_E        = as<field<mat>>(restrictions["R_E"]);
+  field<mat> D_E        = as<field<mat>>(restrictions["D_E"]);
+  field<mat> R_I        = as<field<mat>>(restrictions["R_I"]);
+  field<mat> U_I        = as<field<mat>>(restrictions["U_I"]);
+  field<mat> L_I        = as<field<mat>>(restrictions["L_I"]);
+  
+  mat prior_VB0         = as<mat>(prior["VB0"]);
+  mat prior_B0          = as<mat>(prior["B0"]);
+  
+  const int N           = aux_Theta0.n_rows;
+  const int T           = shocks.n_cols;
+  int       Ltmp        = R_E.n_elem - 1;
+  vec       Lm          = R_E(Ltmp);
+  double    L           = accu(Lm);
+  field<mat> RE         = R_E.rows(0, L-1);
+  mat aux_Theta0_tmp_inv;
+  
+  for (int n=0; n<N; n++) {
+    
+    mat aux_Theta0_nL(N, Lm(n));
+    vec log_posterior_kernel_nL(Lm(n));
+    mat aux_Theta0_tmp      = aux_Theta0;
+    
+    for (int l=0; l<Lm(n); l++) {
+      int ll = 0;
+      if (n == 0) {
+        ll                    = l;
+      } else {
+        vec Lm_cs             = cumsum(Lm);
+        ll                    = Lm_cs(n-1) + l;
+      }
+    
+      aux_Theta0_tmp          = sample_Theta0_Hou24_heterosk1_coln( n, aux_Theta0_tmp, shocks, aux_sigma, prior, RE(ll), D_E(ll), restrictions );
+      aux_Theta0_nL.col(l)    = aux_Theta0_tmp.col(n);
+      
+      // posterior kernel
+      aux_Theta0_tmp_inv          = inv(aux_Theta0_tmp);
+      log_posterior_kernel_nL(l)  = accu(square((aux_Theta0_tmp_inv * shocks) / aux_sigma));                  // likelihood
+      log_posterior_kernel_nL(l) += accu(square(aux_Theta0_tmp.col(n) - prior_B0.col(n)) / prior_VB0.col(n)); // prior
+    } // END loop l
+    
+    // Sample S4 indicator
+    int     index_s4          = 0;
+    if (Lm(n) > 1) {
+      // Compute S4 components probabilities
+      log_posterior_kernel_nL -= log_posterior_kernel_nL.max();
+      vec     pr_s4           = exp(log_posterior_kernel_nL)/accu(exp(log_posterior_kernel_nL));
+      
+      // Sample S4 indicator
+      NumericVector seq_1S    = wrap(seq_len(Lm(n)) - 1);
+      index_s4                = csample_num1(seq_1S, wrap(pr_s4));
+    }
+    
+    aux_SL(n)                 = index_s4;
+    aux_Theta0.col(n)         = aux_Theta0_nL.col(index_s4);
+    
+  } // END n loop
+  
+  return List::create(
+    _["aux_Theta0"] = aux_Theta0,
+    _["aux_SL"]     = aux_SL
+  );
+} // END sample_Theta0_Hou24_heterosk1_s4
 
-*/
+
+
+
+
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+Rcpp::List sample_Theta0_mss_s4 (
+    arma::cube        aux_Theta0,     // NxNxM
+    arma::imat        aux_SL,         // NxM row-specific S4 indicators
+    const arma::cube& aux_B,          // NxNxM
+    const arma::mat&  shocks,         // NxT
+    const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+    const arma::mat&  aux_xi,         // MxT
+    const Rcpp::List& prior,          // a list of priors - original dimensions
+    const Rcpp::List& restrictions
+) {
+  const int T     = shocks.n_cols;
+  const int N     = shocks.n_rows;
+  const int M     = aux_Theta0.n_slices;
+  const vec T_m  = sum(aux_xi,1);
+  
+  for (int m=0; m<M; m++) {
+    int ii = 0;
+    mat aux_sigma_m(N, T_m(m));
+    mat shocks_m(N, T_m(m));
+    
+    for (int t=0; t<T; t++){
+      if (aux_xi(m,t)==1) {
+        aux_sigma_m.col(ii) = aux_sigma.col(t);
+        shocks_m.col(ii)    = aux_B.slice(m) * shocks.col(t);
+        ii++;
+      }
+    }
+    
+    List BSL_m              = sample_Theta0_Hou24_heterosk1_s4( aux_Theta0.slice(m), aux_SL.col(m), shocks_m, aux_sigma_m, prior, restrictions );
+    aux_Theta0.slice(m)     = as<mat>(BSL_m["aux_Theta0"]);
+    aux_SL.col(m)           = as<ivec>(BSL_m["aux_SL"]);
+  }
+  
+  return List::create(
+    _["aux_Theta0"] = aux_Theta0,
+    _["aux_SL"]     = aux_SL
+  );
+} // END sample_B_mss_s4

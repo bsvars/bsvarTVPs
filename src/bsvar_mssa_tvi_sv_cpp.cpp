@@ -4,6 +4,7 @@
 #include "bsvars.h"
 
 #include "sample_ABhyper.h"
+#include "sampleTheta0.h"
 #include "sample_sv_ms.h"
 #include "sample_mst.h"
 
@@ -19,6 +20,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     const arma::mat&              X,                    // KxT explanatory variables
     const Rcpp::List&             prior,                // a list of priors - original dimensions
     const arma::field<arma::mat>& VB,                   // restrictions on B0
+    const Rcpp::List&             VTheta0,              // restrictions on Theta0
     const Rcpp::List&             starting_values,
     const arma::uvec              sv_select,            // {1 - non-centred, 2 - centred, 3 - homoskedastic};
     const bool                    studentt,             // {FALSE - normal, TRUE - Student-t};
@@ -53,6 +55,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
   
   const int   T     = Y.n_cols;
   const int   N     = Y.n_rows;
+  const int   K     = X.n_rows;
   
   // aux_lambda - contains latent process
   // aux_lambda_sqrt = sqrt(aux_lambda)
@@ -60,14 +63,14 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
   // aux_hetero - contains the diagonal of the covariance of conditional normal aux_hetero = aux_sigma * aux_lambda_sqrt
   
   cube  aux_B       = as<cube>(starting_values["B"]);
+  cube  aux_Theta0  = as<cube>(starting_values["Theta0"]);
+  cube  aux_Theta0_inv(size(aux_Theta0));
+  cube  aux_struc(size(aux_B));
   cube  aux_A       = as<cube>(starting_values["A"]);
   List  aux_hyper   = as<List>(starting_values["hyper"]);  // (2*N+1)x2 (gamma_0, gamma_+, s_0, s_+, s_)
   mat   aux_PR_TR   = as<mat>(starting_values["PR_TR"]);
   vec   aux_pi_0    = as<vec>(starting_values["pi_0"]);
   mat   aux_xi      = as<mat>(starting_values["xi"]);
-  mat   aux_lambda  = as<mat>(starting_values["lambda"]);
-  mat   aux_lambda_sqrt = sqrt(aux_lambda);
-  mat   aux_df = as<mat>(starting_values["df"]);
   mat   aux_h       = as<mat>(starting_values["h"]);
   vec   aux_rho     = as<vec>(starting_values["rho"]);
   mat   aux_omega   = as<mat>(starting_values["omega"]);
@@ -75,12 +78,19 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
   umat  aux_S       = as<umat>(starting_values["S"]);
   vec   aux_sigma2_omega = as<vec>(starting_values["sigma2_omega"]);
   vec   aux_s_      = as<vec>(starting_values["s_"]);
-  imat  aux_SL      = as<imat>(starting_values["S4_indicator"]) - 1;      // NxM S4 indicator matrix
+  icube aux_SL      = as<icube>(starting_values["S4_indicator"]) - 1;      // NxMx2 S4 indicator matrix
   mat   aux_sigma   = as<mat>(starting_values["sigma"]);
+  mat   aux_lambda  = as<mat>(starting_values["lambda"]);
+  mat   aux_lambda_sqrt = sqrt(aux_lambda);
+  mat   aux_df = as<mat>(starting_values["df"]);
   mat   aux_hetero  = aux_sigma % aux_lambda_sqrt;
   
   const int M       = aux_PR_TR.n_cols;
   vec      Tm       = sum(aux_xi, 1);
+  for (int m=0; m<M; m++) {
+    aux_Theta0_inv.slice(m) = inv(aux_Theta0.slice(m));
+    aux_struc.slice(m)      = aux_Theta0.slice(m) * aux_B.slice(m);
+  }
   
   // parameters for adaptive sampling of degrees of freedom
   NumericVector aag = {0.44, 0.6};
@@ -94,13 +104,13 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
   const int   S     = floor(SS / thin);
   
   field<cube> posterior_B(S); // of NxNxM cubes
+  field<cube> posterior_Theta0(S);
+  field<cube> posterior_struc(S);
   field<cube> posterior_A(S); // of NxKxM cubes
   List  posterior_hyper(S);
   cube  posterior_PR_TR(M, M, S);
   mat   posterior_pi_0(M,S);
   cube  posterior_xi(M, T, S);
-  cube  posterior_lambda(N, T, S);
-  cube  posterior_df(N, M, S);
   cube  posterior_h(N, T, S);
   mat   posterior_rho(N, S);
   cube  posterior_omega(N, M, S);
@@ -108,11 +118,20 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
   ucube posterior_S(N, T, S);
   mat   posterior_sigma2_omega(N, S);
   mat   posterior_s_(N, S);
-  icube posterior_SL(N, M, S);
+  field<icube> posterior_SL(S);
+  cube  posterior_lambda(N, T, S);
+  cube  posterior_df(N, M, S);
   cube  posterior_sigma(N, T, S);
   
   vec   acceptance_count(4 + N);
-  List  BSL;
+  List  BSL = List::create(
+    _["aux_B"]      = aux_B,
+    _["aux_SL"]     = aux_SL
+  );
+  List  TSL = List::create(
+    _["aux_Theta0"] = aux_Theta0,
+    _["aux_SL"]     = aux_SL
+  );
   List  sv_n;
   List  PR_TR_tmp;
   
@@ -121,8 +140,8 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
   
   mat aux_sigma_tmp_m(N, T, fill::ones);
   mat sigmaT(N, T, fill::ones);
-  
-  rowvec    omega_T_n(T);
+  rowvec omega_T_n(T);
+  List aux_df_tmp;
   
   int   s = 0;
   
@@ -153,7 +172,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
       } catch (std::runtime_error &e) {}
       
       try {
-        List aux_df_tmp = sample_df_ms (aux_df, aux_lambda, aux_xi, U, prior, ss, adaptive_scale, adptive_alpha_gamma);
+        aux_df_tmp      = sample_df_ms (aux_df, aux_lambda, aux_xi, U, prior, ss, adaptive_scale, adptive_alpha_gamma);
         aux_df          = as<mat>(aux_df_tmp["aux_df"]);
         adaptive_scale  = as<mat>(aux_df_tmp["adaptive_scale"]);
       } catch (std::runtime_error &e) {}
@@ -218,15 +237,38 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     // sample aux_B
     if ( debug ) Rcout << " sample aux_B" << endl;
     try {
-      BSL               = sample_B_mssa_s4(aux_B, aux_SL, aux_A, precisionB, aux_hetero, aux_xi, Y, X, prior, VB);
+      BSL             = sample_B_mssa_s4 (aux_B, aux_SL.slice(0), aux_Theta0, aux_Theta0_inv, aux_A,
+                                         precisionB, aux_hetero, aux_xi, Y, X, prior, VB);
       aux_B             = as<cube>(BSL["aux_B"]);
-      aux_SL            = as<imat>(BSL["aux_SL"]);
+      aux_SL.slice(0)   = as<imat>(BSL["aux_SL"]);
     } catch (std::runtime_error &e) {}
+    
+    // sample aux_B, aux_SL
+    if ( debug ) Rcout<<" sample aux_Theta0, aux_SL"<< endl;
+    mat shocks;
+    for (int m=0; m<M; m++) {
+      for (int t=0; t<T; t++){
+        if (aux_xi(m,t)==1) {
+          shocks.col(t)   = Y.col(t) - aux_A.slice(m) * X.col(t);
+        }
+      }
+      
+      try {
+        TSL             = sample_Theta0_mss_s4( aux_Theta0, aux_SL.slice(1), aux_B, shocks, aux_sigma, aux_xi, prior, VTheta0 );
+        aux_Theta0      = as<cube>(TSL["aux_Theta0"]);
+        aux_SL.slice(1) = as<imat>(TSL["aux_SL"]);
+      } catch (std::runtime_error &e) {}
+    }
+    
+    for (int m=0; m<M; m++) {
+      aux_Theta0_inv.slice(m) = inv(aux_Theta0.slice(m));
+      aux_struc.slice(m)      = aux_Theta0_inv.slice(m) * aux_B.slice(m);
+    }
     
     // sample aux_A
     if ( debug ) Rcout << " sample aux_A" << endl;
     try {
-      aux_A             = sample_A_heterosk1_mssa(aux_A, aux_B, aux_xi, precisionA, aux_hetero, Y, X, prior);
+      aux_A             = sample_A_heterosk1_mssa(aux_A, aux_struc, aux_xi, precisionA, aux_hetero, Y, X, prior);
     } catch (std::runtime_error &e) {}
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
@@ -234,7 +276,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     for (int m=0; m<M; m++) {
       for (int t=0; t<T; t++) {
         if (aux_xi(m,t)==1) {
-          U.col(t)      = aux_B.slice(m) * (Y.col(t) - aux_A.slice(m) * X.col(t)) / aux_lambda_sqrt.col(t);
+          U.col(t)      = aux_struc.slice(m) * (Y.col(t) - aux_A.slice(m) * X.col(t)) / aux_lambda_sqrt.col(t);
         }
       }
     }
@@ -286,6 +328,8 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     if ( debug ) Rcout << " saving posterior" << endl;
     if (ss % thin == 0) {
       posterior_B(s)                = aux_B;
+      posterior_Theta0(s)           = aux_Theta0;
+      posterior_struc(s)            = aux_struc;  
       posterior_A(s)                = aux_A;
       posterior_hyper(s)            = aux_hyper;
       posterior_PR_TR.slice(s)      = aux_PR_TR;
@@ -300,7 +344,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
       posterior_S.slice(s)          = aux_S;
       posterior_sigma2_omega.col(s) = aux_sigma2_omega;
       posterior_s_.col(s)           = aux_s_;
-      posterior_SL.slice(s)         = aux_SL;
+      posterior_SL(s)               = aux_SL + 1;
       posterior_sigma.slice(s)      = aux_sigma;
       s++;
     }
@@ -309,6 +353,8 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
   return List::create(
     _["last_draw"]  = List::create(
       _["B"]        = aux_B,
+      _["Theta0"]   = aux_Theta0,
+      _["structural"] = aux_struc,
       _["A"]        = aux_A,
       _["hyper"]    = aux_hyper,
       _["PR_TR"]    = aux_PR_TR,
@@ -328,6 +374,8 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     ),
     _["posterior"]  = List::create(
       _["B_cpp"]    = posterior_B,
+      _["Theta0_cpp"] = posterior_Theta0,
+      _["structural_cpp"] = posterior_struc,
       _["A_cpp"]    = posterior_A,
       _["hyper"]    = posterior_hyper,
       _["PR_TR"]    = posterior_PR_TR,
@@ -340,7 +388,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
       _["S"]        = posterior_S,
       _["sigma2_omega"] = posterior_sigma2_omega,
       _["s_"]        = posterior_s_,
-      _["S4_indicator"] = posterior_SL + 1,
+      _["S4_indicator"] = posterior_SL,
       _["sigma"]    = posterior_sigma,
       _["lambda"]   = posterior_lambda,
       _["df"]       = posterior_df

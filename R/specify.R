@@ -30,6 +30,15 @@ specify_prior_bsvarTVP = R6::R6Class(
     #' the generalised-normal prior distribution for the structural matrix \eqn{B}.
     B_nu       = NA,
     
+    #' @field VB0 an \code{NxN} containing in columns diagonal element of the diagonal 
+    #' covariance matrix of the normal prior distribution 
+    #' for the structural matrix \eqn{\Theta_0}.
+    VB0        = matrix(),
+    
+    #' @field B0 an \code{NxN} matrix in columns containing the mean of the normal prior distribution 
+    #' for the structural matrix \eqn{\Theta_0}.
+    B0         = matrix(),
+    
     #' @field hyper_nu_B a positive scalar, the shape parameter of the inverted-gamma 2 prior
     #' for the overall shrinkage parameter for matrix \eqn{B}.
     hyper_nu_B = NA,
@@ -125,6 +134,8 @@ specify_prior_bsvarTVP = R6::R6Class(
       self$A_V_inv      = diag(c(kronecker((1:p)^2, rep(1, N) ), rep(1, d + 1)))
       self$B_V_inv      = S_inv
       self$B_nu         = T_train + N + 1
+      self$VB0          = matrix(1, N, N)
+      self$B0           = matrix(0, N, N)
       self$hyper_nu_B   = 10
       self$hyper_a_B    = 10
       self$hyper_s_BB   = 100
@@ -153,6 +164,8 @@ specify_prior_bsvarTVP = R6::R6Class(
         A_V_inv  = self$A_V_inv,
         B_V_inv  = self$B_V_inv,
         B_nu     = self$B_nu,
+        VB0      = self$VB0,
+        B0       = self$B0,
         hyper_nu_B  = self$hyper_nu_B,
         hyper_a_B   = self$hyper_a_B,
         hyper_s_BB  = self$hyper_s_BB,
@@ -199,6 +212,10 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
     #' parameter \eqn{B}. 
     B             = array(),
     
+    #' @field Theta0 an \code{NxNxM} array of starting values for the regime-dependent 
+    #' parameter \eqn{\Theta_0}. 
+    Theta0        = array(),
+    
     #' @field hyper a list of starting values for the shrinkage hyper-parameters of the 
     #' hierarchical prior distribution. 
     hyper         = list(),
@@ -228,8 +245,9 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
     #' gamma prior of the hierarchical prior for \eqn{\sigma^2_{\omega}}.
     s_            = matrix(),
     
-    #' @field S4_indicator a \code{NxM} matrix of initial identification allocations.
-    S4_indicator  = matrix(),
+    #' @field S4_indicator a \code{NxMx2} matrix of initial identification allocations.
+    #' Slice 1 is for matrix \eqn{B} and slice 2 is for \eqn{\Theta_0}.
+    S4_indicator  = array(),
     
     #' @field sigma a \code{NxT} matrix of starting values for conditional 
     #' standard deviations.
@@ -292,16 +310,32 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
       }
       
       if (M > 1) {
-        xi    = diag(M)[,sample(1:M, T, replace = TRUE)]
+        Tm      = floor(T / M)
+        st      = c()
+        for (m in 1:M) {
+          if (m != M) {
+            st  = c(st, rep(m, Tm))
+          } else {
+            st  = c(st, rep(m, T - (M - 1) * Tm))
+          }
+        }
+        xi      = diag(M)[,st]
       } else {
-        xi    = matrix(1, M, T)
+        xi      = matrix(1, M, T)
       }
       
-      K                   = N * p + 1 + d
-      self$B              = array(0, c(N, N, M))
+      K         = N * p + 1 + d
+      
+      self$B    = array(0, c(N, N, M))
       for (m in 1:M) {
         diag(self$B[,,m])[diag(B)] = runif(sum(diag(B)))
       }
+      
+      self$Theta0         = array(0, c(N, N, M))
+      for (m in 1:M) {
+        diag(self$Theta0[,,m]) = 1
+      }
+      
       self$A              = matrix(0, N, K)
       diag(self$A)[diag(A[,1:N])] = runif(sum(diag(A[,1:N])))
       self$hyper          = list(
@@ -309,13 +343,13 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
       )
       self$hyper$aux_hyper[,2] = 0.05
       
-      self$S4_indicator   = matrix(1, N, M) 
+      self$S4_indicator   = array(1, c(N, M, 2))
       self$sigma          = matrix(1, N, T)
       
       self$lambda         = matrix(1, N, T)
       self$df             = matrix(3, N, M)
       
-      self$h              = matrix(rnorm(N * T, sd = .01), N, T)
+      self$h              = matrix(1, N, T)
       self$rho            = rep(.5, N)
       self$omega          = matrix(.1, N, M)
       self$sigma2v        = matrix(.1^2, N, M)
@@ -341,6 +375,7 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
     get_starting_values   = function(){
       list(
         B                 = self$B,
+        Theta0            = self$Theta0,
         A                 = self$A,
         hyper             = self$hyper,
         lambda            = self$lambda,
@@ -380,6 +415,7 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
     #' 
     set_starting_values   = function(last_draw) {
         self$B            = last_draw$B
+        self$Theta0       = last_draw$Theta0
         self$A            = last_draw$A
         self$hyper        = last_draw$hyper
         self$lambda       = last_draw$lambda
@@ -505,6 +541,9 @@ specify_identification_bsvarsTVI = R6::R6Class(
     #' @field VB a list of \code{N} matrices determining the unrestricted elements of matrix \eqn{B}. 
     VB    = list(),
     
+    #' @field VTheta0 a list of matrices determining the zero and sign restriction of matrix \eqn{\Theta_0}. 
+    VTheta0    = list(),
+    
     #' @field VA a list of \code{N} matrices determining the unrestricted elements of matrix \eqn{A}. 
     VA    = list(),
     
@@ -513,19 +552,35 @@ specify_identification_bsvarsTVI = R6::R6Class(
     #' @param B a logical \code{NxN} matrix containing value \code{TRUE} for the elements of 
     #' the structural matrix \eqn{B} to be estimated and value \code{FALSE} for exclusion restrictions 
     #' to be set to zero.
+    #' @param Theta0 a logical \code{NxN} matrix containing value \code{TRUE} for the elements of 
+    #' the structural matrix \eqn{\Theta_0} to be estimated and value \code{FALSE} for exclusion restrictions 
+    #' to be set to zero.
     #' @param A a logical \code{NxK} matrix containing value \code{TRUE} for the elements of 
     #' the autoregressive matrix \eqn{A} to be estimated and value \code{FALSE} for exclusion restrictions 
     #' to be set to zero.
     #' @param N a positive integer - the number of dependent variables in the model.
     #' @param K a positive integer - the number of parameters in a row of autoregressive matrix.
     #' @return Identifying restrictions IdentificationBSVARTVIs
-    initialize = function(B, A, N, K) {
+    initialize = function(B, Theta0, A, N, K) {
       if (missing(B)) {
-        B     = matrix(FALSE, N, N)
+        B             = matrix(FALSE, N, N)
         B[lower.tri(B, diag = TRUE)] = TRUE
       }
+      
+      # Theta0 is transformed into numeric to facilitate construct_LR function.
+      # Theta0_sign only sets the unrestricted diagonal elements to positive numbers.
+      if (missing(Theta0)) {
+        Theta0        = diag(N)
+        Theta0_sign   = diag(N)
+      } else {
+        stopifnot("Argument Theta0 must be an NxN matrix with logical values." = is.logical(Theta0) & is.matrix(Theta0) & prod(dim(Theta0) == N))
+        Theta0        = matrix(as.numeric(Theta0), N, N)
+        Theta0_sign   = 0 * diag(N)
+        diag(Theta0_sign) = diag(Theta0)
+      }
+      
       if (missing(A)) {
-        A     = matrix(TRUE, N, K)
+        A             = matrix(TRUE, N, K)
       }
       
       stopifnot("Argument B must be an NxN matrix with logical values." = is.logical(B) & is.matrix(B) & prod(dim(B) == N))
@@ -533,11 +588,32 @@ specify_identification_bsvarsTVI = R6::R6Class(
       
       self$VB          <- vector("list", N)
       self$VA          <- vector("list", N)
+      self$VTheta0     <- vector("list", 5)
+      
       for (n in 1:N) {
         self$VB[[n]]   <- matrix(diag(N)[B[n,],], ncol = N)
         self$VA[[n]]   <- matrix(diag(K)[A[n,],], ncol = K)
       }
-      self$VB[[n + 1]] <- as.matrix(rep(1, N))
+      self$VB[[N + 1]] <- as.matrix(rep(1, N))
+      
+      restrictions_Theta0 <- .Call(`_bsvarTVPs_construct_LR`, Theta0, Theta0_sign)
+      
+      VTheta0     = list(5)
+      VTheta0_R_E = list()
+      VTheta0_D_E = list()
+      for (n in 1:N) {
+        VTheta0_R_E[[n]] = restrictions_Theta0$R_E[n,1][[1]]
+        VTheta0_D_E[[n]] = restrictions_Theta0$D_E[n,1][[1]]
+      }
+      VTheta0_R_E[[N + 1]] = as.matrix(rep(1, N))
+      VTheta0$R_E = VTheta0_R_E
+      VTheta0$D_E = VTheta0_D_E
+      
+      VTheta0$R_I = restrictions_Theta0$R_I
+      VTheta0$U_I = restrictions_Theta0$U_I
+      VTheta0$L_I = restrictions_Theta0$L_I
+      
+      self$VTheta0 = VTheta0
     }, # END initialize
     
     #' @description
@@ -551,7 +627,8 @@ specify_identification_bsvarsTVI = R6::R6Class(
     get_identification = function() {
       list(
         VB = self$VB,
-        VA = self$VA
+        VA = self$VA,
+        Theta0 = self$Theta0
       )
     }, # END get_identification
     
@@ -593,16 +670,16 @@ specify_identification_bsvarsTVI = R6::R6Class(
     
     
     #' @description
-    #' Adds a new restriction to the restrictions identifying the shock as specified 
-    #' in \code{shock} for the model to select from.
+    #' Adds a new restriction to the restrictions identifying the structural matrix \eqn{B} 
+    #' for the shock as specified in \code{shock} for the model to select from.
     #' @param restriction an \code{N}-logical vector with values \code{TRUE} for 
     #' the parameters to be estimated and \code{FALSE} for the parameters to be 
     #' restricted to zero.
     #' @param shock a positive integer specifying to which shock add the restriction.
     #' @examples 
     #' spec = specify_bsvarTVP$new(us_fiscal_lsuw)
-    #' spec$add_restriction(c(TRUE, FALSE, TRUE), shock = 2)
-    add_restriction = function(restriction, shock) {
+    #' spec$add_restriction_B(c(TRUE, FALSE, TRUE), shock = 2)
+    add_restriction_B = function(restriction, shock) {
       
       N     = length(self$VA)
       V     = length(self$VB)
@@ -625,7 +702,46 @@ specify_identification_bsvarsTVI = R6::R6Class(
       }
       self$VB[[C + 1]] = matrix( diag(N)[restriction,], ncol = N)
       self$VB[[V + 1]][shock] = self$VB[[V + 1]][shock] + 1
-    } # END get_normal
+    }, # END add_restriction_B
+    
+    #' @description
+    #' Adds a new restriction to the restrictions identifying the structural matrix \eqn{\Theta_0} 
+    #' for the shock as specified in \code{shock} for the model to select from.
+    #' @param restriction an \code{N}-logical vector with values \code{TRUE} for 
+    #' the parameters to be estimated and \code{FALSE} for the parameters to be 
+    #' restricted to zero.
+    #' @param shock a positive integer specifying to which shock add the restriction.
+    #' @examples 
+    #' spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+    #' spec$add_restriction_Theta0(c(TRUE, FALSE, TRUE), shock = 2)
+    add_restriction_Theta0 = function(restriction, shock) {
+      
+      N     = length(self$VA)
+      V     = length(self$VTheta0$R_E)
+      
+      stopifnot(
+        "The argument restriction must be a logical vector of length N." = 
+          is.logical(restriction) & length(restriction) == N & all(is.na(restriction) == FALSE) 
+      )
+      stopifnot(
+        "Argument shock has to be a positive integer in {1,..,N}." = 
+          (shock %% 1) == 0 & shock > 0 & shock <= N
+      )
+      
+      C  = tail(
+        cumsum(self$VTheta0$R_E[[V]][1:shock]),
+        1
+      )
+      for (i in V:C) {
+        self$VTheta0$R_E[[i + 1]] = self$VTheta0$R_E[[i]]
+        if (i != V) {
+          self$VTheta0$D_E[[i + 1]] = self$VTheta0$D_E[[i]]
+        }
+      }
+      self$VTheta0$R_E[[C + 1]] = matrix( diag(N)[!restriction,], ncol = N)
+      self$VTheta0$D_E[[C + 1]] = matrix(0, sum(!restriction), 1)
+      self$VTheta0$R_E[[V + 1]][shock] = self$VTheta0$R_E[[V + 1]][shock] + 1
+    } # END add_restriction_Theta0
     
   ) # END public
 ) # END specify_identification_bsvarsTVI
@@ -680,6 +796,9 @@ specify_bsvarTVP = R6::R6Class(
     #' @param B a logical \code{NxN} matrix containing value \code{TRUE} for the elements of 
     #' the structural matrix \eqn{B} to be estimated and value \code{FALSE} for exclusion restrictions 
     #' to be set to zero.
+    #' @param Theta0 a logical \code{NxN} matrix containing value \code{TRUE} for the elements of 
+    #' the structural matrix \eqn{\Theta_0} to be estimated and value \code{FALSE} for exclusion restrictions 
+    #' to be set to zero.
     #' @param train_data a positive integer specifying the number of initial observations
     #' to be used as training sample to be used to train the prior distribution for \eqn{B}.
     #' @param distribution a character string specifying the conditional distribution 
@@ -701,18 +820,19 @@ specify_bsvarTVP = R6::R6Class(
     #' in which \code{M=20} and the number of visited states is estimated.
     #' @return A new complete specification for the bsvarTVP model.
     initialize = function(
-    data,
-    p = 1L,
-    M = 2L,
-    B,
-    train_data = 0L,
-    distribution = c("norm","t"),
-    volatility = rep(FALSE, ncol(data)),
-    ms4ar = FALSE,
-    estimate_hyper = TRUE,
-    exogenous = NULL,
-    stationary = rep(FALSE, ncol(data)),
-    finiteM = TRUE
+      data,
+      p = 1L,
+      M = 2L,
+      B,
+      Theta0,
+      train_data = 0L,
+      distribution = c("norm","t"),
+      volatility = rep(FALSE, ncol(data)),
+      ms4ar = FALSE,
+      estimate_hyper = TRUE,
+      exogenous = NULL,
+      stationary = rep(FALSE, ncol(data)),
+      finiteM = TRUE
     ) {
       stopifnot("Argument p has to be a positive integer." = ((p %% 1) == 0 & p > 0))
       private$p     = p
@@ -733,7 +853,7 @@ specify_bsvarTVP = R6::R6Class(
       private$N     = N
       
       if (missing(volatility)) {
-        volatility  = rep(TRUE, N)
+        volatility  = rep(FALSE, N)
       }
       private$sv    = volatility
       
@@ -767,6 +887,11 @@ specify_bsvarTVP = R6::R6Class(
       }
       stopifnot("Incorrectly specified argument B." = (is.matrix(B) & is.logical(B)) | (length(B) == 1 & is.na(B)))
       
+      if (missing(Theta0)) {
+        Theta0        = matrix(FALSE, N, N)
+        diag(Theta0)  = TRUE
+      }
+      
       if (train_data == 0) {
         data_train    = NULL
         data_estimate = data
@@ -779,7 +904,7 @@ specify_bsvarTVP = R6::R6Class(
       A             = matrix(TRUE, N, K)
       
       self$data_matrices   = specify_data_matrices$new(data_estimate, p, exogenous)
-      self$identification  = specify_identification_bsvarsTVI$new(B, A, N, K)
+      self$identification  = specify_identification_bsvarsTVI$new(B, Theta0, A, N, K)
       self$prior           = specify_prior_bsvarTVP$new(data_train, N, M, p, d, stationary)
       if ( ms4ar ) {
         self$starting_values = specify_starting_values_bsvarTVPmsa$new(A, B, N, M, T, p, d, finiteM)
@@ -789,18 +914,32 @@ specify_bsvarTVP = R6::R6Class(
     }, # END initialize
     
     #' @description
-    #' Adds a new restriction to the restrictions identifying the shock as specified 
-    #' in \code{shock} for the model to select from.
+    #' Adds a new restriction to the restrictions identifying the structural matrix \eqn{B} 
+    #' for the shock as specified in \code{shock} for the model to select from.
     #' @param restriction an \code{N}-logical vector with values \code{TRUE} for 
     #' the parameters to be estimated and \code{FALSE} for the parameters to be 
     #' restricted to zero.
     #' @param shock a positive integer specifying to which shock add the restriction.
     #' @examples 
     #' spec = specify_bsvarTVP$new(us_fiscal_lsuw)
-    #' spec$add_restriction(c(TRUE, FALSE, TRUE), shock = 2)
-    add_restriction = function(restriction, shock) {
-      self$identification$add_restriction(restriction, shock)
-    }, # END add_restriction
+    #' spec$add_restriction_B(c(TRUE, FALSE, TRUE), shock = 2)
+    add_restriction_B = function(restriction, shock) {
+      self$identification$add_restriction_B(restriction, shock)
+    }, # END add_restriction_B
+    
+    #' @description
+    #' Adds a new restriction to the restrictions identifying the structural matrix \eqn{\Theta_0} 
+    #' for the shock as specified in \code{shock} for the model to select from.
+    #' @param restriction an \code{N}-logical vector with values \code{TRUE} for 
+    #' the parameters to be estimated and \code{FALSE} for the parameters to be 
+    #' restricted to zero.
+    #' @param shock a positive integer specifying to which shock add the restriction.
+    #' @examples 
+    #' spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+    #' spec$add_restriction_Theta0(c(TRUE, FALSE, TRUE), shock = 2)
+    add_restriction_Theta0 = function(restriction, shock) {
+      self$identification$add_restriction_Theta0(restriction, shock)
+    }, # END add_restriction_Theta0
     
     #' @description
     #' Returns the logical value of whether the conditional shock distribution is normal.

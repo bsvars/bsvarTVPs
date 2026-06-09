@@ -79,6 +79,24 @@ compute_impulse_responses.PosteriorBSVARTVP <- function(posterior, horizon, stan
 
 
 
+#' @title Turns \code{Sx1} field of \code{NxKxM} \code{cube}s to an \code{NxKxMxS} \code{array} in R
+#' @description Turns \code{Sx1} field of \code{NxKxM} \code{cube}s to an \code{NxKxMxS} \code{array} in R
+#' @param field \code{Sx1} field of \code{NxKxM} \code{cube}s
+#' @return An \code{NxKxMxS} array
+field1_to_array <- function(field) {
+  
+  S       = dim(field)[1]
+  N       = dim(field[1,1][[1]])[1]
+  K       = dim(field[1,1][[1]])[2]
+  M       = dim(field[1,1][[1]])[3]
+  
+  out     = array(NA, c(N, K, M, S))
+  for (s in 1:S) {
+    out[,,,s]  = field[s,1][[1]]
+  }
+  
+  return(out)
+}
 
 
 

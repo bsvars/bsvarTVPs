@@ -57,6 +57,9 @@ sv$set_starting_values(sv_list)      # providing to the class object
 \item{\code{B}}{an \code{NxNxM} array of starting values for the regime-dependent 
 parameter \eqn{B}.}
 
+\item{\code{Theta0}}{an \code{NxNxM} array of starting values for the regime-dependent 
+parameter \eqn{\Theta_0}.}
+
 \item{\code{hyper}}{a list of starting values for the shrinkage hyper-parameters of the 
 hierarchical prior distribution.}
 
@@ -78,7 +81,8 @@ normal prior for \eqn{\omega_n}.}
 \item{\code{s_}}{an \code{Nx1} matrix of positive scalars with the scales of the 
 gamma prior of the hierarchical prior for \eqn{\sigma^2_{\omega}}.}
 
-\item{\code{S4_indicator}}{a \code{NxM} matrix of initial identification allocations.}
+\item{\code{S4_indicator}}{a \code{NxMx2} matrix of initial identification allocations.
+Slice 1 is for matrix \eqn{B} and slice 2 is for \eqn{\Theta_0}.}
 
 \item{\code{sigma}}{a \code{NxT} matrix of starting values for conditional 
 standard deviations.}

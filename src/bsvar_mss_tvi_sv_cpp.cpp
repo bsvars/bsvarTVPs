@@ -4,6 +4,7 @@
 #include "bsvars.h"
 
 #include "sample_ABhyper.h"
+#include "sampleTheta0.h"
 #include "sample_sv_ms.h"
 #include "sample_mst.h"
 
@@ -19,11 +20,12 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     const arma::mat&              X,                    // KxT explanatory variables
     const Rcpp::List&             prior,                // a list of priors - original dimensions
     const arma::field<arma::mat>& VB,                   // restrictions on B0
+    const Rcpp::List&             VTheta0,              // restrictions on Theta0
     const Rcpp::List&             starting_values,
     const arma::uvec              sv_select,            // {1 - non-centred, 2 - centred, 3 - homoskedastic};
     const bool                    studentt,             // {FALSE - normal, TRUE - Student-t};
     const int                     thin = 100,           // introduce thinning
-    const int                     hyper_select = 1,     // {1 - horseshoe, 2 - boost, 3 - fixed}
+    const int                     hyper_select = 3,     // {1 - horseshoe, 2 - boost, 3 - fixed}
     const bool                    finiteM = true,       // {true - stationary MS, false - overfitted};
     const bool                    show_progress = true
 ) {
@@ -60,6 +62,9 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
   // aux_sigma - contains time-varying sds
   // aux_hetero - contains the diagonal of the covariance of conditional normal aux_hetero = aux_sigma * aux_lambda_sqrt
   cube  aux_B       = as<cube>(starting_values["B"]);
+  cube  aux_Theta0  = as<cube>(starting_values["Theta0"]);
+  cube  aux_Theta0_inv(size(aux_Theta0));
+  cube  aux_struc(size(aux_B));
   mat   aux_A       = as<mat>(starting_values["A"]);
   List  aux_hyper   = as<List>(starting_values["hyper"]);  // (2*N+1)x2 (gamma_0, gamma_+, s_0, s_+, s_)
   mat   aux_PR_TR   = as<mat>(starting_values["PR_TR"]);
@@ -72,7 +77,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
   umat  aux_S       = as<umat>(starting_values["S"]);
   vec   aux_sigma2_omega = as<vec>(starting_values["sigma2_omega"]);
   vec   aux_s_      = as<vec>(starting_values["s_"]);
-  imat  aux_SL      = as<imat>(starting_values["S4_indicator"]) - 1;      // NxM S4 indicator matrix
+  icube aux_SL      = as<icube>(starting_values["S4_indicator"]) - 1;      // NxMx2 S4 indicator matrix
   mat   aux_sigma   = as<mat>(starting_values["sigma"]);
   mat   aux_lambda  = as<mat>(starting_values["lambda"]);
   mat   aux_lambda_sqrt = sqrt(aux_lambda);
@@ -81,6 +86,10 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
   
   const int M       = aux_PR_TR.n_cols;
   vec      Tm       = sum(aux_xi, 1);
+  for (int m=0; m<M; m++) {
+    aux_Theta0_inv.slice(m) = inv(aux_Theta0.slice(m));
+    aux_struc.slice(m)      = aux_Theta0.slice(m) * aux_B.slice(m);
+  }
   
   // parameters for adaptive sampling of degrees of freedom
   NumericVector aag = {0.44, 0.6};
@@ -94,6 +103,8 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
   const int   S     = floor(SS / thin);
   
   field<cube> posterior_B(S);
+  field<cube> posterior_Theta0(S);
+  field<cube> posterior_struc(S);
   cube  posterior_A(N, K, S);
   List  posterior_hyper(S);
   cube  posterior_PR_TR(M, M, S);
@@ -106,7 +117,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
   ucube posterior_S(N, T, S);
   mat   posterior_sigma2_omega(N, S);
   mat   posterior_s_(N, S);
-  icube posterior_SL(N, M, S);
+  field<icube> posterior_SL(S);
   cube  posterior_lambda(N, T, S);
   cube  posterior_df(N, M, S);
   cube  posterior_sigma(N, T, S);
@@ -116,7 +127,19 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     _["aux_B"]      = aux_B,
     _["aux_SL"]     = aux_SL
   );
-  List  sv_n;
+  List  TSL = List::create(
+    _["aux_Theta0"] = aux_Theta0,
+    _["aux_SL"]     = aux_SL
+  );
+  List  sv_n = List::create(
+    _["aux_h_n"]              = aux_h.row(0),
+    _["aux_rho_n"]            = aux_rho(0),
+    _["aux_omega_n"]          = aux_omega.row(0),
+    _["aux_sigma2v_n"]        = square(aux_omega.row(0)),
+    _["aux_sigma2_omega_n"]   = aux_sigma2_omega(0),
+    _["aux_s_n"]              = aux_s_(0),
+    _["aux_S_n"]              = aux_S.row(0)
+  );
   List  PR_TR_tmp;
   
   field<mat> precisionB;
@@ -146,7 +169,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
       mat U           = E;
       for (int t=0; t<T; t++) {
         int   m       = aux_xi.col(t).index_max();
-        U.col(t)      = aux_B.slice(m) * (Y.col(t) - aux_A * X.col(t));
+        U.col(t)      = aux_struc.slice(m) * (Y.col(t) - aux_A * X.col(t));
       }
       U              /= aux_sigma;
       
@@ -167,7 +190,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     if ( debug ) Rcout<<" sample aux_xi"<<endl;
     cube Z(N, T, M);
     for (int m=0; m<M; m++) {
-      Z.slice(m)     = aux_B.slice(m) * (Y - aux_A * X);
+      Z.slice(m)     = aux_struc.slice(m) * (Y - aux_A * X);
       for (int n=0; n<N; n++) {
         if ( sv_select(n) != 3 ) {
           aux_sigma_tmp_m.row(n) = exp(0.5 * aux_omega(n,m) * aux_h.row(n));
@@ -187,8 +210,8 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
       } catch (std::runtime_error &e) {
         Rcout << "   sample_Markov_process failure " << endl;
       }
-    }    
-    
+    }
+
     // sample aux_PR_TR and aux_pi_0
     if ( debug ) Rcout<<" sample aux_PR_TR and aux_pi_0"<<endl;
     try {
@@ -202,7 +225,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     if ( hyper_select == 1 ) {
 
       try {
-        aux_hyper     = sample_hyperparameter_mss_s4_horseshoe(aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
+        aux_hyper     = sample_hyperparameter_mss_s4_horseshoe(aux_hyper, aux_B, aux_A, VB, aux_SL.slice(0), prior);
         precisionB    = hyper2precisionB_mss_horseshoe(aux_hyper);
         precisionA    = hyper2precisionA_horseshoe(aux_hyper);
       } catch (std::logic_error &e) {
@@ -211,31 +234,17 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
 
     } else if ( hyper_select == 2 ) {
 
-      aux_hyper       = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, true);
+      aux_hyper       = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL.slice(0), prior, true);
       precisionB      = hyper2precisionB_mss_boost(aux_hyper, prior);
       precisionA      = hyper2precisionA_boost(aux_hyper, prior);
 
     } else if ( hyper_select == 3 ) {
-  
-      aux_hyper       = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, false);
+
+      aux_hyper       = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL.slice(0), prior, false);
       precisionB      = hyper2precisionB_mss_boost(aux_hyper, prior);
       precisionA      = hyper2precisionA_boost(aux_hyper, prior);
 
     }
-    
-    // sample aux_B
-    if ( debug ) Rcout<<" sample aux_B"<<endl;
-    try {
-      BSL             = sample_B_mss_s4(aux_B, aux_SL, aux_A, precisionB, aux_hetero, aux_xi, Y, X, prior, VB);
-      aux_B           = as<cube>(BSL["aux_B"]);
-      aux_SL          = as<imat>(BSL["aux_SL"]);
-    } catch (std::runtime_error &e) {}
-    
-    // sample aux_A
-    if ( debug ) Rcout<<" sample aux_A"<<endl;
-    try {
-      aux_A           = sample_A_heterosk1_mss(aux_A, aux_B, aux_xi, precisionA, aux_hetero, Y, X, prior);
-    } catch (std::runtime_error &e) {}
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
     if ( debug ) Rcout<<" sample aux_h, aux_omega and aux_S, aux_sigma2_omega"<<endl;
@@ -244,15 +253,14 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     for (int m=0; m<M; m++) {
       for (int t=0; t<T; t++) {
         if (aux_xi(m,t)==1) {
-          U.col(t)      = aux_B.slice(m) * E.col(t) / aux_lambda_sqrt.col(t);
+          U.col(t)      = aux_struc.slice(m) * E.col(t) / aux_lambda_sqrt.col(t);
         }
       }
     }
-      
-      
+    
     for (int n=0; n<N; n++) {
-      if ( sv_select(n) != 3 ) {
-        
+      // if ( sv_select(n) != 3 ) {
+      if ( debug ) Rcout<<" sv n: "<< n << endl;
         rowvec  h_tmp       = aux_h.row(n);
         double  rho_tmp     = aux_rho(n);
         rowvec  omega_tmp   = aux_omega.row(n);
@@ -289,13 +297,48 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
         }
         aux_sigma.row(n)    = exp(0.5 * (aux_h.row(n) % omega_T_n));
         
-      } // END if( sv_select(n) != 3 )
+      // } // END if( sv_select(n) != 3 )
     } // END n loop
     aux_hetero            = aux_sigma % aux_lambda_sqrt;
+    
+    
+    // sample aux_A
+    if ( debug ) Rcout<<" sample aux_A"<<endl;
+    try {
+      aux_A           = sample_A_heterosk1_mss(aux_A, aux_struc, aux_xi, precisionA, aux_hetero, Y, X, prior);
+    } catch (std::runtime_error &e) {}
+    
+    
+    // sample aux_B, aux_SL
+    if ( debug ) Rcout<<" sample aux_B, aux_SL"<< endl;
+    try {
+      
+      BSL             = sample_B_mss_s4 (aux_B, aux_SL.slice(0), aux_Theta0, aux_Theta0_inv, aux_A,
+                                         precisionB, aux_hetero, aux_xi, Y, X, prior, VB);
+      aux_B           = as<cube>(BSL["aux_B"]);
+      aux_SL.slice(0) = as<imat>(BSL["aux_SL"]);
+    } catch (std::runtime_error &e) {}
+    
+    // sample aux_Theta0, aux_SL
+    if ( debug ) Rcout<<" sample aux_Theta0, aux_SL"<< endl;
+    try {
+      mat shocks      = Y - aux_A * X;
+      TSL             = sample_Theta0_mss_s4( aux_Theta0, aux_SL.slice(1), aux_B, shocks, aux_sigma, aux_xi, prior, VTheta0 );
+      aux_Theta0      = as<cube>(TSL["aux_Theta0"]);
+      aux_SL.slice(1) = as<imat>(TSL["aux_SL"]);
+      
+      for (int m=0; m<M; m++) {
+        aux_Theta0_inv.slice(m) = inv(aux_Theta0.slice(m));
+        aux_struc.slice(m)      = aux_Theta0_inv.slice(m) * aux_B.slice(m);
+      }
+    } catch (std::runtime_error &e) {}
+  
     
     if ( debug ) Rcout<<" save in posterior"<<endl;
     if (ss % thin == 0) {
       posterior_B(s)                = aux_B;
+      posterior_Theta0(s)           = aux_Theta0;
+      posterior_struc(s)            = aux_struc;  
       posterior_A.slice(s)          = aux_A;
       posterior_hyper(s)            = aux_hyper;
       posterior_PR_TR.slice(s)      = aux_PR_TR;
@@ -310,7 +353,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
       posterior_S.slice(s)          = aux_S;
       posterior_sigma2_omega.col(s) = aux_sigma2_omega;
       posterior_s_.col(s)           = aux_s_;
-      posterior_SL.slice(s)         = aux_SL;
+      posterior_SL(s)               = aux_SL + 1;
       posterior_sigma.slice(s)      = aux_sigma;
       s++;
     }
@@ -319,6 +362,8 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
   return List::create(
     _["last_draw"]  = List::create(
       _["B"]        = aux_B,
+      _["Theta0"]   = aux_Theta0,
+      _["structural"] = aux_struc,
       _["A"]        = aux_A,
       _["hyper"]    = aux_hyper,
       _["PR_TR"]    = aux_PR_TR,
@@ -338,6 +383,8 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     ),
     _["posterior"]  = List::create(
       _["B_cpp"]    = posterior_B,
+      _["Theta0_cpp"] = posterior_Theta0,
+      _["structural_cpp"] = posterior_struc,
       _["A_cpp"]    = posterior_A,
       _["A"]        = posterior_A,
       _["hyper"]    = posterior_hyper,
@@ -351,7 +398,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
       _["S"]        = posterior_S,
       _["sigma2_omega"] = posterior_sigma2_omega,
       _["s_"]        = posterior_s_,
-      _["S4_indicator"] = posterior_SL + 1,
+      _["S4_indicator"] = posterior_SL,
       _["sigma"]    = posterior_sigma,
       _["lambda"]   = posterior_lambda,
       _["df"]       = posterior_df

@@ -11,11 +11,18 @@ spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 
 
 ## ------------------------------------------------
-## Method `specify_bsvarTVP$add_restriction`
+## Method `specify_bsvarTVP$add_restriction_B`
 ## ------------------------------------------------
 
 spec = specify_bsvarTVP$new(us_fiscal_lsuw)
-spec$add_restriction(c(TRUE, FALSE, TRUE), shock = 2)
+spec$add_restriction_B(c(TRUE, FALSE, TRUE), shock = 2)
+
+## ------------------------------------------------
+## Method `specify_bsvarTVP$add_restriction_Theta0`
+## ------------------------------------------------
+
+spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$add_restriction_Theta0(c(TRUE, FALSE, TRUE), shock = 2)
 
 ## ------------------------------------------------
 ## Method `specify_bsvarTVP$get_normal`
@@ -112,7 +119,8 @@ StartingValuesBSVARTVPMSA with the starting values.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-BSVARTVP-new}{\code{specify_bsvarTVP$new()}}
-\item \href{#method-BSVARTVP-add_restriction}{\code{specify_bsvarTVP$add_restriction()}}
+\item \href{#method-BSVARTVP-add_restriction_B}{\code{specify_bsvarTVP$add_restriction_B()}}
+\item \href{#method-BSVARTVP-add_restriction_Theta0}{\code{specify_bsvarTVP$add_restriction_Theta0()}}
 \item \href{#method-BSVARTVP-get_normal}{\code{specify_bsvarTVP$get_normal()}}
 \item \href{#method-BSVARTVP-get_sv}{\code{specify_bsvarTVP$get_sv()}}
 \item \href{#method-BSVARTVP-get_M}{\code{specify_bsvarTVP$get_M()}}
@@ -138,6 +146,7 @@ Create a new specification of the bsvarTVP model.
   p = 1L,
   M = 2L,
   B,
+  Theta0,
   train_data = 0L,
   distribution = c("norm", "t"),
   volatility = rep(FALSE, ncol(data)),
@@ -160,6 +169,10 @@ Create a new specification of the bsvarTVP model.
 
 \item{\code{B}}{a logical \code{NxN} matrix containing value \code{TRUE} for the elements of 
 the structural matrix \eqn{B} to be estimated and value \code{FALSE} for exclusion restrictions 
+to be set to zero.}
+
+\item{\code{Theta0}}{a logical \code{NxN} matrix containing value \code{TRUE} for the elements of 
+the structural matrix \eqn{\Theta_0} to be estimated and value \code{FALSE} for exclusion restrictions 
 to be set to zero.}
 
 \item{\code{train_data}}{a positive integer specifying the number of initial observations
@@ -196,13 +209,13 @@ A new complete specification for the bsvarTVP model.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-BSVARTVP-add_restriction"></a>}}
-\if{latex}{\out{\hypertarget{method-BSVARTVP-add_restriction}{}}}
-\subsection{Method \code{add_restriction()}}{
-Adds a new restriction to the restrictions identifying the shock as specified 
-in \code{shock} for the model to select from.
+\if{html}{\out{<a id="method-BSVARTVP-add_restriction_B"></a>}}
+\if{latex}{\out{\hypertarget{method-BSVARTVP-add_restriction_B}{}}}
+\subsection{Method \code{add_restriction_B()}}{
+Adds a new restriction to the restrictions identifying the structural matrix \eqn{B} 
+for the shock as specified in \code{shock} for the model to select from.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$add_restriction(restriction, shock)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$add_restriction_B(restriction, shock)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -219,7 +232,38 @@ restricted to zero.}
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
-spec$add_restriction(c(TRUE, FALSE, TRUE), shock = 2)
+spec$add_restriction_B(c(TRUE, FALSE, TRUE), shock = 2)
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BSVARTVP-add_restriction_Theta0"></a>}}
+\if{latex}{\out{\hypertarget{method-BSVARTVP-add_restriction_Theta0}{}}}
+\subsection{Method \code{add_restriction_Theta0()}}{
+Adds a new restriction to the restrictions identifying the structural matrix \eqn{\Theta_0} 
+for the shock as specified in \code{shock} for the model to select from.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$add_restriction_Theta0(restriction, shock)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{restriction}}{an \code{N}-logical vector with values \code{TRUE} for 
+the parameters to be estimated and \code{FALSE} for the parameters to be 
+restricted to zero.}
+
+\item{\code{shock}}{a positive integer specifying to which shock add the restriction.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$add_restriction_Theta0(c(TRUE, FALSE, TRUE), shock = 2)
 }
 \if{html}{\out{</div>}}
 

@@ -10,6 +10,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     const arma::mat&              X,                    // KxT explanatory variables
     const Rcpp::List&             prior,                // a list of priors - original dimensions
     const arma::field<arma::mat>& VB,                   // restrictions on B0
+    const Rcpp::List&             VTheta0,              // restrictions on Theta0
     const Rcpp::List&             starting_values,
     const arma::uvec              sv_select,            // {1 - non-centred, 2 - centred, 3 - homoskedastic};
     const bool                    studentt,             // {FALSE - normal, TRUE - Student-t};

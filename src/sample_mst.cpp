@@ -17,7 +17,7 @@ arma::mat sample_lambda_ms (
   const int N           = aux_df.n_rows;
   const int T           = aux_xi.n_cols;
   
-  U.each_col()         /= sum(U, 1);        // normalisation E[u] = 1
+  U.each_col()         /= sum(U, 1) / T;        // normalisation E[u] = 1
   
   mat       nu_lambda   = aux_df + 1;
   mat       s_lambda    = square(U) - 2;

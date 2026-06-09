@@ -33,16 +33,25 @@ spec$set_identification(B = B, N = 3, K = 4)  # modify an existing specification
 spec$get_identification()              # check the outcome
 
 ## ------------------------------------------------
-## Method `specify_identification_bsvarsTVI$add_restriction`
+## Method `specify_identification_bsvarsTVI$add_restriction_B`
 ## ------------------------------------------------
 
 spec = specify_bsvarTVP$new(us_fiscal_lsuw)
-spec$add_restriction(c(TRUE, FALSE, TRUE), shock = 2)
+spec$add_restriction_B(c(TRUE, FALSE, TRUE), shock = 2)
+
+## ------------------------------------------------
+## Method `specify_identification_bsvarsTVI$add_restriction_Theta0`
+## ------------------------------------------------
+
+spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$add_restriction_Theta0(c(TRUE, FALSE, TRUE), shock = 2)
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{VB}}{a list of \code{N} matrices determining the unrestricted elements of matrix \eqn{B}.}
+
+\item{\code{VTheta0}}{a list of matrices determining the zero and sign restriction of matrix \eqn{\Theta_0}.}
 
 \item{\code{VA}}{a list of \code{N} matrices determining the unrestricted elements of matrix \eqn{A}.}
 }
@@ -54,7 +63,8 @@ spec$add_restriction(c(TRUE, FALSE, TRUE), shock = 2)
 \item \href{#method-IdentificationBSVARTVIs-new}{\code{specify_identification_bsvarsTVI$new()}}
 \item \href{#method-IdentificationBSVARTVIs-get_identification}{\code{specify_identification_bsvarsTVI$get_identification()}}
 \item \href{#method-IdentificationBSVARTVIs-set_identification}{\code{specify_identification_bsvarsTVI$set_identification()}}
-\item \href{#method-IdentificationBSVARTVIs-add_restriction}{\code{specify_identification_bsvarsTVI$add_restriction()}}
+\item \href{#method-IdentificationBSVARTVIs-add_restriction_B}{\code{specify_identification_bsvarsTVI$add_restriction_B()}}
+\item \href{#method-IdentificationBSVARTVIs-add_restriction_Theta0}{\code{specify_identification_bsvarsTVI$add_restriction_Theta0()}}
 \item \href{#method-IdentificationBSVARTVIs-clone}{\code{specify_identification_bsvarsTVI$clone()}}
 }
 }
@@ -64,7 +74,7 @@ spec$add_restriction(c(TRUE, FALSE, TRUE), shock = 2)
 \subsection{Method \code{new()}}{
 Create new identifying restrictions IdentificationBSVARTVIs
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_identification_bsvarsTVI$new(B, A, N, K)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{specify_identification_bsvarsTVI$new(B, Theta0, A, N, K)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -72,6 +82,10 @@ Create new identifying restrictions IdentificationBSVARTVIs
 \describe{
 \item{\code{B}}{a logical \code{NxN} matrix containing value \code{TRUE} for the elements of 
 the structural matrix \eqn{B} to be estimated and value \code{FALSE} for exclusion restrictions 
+to be set to zero.}
+
+\item{\code{Theta0}}{a logical \code{NxN} matrix containing value \code{TRUE} for the elements of 
+the structural matrix \eqn{\Theta_0} to be estimated and value \code{FALSE} for exclusion restrictions 
 to be set to zero.}
 
 \item{\code{A}}{a logical \code{NxK} matrix containing value \code{TRUE} for the elements of 
@@ -148,13 +162,13 @@ spec$get_identification()              # check the outcome
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-IdentificationBSVARTVIs-add_restriction"></a>}}
-\if{latex}{\out{\hypertarget{method-IdentificationBSVARTVIs-add_restriction}{}}}
-\subsection{Method \code{add_restriction()}}{
-Adds a new restriction to the restrictions identifying the shock as specified 
-in \code{shock} for the model to select from.
+\if{html}{\out{<a id="method-IdentificationBSVARTVIs-add_restriction_B"></a>}}
+\if{latex}{\out{\hypertarget{method-IdentificationBSVARTVIs-add_restriction_B}{}}}
+\subsection{Method \code{add_restriction_B()}}{
+Adds a new restriction to the restrictions identifying the structural matrix \eqn{B} 
+for the shock as specified in \code{shock} for the model to select from.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_identification_bsvarsTVI$add_restriction(restriction, shock)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{specify_identification_bsvarsTVI$add_restriction_B(restriction, shock)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -171,7 +185,38 @@ restricted to zero.}
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
-spec$add_restriction(c(TRUE, FALSE, TRUE), shock = 2)
+spec$add_restriction_B(c(TRUE, FALSE, TRUE), shock = 2)
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-IdentificationBSVARTVIs-add_restriction_Theta0"></a>}}
+\if{latex}{\out{\hypertarget{method-IdentificationBSVARTVIs-add_restriction_Theta0}{}}}
+\subsection{Method \code{add_restriction_Theta0()}}{
+Adds a new restriction to the restrictions identifying the structural matrix \eqn{\Theta_0} 
+for the shock as specified in \code{shock} for the model to select from.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{specify_identification_bsvarsTVI$add_restriction_Theta0(restriction, shock)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{restriction}}{an \code{N}-logical vector with values \code{TRUE} for 
+the parameters to be estimated and \code{FALSE} for the parameters to be 
+restricted to zero.}
+
+\item{\code{shock}}{a positive integer specifying to which shock add the restriction.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$add_restriction_Theta0(c(TRUE, FALSE, TRUE), shock = 2)
 }
 \if{html}{\out{</div>}}
 

@@ -481,7 +481,6 @@ arma::mat bsvars_normalisation_wz20031 (
   // changes posterior_B by reference filling it with normalised values
   const int   N       = aux_B.n_rows;
   const int   K       = pow(2, N);
-  
   mat B_hat_inv       = inv(B_hat);
   mat Sigma_inv       = B_hat.t() * B_hat;
   
