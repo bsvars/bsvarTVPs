@@ -615,7 +615,8 @@ arma::mat sample_Theta0_Hou24_heterosk1_coln (
   }
   vec w1_vec(1); w1_vec(0) = w1;
   w                   = join_vert(w1_vec, w_1);
-  aux_Theta0.col(n)   = solve(Ti, w);
+  vec aux_Theta0n     = solve(Ti, w);
+  aux_Theta0.col(n)   = aux_Theta0n / aux_Theta0n(n);
   
   return aux_Theta0;
 } // END sample_Theta0_Hou24_heterosk1_coln
