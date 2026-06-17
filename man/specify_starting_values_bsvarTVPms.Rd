@@ -148,8 +148,7 @@ to be set to zero.}
 model is estimated. Otherwise, a sparse Markov switching model is estimated 
 in which \code{M=20} and the number of visited states is estimated. The 
 value of \code{M} can be modified.}
-      \item{\code{fixed_regime}}{a \code{MxT} matrix of 0s and 1s with the same dimensions 
-as \code{xi} - the starting values for regime allocations.}
+      \item{\code{fixed_regime}}{a \code{T+p} vector with the starting values for regime allocations.}
     }
     \if{html}{\out{</div>}}
   }

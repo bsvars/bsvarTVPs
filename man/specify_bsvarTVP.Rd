@@ -199,7 +199,7 @@ otherwise to random walk.}
       \item{\code{finiteM}}{a logical value - if true a stationary Markov switching 
 model is estimated. Otherwise, a sparse Markov switching model is estimated 
 in which \code{M=20} and the number of visited states is estimated.}
-      \item{\code{fixed_regime}}{an \code{NxT} matrix with zeros and ones specifying 
+      \item{\code{fixed_regime}}{an \code{T+p} vector with integers specifying 
 the fixed regimes. Providing this argument overwrites the value of 
 \code{finiteM = TRUE} and sets \code{fixed_regimes = TRUE}. The Markov
 process, transition matrix and initial probabilities are not estimated.}
