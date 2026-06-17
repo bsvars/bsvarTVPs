@@ -287,6 +287,8 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
     #' model is estimated. Otherwise, a sparse Markov switching model is estimated 
     #' in which \code{M=20} and the number of visited states is estimated. The 
     #' value of \code{M} can be modified.
+    #' @param fixed_regime a \code{T+p} vector with the starting values for regime allocations.
+    #' 
     #' @return Starting values StartingValuesBSVARTVPMS
     #' @examples 
     #' # starting values for a model with 4 lags for a 3-variable system
@@ -294,7 +296,7 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
     #' B = matrix(TRUE, 3, 3)
     #' sv = specify_starting_values_bsvarTVPms$new(A = A, B = B, N = 3, M = 2, T = 120, p = 1)
     #' 
-    initialize = function(A, B, N, M, T, p, d = 0, finiteM = TRUE) {
+    initialize = function(A, B, N, M, T, p, d = 0, finiteM = TRUE, fixed_regime = NULL) {
       stopifnot("Argument N must be a positive integer number." = N > 0 & N %% 1 == 0)
       stopifnot("Argument M must be a positive integer number." = M > 0 & M %% 1 == 0)
       stopifnot("Argument T must be a positive integer number." = T > 0 & T %% 1 == 0)
@@ -309,19 +311,24 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
         M = 20
       }
       
-      if (M > 1) {
-        Tm      = floor(T / M)
-        st      = c()
-        for (m in 1:M) {
-          if (m != M) {
-            st  = c(st, rep(m, Tm))
-          } else {
-            st  = c(st, rep(m, T - (M - 1) * Tm))
+      if (is.null(fixed_regime)) {
+        if (M > 1) {
+          Tm      = floor(T / M)
+          st      = c()
+          for (m in 1:M) {
+            if (m != M) {
+              st  = c(st, rep(m, Tm))
+            } else {
+              st  = c(st, rep(m, T - (M - 1) * Tm))
+            }
           }
-        }
-        xi      = diag(M)[,st]
+          xi      = diag(M)[,st]
+        } else {
+          xi      = matrix(1, M, T)
+        } # END if (M > 1)
       } else {
-        xi      = matrix(1, M, T)
+        if (min(fixed_regime) == 0) fixed_regime = fixed_regime + 1
+        xi = diag(M)[,fixed_regime]
       }
       
       K         = N * p + 1 + d
@@ -480,6 +487,9 @@ specify_starting_values_bsvarTVPmsa = R6::R6Class(
     #' model is estimated. Otherwise, a sparse Markov switching model is estimated 
     #' in which \code{M=20} and the number of visited states is estimated. The 
     #' value of \code{M} can be modified.
+    #' @param fixed_regime a \code{MxT} matrix of 0s and 1s with the same dimensions 
+    #' as \code{xi} - the starting values for regime allocations.
+    #' 
     #' @return Starting values StartingValuesBSVARTVPMSA
     #' @examples 
     #' # starting values for a homoskedastic bsvar with 4 lags for a 3-variable system
@@ -487,7 +497,7 @@ specify_starting_values_bsvarTVPmsa = R6::R6Class(
     #' B = matrix(TRUE, 3, 3)
     #' sv = specify_starting_values_bsvarTVPmsa$new(A = A, B = B, N = 3, M = 2, T = 120, p = 1)
     #' 
-    initialize = function(A, B, N, M, T, p, d = 0, finiteM = TRUE) {
+    initialize = function(A, B, N, M, T, p, d = 0, finiteM = TRUE, fixed_regime = NULL) {
       stopifnot("Argument N must be a positive integer number." = N > 0 & N %% 1 == 0)
       stopifnot("Argument M must be a positive integer number." = M > 0 & M %% 1 == 0)
       stopifnot("Argument T must be a positive integer number." = T > 0 & T %% 1 == 0)
@@ -500,7 +510,7 @@ specify_starting_values_bsvarTVPmsa = R6::R6Class(
       
       K                   = N * p + 1 + d
       
-      super$initialize(A, B, N, M, T, p, d, finiteM)
+      super$initialize(A, B, N, M, T, p, d, finiteM, fixed_regime)
       
       self$A              = array(0, c(N, K, M))
       for (m in 1:M) {
@@ -768,6 +778,7 @@ specify_bsvarTVP = R6::R6Class(
     msa    = FALSE,     # if TRUE - MSSA, if FALSE - MSS
     estimate_hyper = TRUE,  # if TRUE - estimate hyper-parameters, if FALSE - fix them
     finiteM = TRUE,     # if true a stationary Markov switching, if FALSE a sparse Markov switching model is estimated
+    fixed_regimes = FALSE, # if true - don't estimate MS, false - estimate MS
     p      = 1,         # a non-negative integer specifying the autoregressive lag order of the model. 
     M      = 2,         # positive integer specifying the number of Markov regimes in the model.
     N      = numeric()
@@ -818,6 +829,11 @@ specify_bsvarTVP = R6::R6Class(
     #' @param finiteM a logical value - if true a stationary Markov switching 
     #' model is estimated. Otherwise, a sparse Markov switching model is estimated 
     #' in which \code{M=20} and the number of visited states is estimated.
+    #' @param fixed_regime an \code{T+p} vector with integers specifying 
+    #' the fixed regimes. Providing this argument overwrites the value of 
+    #' \code{finiteM = TRUE} and sets \code{fixed_regimes = TRUE}. The Markov
+    #' process, transition matrix and initial probabilities are not estimated.
+    #' 
     #' @return A new complete specification for the bsvarTVP model.
     initialize = function(
       data,
@@ -832,16 +848,22 @@ specify_bsvarTVP = R6::R6Class(
       estimate_hyper = TRUE,
       exogenous = NULL,
       stationary = rep(FALSE, ncol(data)),
-      finiteM = TRUE
+      finiteM = TRUE,
+      fixed_regime = NULL
     ) {
       stopifnot("Argument p has to be a positive integer." = ((p %% 1) == 0 & p > 0))
       private$p     = p
       
       stopifnot("Argument M has to be a positive integer." = ((M %% 1) == 0 & M > 0))
+      if (!is.null(fixed_regime)) {
+        stopifnot("Argument M has to be equal to number states in fixed_regime." = M == length(unique(fixed_regime)))
+        stopifnot("Argument data must have the same number of row as the length of fixed_regime." = nrow(data) == length(fixed_regime))
+      }
       private$M     = M
       
       stopifnot("Argument train_data has to be a positive integer." = ((train_data %% 1) == 0 & train_data >= 0))
-      stopifnot("Argument train_data has to much less than the data size." = train_data < nrow(data) / 2)
+      stopifnot("Argument train_data has to be much less than the data size." = train_data < nrow(data) / 2)
+      
       stopifnot("Argument ms4A has to be a logical value." = is.logical(ms4ar) & length(ms4ar) == 1)
       
       distribution  = match.arg(distribution)
@@ -872,10 +894,20 @@ specify_bsvarTVP = R6::R6Class(
       }
       K             = N * p + 1 + d
       
-      if (!finiteM) {
-        if ( M < 20 ) {
-          M = 20L
-          message("In the sparse Markov switching model the value of M is overwritten and set to 20.")
+      if (is.null(fixed_regime)) {
+        if (!finiteM) {
+          if ( M < 20 ) {
+            M = 20L
+            message("In the sparse Markov switching model the value of M is overwritten and set to 20.")
+          }
+        }
+      } else {
+        
+        private$fixed_regimes = TRUE
+        
+        if (!finiteM) {
+          finiteM = TRUE
+          message("Providing fixed_regime overwrites the value of finiteM and sets it to TRUE.")
         }
       }
       private$finiteM  = finiteM
@@ -892,12 +924,19 @@ specify_bsvarTVP = R6::R6Class(
         diag(Theta0)  = TRUE
       }
       
+      if (!is.null(fixed_regime)) {
+        fixed_regime = fixed_regime[-(1:p)]
+      }
+      
       if (train_data == 0) {
         data_train    = NULL
         data_estimate = data
       } else {
         data_train    = data[1:train_data,]
         data_estimate = data[-(1:train_data),]
+        if (!is.null(fixed_regime)) {
+          fixed_regime = fixed_regime[-(1:train_data)]
+        }
       }
       TT            = nrow(data_estimate)
       T             = TT - p
@@ -907,10 +946,12 @@ specify_bsvarTVP = R6::R6Class(
       self$identification  = specify_identification_bsvarsTVI$new(B, Theta0, A, N, K)
       self$prior           = specify_prior_bsvarTVP$new(data_train, N, M, p, d, stationary)
       if ( ms4ar ) {
-        self$starting_values = specify_starting_values_bsvarTVPmsa$new(A, B, N, M, T, p, d, finiteM)
+        sv = specify_starting_values_bsvarTVPmsa$new(A, B, N, M, T, p, d, finiteM, fixed_regime)
       } else {
-        self$starting_values = specify_starting_values_bsvarTVPms$new(A, B, N, M, T, p, d, finiteM)
+        sv = specify_starting_values_bsvarTVPms$new(A, B, N, M, T, p, d, finiteM, fixed_regime)
       }
+      self$starting_values = sv
+      
     }, # END initialize
     
     #' @description
@@ -993,6 +1034,16 @@ specify_bsvarTVP = R6::R6Class(
     get_finiteM = function() {
       private$finiteM
     }, # END get_finiteM
+    
+    #' @description
+    #' Returns the logical value of whether the regimes are fixed.
+    #' 
+    #' @examples 
+    #' spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+    #' spec$get_fixed_regimes()
+    get_fixed_regimes = function() {
+      private$fixed_regimes
+    }, # END get_fixed_regimes
     
     #' @description
     #' Returns the autoregressive lag order of the model.

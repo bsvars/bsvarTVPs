@@ -54,7 +54,17 @@ parameter \eqn{A}.}
   Create new starting values StartingValuesBSVARTVPMSA.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{StartingValuesBSVARTVPMSA$new(A, B, N, M, T, p, d = 0, finiteM = TRUE)}
+    \preformatted{StartingValuesBSVARTVPMSA$new(
+  A,
+  B,
+  N,
+  M,
+  T,
+  p,
+  d = 0,
+  finiteM = TRUE,
+  fixed_regime = NULL
+)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -75,6 +85,8 @@ to be set to zero.}
 model is estimated. Otherwise, a sparse Markov switching model is estimated 
 in which \code{M=20} and the number of visited states is estimated. The 
 value of \code{M} can be modified.}
+      \item{\code{fixed_regime}}{a \code{MxT} matrix of 0s and 1s with the same dimensions 
+as \code{xi} - the starting values for regime allocations.}
     }
     \if{html}{\out{</div>}}
   }

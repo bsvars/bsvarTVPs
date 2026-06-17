@@ -60,6 +60,13 @@ spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_finiteM()
 
 ## ------------------------------------------------
+## Method `BSVARTVP$get_fixed_regimes()`
+## ------------------------------------------------
+
+spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$get_fixed_regimes()
+
+## ------------------------------------------------
 ## Method `BSVARTVP$get_p()`
 ## ------------------------------------------------
 
@@ -126,6 +133,7 @@ StartingValuesBSVARTVPMSA with the starting values.}
     \item \href{#method-BSVARTVP-get_M}{\code{BSVARTVP$get_M()}}
     \item \href{#method-BSVARTVP-get_estimate_hyper}{\code{BSVARTVP$get_estimate_hyper()}}
     \item \href{#method-BSVARTVP-get_finiteM}{\code{BSVARTVP$get_finiteM()}}
+    \item \href{#method-BSVARTVP-get_fixed_regimes}{\code{BSVARTVP$get_fixed_regimes()}}
     \item \href{#method-BSVARTVP-get_p}{\code{BSVARTVP$get_p()}}
     \item \href{#method-BSVARTVP-get_msa}{\code{BSVARTVP$get_msa()}}
     \item \href{#method-BSVARTVP-get_data_matrices}{\code{BSVARTVP$get_data_matrices()}}
@@ -155,7 +163,8 @@ StartingValuesBSVARTVPMSA with the starting values.}
   estimate_hyper = TRUE,
   exogenous = NULL,
   stationary = rep(FALSE, ncol(data)),
-  finiteM = TRUE
+  finiteM = TRUE,
+  fixed_regime = NULL
 )}
     \if{html}{\out{</div>}}
   }
@@ -190,6 +199,10 @@ otherwise to random walk.}
       \item{\code{finiteM}}{a logical value - if true a stationary Markov switching 
 model is estimated. Otherwise, a sparse Markov switching model is estimated 
 in which \code{M=20} and the number of visited states is estimated.}
+      \item{\code{fixed_regime}}{an \code{NxT} matrix with zeros and ones specifying 
+the fixed regimes. Providing this argument overwrites the value of 
+\code{finiteM = TRUE} and sets \code{fixed_regimes = TRUE}. The Markov
+process, transition matrix and initial probabilities are not estimated.}
     }
     \if{html}{\out{</div>}}
   }
@@ -351,6 +364,25 @@ spec$get_estimate_hyper()
     \if{html}{\out{<div class="r example copy">}}
     \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_finiteM()
+}
+    \if{html}{\out{</div>}}
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BSVARTVP-get_fixed_regimes"></a>}}
+\if{latex}{\out{\hypertarget{method-BSVARTVP-get_fixed_regimes}{}}}
+\subsection{\code{BSVARTVP$get_fixed_regimes()}}{
+  Returns the logical value of whether the regimes are fixed.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BSVARTVP$get_fixed_regimes()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+spec$get_fixed_regimes()
 }
     \if{html}{\out{</div>}}
   }
