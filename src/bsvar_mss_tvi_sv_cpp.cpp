@@ -22,11 +22,12 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     const arma::field<arma::mat>& VB,                   // restrictions on B0
     const Rcpp::List&             VTheta0,              // restrictions on Theta0
     const Rcpp::List&             starting_values,
-    const arma::uvec              sv_select,            // {1 - non-centred, 2 - centred, 3 - homoskedastic};
+    const arma::uvec              sv_select,            // Nx1, for each equation: {1 - non-centred, 2 - centred, 3 - homoskedastic};
     const bool                    studentt,             // {FALSE - normal, TRUE - Student-t};
     const int                     thin = 100,           // introduce thinning
     const int                     hyper_select = 3,     // {1 - horseshoe, 2 - boost, 3 - fixed}
     const bool                    finiteM = true,       // {true - stationary MS, false - overfitted};
+    const bool                    fixed_regime = false, // {true - don't estimate MS, false - estimate MS};
     const bool                    show_progress = true
 ) {
   
@@ -188,37 +189,41 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     
     // sample aux_xi
     if ( debug ) Rcout<<" sample aux_xi"<<endl;
-    cube Z(N, T, M);
-    for (int m=0; m<M; m++) {
-      Z.slice(m)     = aux_struc.slice(m) * (Y - aux_A * X);
-      for (int n=0; n<N; n++) {
-        if ( sv_select(n) != 3 ) {
-          aux_sigma_tmp_m.row(n) = exp(0.5 * aux_omega(n,m) * aux_h.row(n));
-          Z.slice(m).row(n)     /= aux_sigma_tmp_m.row(n);
+    if (!fixed_regime) {
+      cube Z(N, T, M);
+      for (int m=0; m<M; m++) {
+        Z.slice(m)     = aux_struc.slice(m) * (Y - aux_A * X);
+        for (int n=0; n<N; n++) {
+          if ( sv_select(n) != 3 ) {
+            aux_sigma_tmp_m.row(n) = exp(0.5 * aux_omega(n,m) * aux_h.row(n));
+            Z.slice(m).row(n)     /= aux_sigma_tmp_m.row(n);
+          }
         }
-      }
-    }
-    if ( studentt ) {
-      try {
-        aux_xi        = sample_Markov_process_studentt(Z, aux_xi, aux_PR_TR, aux_pi_0, aux_df, finiteM);
-      } catch (std::runtime_error &e) {
-        Rcout << "   sample_Markov_process_studentt failure " << endl;
-      }
-    } else {
-      try {
-        aux_xi        = sample_Markov_process(Z, aux_xi, aux_PR_TR, aux_pi_0, finiteM);
-      } catch (std::runtime_error &e) {
-        Rcout << "   sample_Markov_process failure " << endl;
-      }
-    }
-
+      } // END loop m
+      if ( studentt ) {
+        try {
+          aux_xi        = sample_Markov_process_studentt(Z, aux_xi, aux_PR_TR, aux_pi_0, aux_df, finiteM);
+        } catch (std::runtime_error &e) {
+          Rcout << "   sample_Markov_process_studentt failure " << endl;
+        }
+      } else {
+        try {
+          aux_xi        = sample_Markov_process(Z, aux_xi, aux_PR_TR, aux_pi_0, finiteM);
+        } catch (std::runtime_error &e) {
+          Rcout << "   sample_Markov_process failure " << endl;
+        }
+      } // END if ( studentt )
+    } // END (!fixed_regime)
+    
     // sample aux_PR_TR and aux_pi_0
     if ( debug ) Rcout<<" sample aux_PR_TR and aux_pi_0"<<endl;
-    try {
-      PR_TR_tmp       = sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
-      aux_PR_TR       = as<mat>(PR_TR_tmp["aux_PR_TR"]);
-      aux_pi_0        = as<vec>(PR_TR_tmp["aux_pi_0"]);
-    } catch (std::runtime_error &e) {}
+    if (!fixed_regime) {
+      try {
+        PR_TR_tmp       = sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
+        aux_PR_TR       = as<mat>(PR_TR_tmp["aux_PR_TR"]);
+        aux_pi_0        = as<vec>(PR_TR_tmp["aux_pi_0"]);
+      } catch (std::runtime_error &e) {}
+    } // END (!fixed_regime)
     
     // sample aux_hyper
     if ( debug ) Rcout<<" sample aux_hyper"<<endl;
