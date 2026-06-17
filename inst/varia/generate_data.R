@@ -121,7 +121,7 @@ us_fiscal       = cbind(us_fiscal_lsuw_tmp, 0)
 for (i in 1:nrow(fiscal_shocks)) {
   us_fiscal[which(fiscal_time == fiscal_shocks$time[i]), 4] = fiscal_shocks$value[i]
 }
-colnames(us_fiscal) = c("ttr", "gs", "gdp", "IV")
+colnames(us_fiscal) = c("ttr", "gs", "gdp", "iv")
 
 save(
   us_fiscal, 
