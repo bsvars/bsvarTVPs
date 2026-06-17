@@ -106,13 +106,14 @@ estimate.BSVARTVP <- function(specification, S, thin = 1, show_progress = TRUE) 
     hyper_select      = 3
   }
   finiteM             = specification$get_finiteM() 
+  fixed_regime        = specification$get_fixed_regimes()
   studentt            = !specification$get_normal()
   
   if (specification$get_msa()) {
-    output            = .Call(`_bsvarTVPs_bsvar_mssa_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, VTheta0, starting_values, sv_select, studentt, thin, hyper_select, finiteM, show_progress)
+    output            = .Call(`_bsvarTVPs_bsvar_mssa_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, VTheta0, starting_values, sv_select, studentt, thin, hyper_select, finiteM, fixed_regime, show_progress)
     output$posterior$A = field1_to_array(output$posterior$A_cpp)
   } else {
-    output            = .Call(`_bsvarTVPs_bsvar_mss_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, VTheta0, starting_values, sv_select, studentt, thin, hyper_select, finiteM, show_progress)
+    output            = .Call(`_bsvarTVPs_bsvar_mss_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, VTheta0, starting_values, sv_select, studentt, thin, hyper_select, finiteM, fixed_regime, show_progress)
   }
   
   output$posterior$B      = field1_to_array(output$posterior$B_cpp)
@@ -155,13 +156,14 @@ estimate.PosteriorBSVARTVP <- function(specification, S, thin = 1, show_progress
     hyper_select      = 3
   }
   finiteM             = specification$last_draw$get_finiteM() 
+  fixed_regime        = specification$last_draw$get_fixed_regimes()
   studentt            = !specification$last_draw$get_normal()
   
   if (specification$last_draw$get_msa()) {
-    output            = .Call(`_bsvarTVPs_bsvar_mssa_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, VTheta0, starting_values, sv_select, studentt, thin, hyper_select, finiteM, show_progress)
+    output            = .Call(`_bsvarTVPs_bsvar_mssa_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, VTheta0, starting_values, sv_select, studentt, thin, hyper_select, finiteM, fixed_regime, show_progress)
     output$posterior$A = field1_to_array(output$posterior$A_cpp)
   } else {
-    output            = .Call(`_bsvarTVPs_bsvar_mss_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, VTheta0, starting_values, sv_select, studentt, thin, hyper_select, finiteM, show_progress)
+    output            = .Call(`_bsvarTVPs_bsvar_mss_tvi_sv_cpp`, S, data_matrices$Y, data_matrices$X, prior, VB, VTheta0, starting_values, sv_select, studentt, thin, hyper_select, finiteM, fixed_regime, show_progress)
   }
   
   output$posterior$B      = field1_to_array(output$posterior$B_cpp)
