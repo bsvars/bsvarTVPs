@@ -14,7 +14,7 @@ sv = specify_starting_values_bsvarTVPms$new(A = A, B = B, N = 3, M = 2, T = 120,
 
 
 ## ------------------------------------------------
-## Method `specify_starting_values_bsvarTVPms$new`
+## Method `StartingValuesBSVARTVPMS$new()`
 ## ------------------------------------------------
 
 # starting values for a model with 4 lags for a 3-variable system
@@ -24,7 +24,7 @@ sv = specify_starting_values_bsvarTVPms$new(A = A, B = B, N = 3, M = 2, T = 120,
 
 
 ## ------------------------------------------------
-## Method `specify_starting_values_bsvarTVPms$get_starting_values`
+## Method `StartingValuesBSVARTVPMS$get_starting_values()`
 ## ------------------------------------------------
 
 # starting values for a model with 1 lag for a 3-variable system
@@ -35,7 +35,7 @@ sv$get_starting_values()   # show starting values as list
 
 
 ## ------------------------------------------------
-## Method `specify_starting_values_bsvarTVPms$set_starting_values`
+## Method `StartingValuesBSVARTVPMS$set_starting_values()`
 ## ------------------------------------------------
 
 # starting values for a model with 1 lag for a 3-variable system
@@ -50,166 +50,158 @@ sv$set_starting_values(sv_list)      # providing to the class object
 
 }
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{A}}{an \code{NxK} matrix of starting values for the parameter \eqn{A}.}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{A}}{an \code{NxK} matrix of starting values for the parameter \eqn{A}.}
 
-\item{\code{B}}{an \code{NxNxM} array of starting values for the regime-dependent 
+    \item{\code{B}}{an \code{NxNxM} array of starting values for the regime-dependent 
 parameter \eqn{B}.}
 
-\item{\code{Theta0}}{an \code{NxNxM} array of starting values for the regime-dependent 
+    \item{\code{Theta0}}{an \code{NxNxM} array of starting values for the regime-dependent 
 parameter \eqn{\Theta_0}.}
 
-\item{\code{hyper}}{a list of starting values for the shrinkage hyper-parameters of the 
+    \item{\code{hyper}}{a list of starting values for the shrinkage hyper-parameters of the 
 hierarchical prior distribution.}
 
-\item{\code{h}}{an \code{NxT} matrix with the starting values of the log-volatility processes.}
+    \item{\code{h}}{an \code{NxT} matrix with the starting values of the log-volatility processes.}
 
-\item{\code{omega}}{an \code{NxM} matrix with values of regime-dependent SV process 
+    \item{\code{omega}}{an \code{NxM} matrix with values of regime-dependent SV process 
 conditional standard deviations.}
 
-\item{\code{sigma2v}}{an \code{NxM} matrix with values of regime-dependent SV process 
+    \item{\code{sigma2v}}{an \code{NxM} matrix with values of regime-dependent SV process 
 conditional variances.}
 
-\item{\code{rho}}{an \code{Nx1} matrix with values of SV autoregressive parameters.}
+    \item{\code{rho}}{an \code{Nx1} matrix with values of SV autoregressive parameters.}
 
-\item{\code{S}}{an \code{NxT} integer matrix with the auxiliary mixture component indicators.}
+    \item{\code{S}}{an \code{NxT} integer matrix with the auxiliary mixture component indicators.}
 
-\item{\code{sigma2_omega}}{an \code{Nx1} matrix with variances of the zero-mean 
+    \item{\code{sigma2_omega}}{an \code{Nx1} matrix with variances of the zero-mean 
 normal prior for \eqn{\omega_n}.}
 
-\item{\code{s_}}{an \code{Nx1} matrix of positive scalars with the scales of the 
+    \item{\code{s_}}{an \code{Nx1} matrix of positive scalars with the scales of the 
 gamma prior of the hierarchical prior for \eqn{\sigma^2_{\omega}}.}
 
-\item{\code{S4_indicator}}{a \code{NxMx2} matrix of initial identification allocations.
+    \item{\code{S4_indicator}}{a \code{NxMx2} matrix of initial identification allocations.
 Slice 1 is for matrix \eqn{B} and slice 2 is for \eqn{\Theta_0}.}
 
-\item{\code{sigma}}{a \code{NxT} matrix of starting values for conditional 
+    \item{\code{sigma}}{a \code{NxT} matrix of starting values for conditional 
 standard deviations.}
 
-\item{\code{PR_TR}}{a \code{MxM} matrix of starting values for transition probabilities.}
+    \item{\code{PR_TR}}{a \code{MxM} matrix of starting values for transition probabilities.}
 
-\item{\code{pi_0}}{an \code{M}-vector of starting values for initial regime probabilities.}
+    \item{\code{pi_0}}{an \code{M}-vector of starting values for initial regime probabilities.}
 
-\item{\code{xi}}{a \code{MxT} matrix of starting values for regime allocations.}
+    \item{\code{xi}}{a \code{MxT} matrix of starting values for regime allocations.}
 
-\item{\code{lambda}}{a \code{NxT} matrix of starting values for latent variables.}
+    \item{\code{lambda}}{a \code{NxT} matrix of starting values for latent variables.}
 
-\item{\code{df}}{an \code{NxM} matrix of positive numbers with starting values 
+    \item{\code{df}}{an \code{NxM} matrix of positive numbers with starting values 
 for the equation- and regime-specific degrees of freedom parameters of 
 the Student-t conditional distribution of structural shocks.}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-StartingValuesBSVARTVPMS-new}{\code{specify_starting_values_bsvarTVPms$new()}}
-\item \href{#method-StartingValuesBSVARTVPMS-get_starting_values}{\code{specify_starting_values_bsvarTVPms$get_starting_values()}}
-\item \href{#method-StartingValuesBSVARTVPMS-set_starting_values}{\code{specify_starting_values_bsvarTVPms$set_starting_values()}}
-\item \href{#method-StartingValuesBSVARTVPMS-clone}{\code{specify_starting_values_bsvarTVPms$clone()}}
-}
+  \itemize{
+    \item \href{#method-StartingValuesBSVARTVPMS-initialize}{\code{StartingValuesBSVARTVPMS$new()}}
+    \item \href{#method-StartingValuesBSVARTVPMS-get_starting_values}{\code{StartingValuesBSVARTVPMS$get_starting_values()}}
+    \item \href{#method-StartingValuesBSVARTVPMS-set_starting_values}{\code{StartingValuesBSVARTVPMS$set_starting_values()}}
+    \item \href{#method-StartingValuesBSVARTVPMS-clone}{\code{StartingValuesBSVARTVPMS$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-StartingValuesBSVARTVPMS-new"></a>}}
-\if{latex}{\out{\hypertarget{method-StartingValuesBSVARTVPMS-new}{}}}
-\subsection{Method \code{new()}}{
-Create new starting values StartingValuesBSVARTVPMS.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_starting_values_bsvarTVPms$new(A, B, N, M, T, p, d = 0, finiteM = TRUE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{A}}{a logical \code{NxK} matrix containing value \code{TRUE} for the elements of 
+\if{html}{\out{<a id="method-StartingValuesBSVARTVPMS-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-StartingValuesBSVARTVPMS-initialize}{}}}
+\subsection{\code{StartingValuesBSVARTVPMS$new()}}{
+  Create new starting values StartingValuesBSVARTVPMS.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{StartingValuesBSVARTVPMS$new(A, B, N, M, T, p, d = 0, finiteM = TRUE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{A}}{a logical \code{NxK} matrix containing value \code{TRUE} for the elements of 
 the autoregressive matrix \eqn{A} to be estimated and value \code{FALSE} for exclusion restrictions 
 to be set to zero.}
-
-\item{\code{B}}{a logical \code{NxN} matrix containing value \code{TRUE} for the elements of 
+      \item{\code{B}}{a logical \code{NxN} matrix containing value \code{TRUE} for the elements of 
 the staructural matrix \eqn{B} to be estimated and value \code{FALSE} for exclusion restrictions 
 to be set to zero.}
-
-\item{\code{N}}{a positive integer - the number of dependent variables in the model.}
-
-\item{\code{M}}{a positive integer - the number of Markov regimes.}
-
-\item{\code{T}}{a positive integer - the number of time periods in the data.}
-
-\item{\code{p}}{a positive integer - the autoregressive lag order of the SVAR model.}
-
-\item{\code{d}}{a positive integer - the number of \code{exogenous} variables in the model.}
-
-\item{\code{finiteM}}{a logical value - if true a stationary Markov switching 
+      \item{\code{N}}{a positive integer - the number of dependent variables in the model.}
+      \item{\code{M}}{a positive integer - the number of Markov regimes.}
+      \item{\code{T}}{a positive integer - the number of time periods in the data.}
+      \item{\code{p}}{a positive integer - the autoregressive lag order of the SVAR model.}
+      \item{\code{d}}{a positive integer - the number of \code{exogenous} variables in the model.}
+      \item{\code{finiteM}}{a logical value - if true a stationary Markov switching 
 model is estimated. Otherwise, a sparse Markov switching model is estimated 
 in which \code{M=20} and the number of visited states is estimated. The 
 value of \code{M} can be modified.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Starting values StartingValuesBSVARTVPMS
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{# starting values for a model with 4 lags for a 3-variable system
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Starting values StartingValuesBSVARTVPMS
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{# starting values for a model with 4 lags for a 3-variable system
 A = matrix(TRUE, 3, 4)
 B = matrix(TRUE, 3, 3)
 sv = specify_starting_values_bsvarTVPms$new(A = A, B = B, N = 3, M = 2, T = 120, p = 1)
-
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-StartingValuesBSVARTVPMS-get_starting_values"></a>}}
 \if{latex}{\out{\hypertarget{method-StartingValuesBSVARTVPMS-get_starting_values}{}}}
-\subsection{Method \code{get_starting_values()}}{
-Returns the elements of the starting values StartingValuesBSVARTVPMS as a \code{list}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_starting_values_bsvarTVPms$get_starting_values()}\if{html}{\out{</div>}}
-}
-
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{# starting values for a model with 1 lag for a 3-variable system
+\subsection{\code{StartingValuesBSVARTVPMS$get_starting_values()}}{
+  Returns the elements of the starting values StartingValuesBSVARTVPMS as a \code{list}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{StartingValuesBSVARTVPMS$get_starting_values()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{# starting values for a model with 1 lag for a 3-variable system
 A = matrix(TRUE, 3, 4)
 B = matrix(TRUE, 3, 3)
 sv = specify_starting_values_bsvarTVPms$new(A = A, B = B, N = 3, M = 2, T = 120, p = 1)
 sv$get_starting_values()   # show starting values as list
-
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-StartingValuesBSVARTVPMS-set_starting_values"></a>}}
 \if{latex}{\out{\hypertarget{method-StartingValuesBSVARTVPMS-set_starting_values}{}}}
-\subsection{Method \code{set_starting_values()}}{
-Returns the elements of the starting values StartingValuesBSVARTVPMS as a \code{list}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_starting_values_bsvarTVPms$set_starting_values(last_draw)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{last_draw}}{a list containing the last draw of elements \code{B} - an \code{NxN} matrix, 
+\subsection{\code{StartingValuesBSVARTVPMS$set_starting_values()}}{
+  Returns the elements of the starting values StartingValuesBSVARTVPMS as a \code{list}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{StartingValuesBSVARTVPMS$set_starting_values(last_draw)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{last_draw}}{a list containing the last draw of elements \code{B} - an \code{NxN} matrix, 
 \code{A} - an \code{NxK} matrix, and \code{hyper} - a vector of 5 positive real numbers.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-An object of class StartingValuesBSVARTVPMS including the last draw of the current MCMC 
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    An object of class StartingValuesBSVARTVPMS including the last draw of the current MCMC 
 as the starting value to be passed to the continuation of the MCMC estimation using \code{estimate()}.
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{# starting values for a model with 1 lag for a 3-variable system
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{# starting values for a model with 1 lag for a 3-variable system
 A = matrix(TRUE, 3, 4)
 B = matrix(TRUE, 3, 3)
 sv = specify_starting_values_bsvarTVPms$new(A = A, B = B, N = 3, M = 2, T = 120, p = 1)
@@ -218,28 +210,28 @@ sv = specify_starting_values_bsvarTVPms$new(A = A, B = B, N = 3, M = 2, T = 120,
 sv_list = sv$get_starting_values()   # getting them as list
 sv_list$A <- matrix(rnorm(12), 3, 4) # modifying the entry
 sv$set_starting_values(sv_list)      # providing to the class object
-
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-StartingValuesBSVARTVPMS-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-StartingValuesBSVARTVPMS-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_starting_values_bsvarTVPms$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{StartingValuesBSVARTVPMS$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{StartingValuesBSVARTVPMS$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

@@ -13,7 +13,7 @@ prior$A # show autoregressive prior mean
 
 
 ## ------------------------------------------------
-## Method `specify_prior_bsvarTVP$new`
+## Method `PriorBSVARTVP$new()`
 ## ------------------------------------------------
 
 # a prior for 3-variable example with one lag
@@ -22,7 +22,7 @@ prior$A # show autoregressive prior mean
 
 
 ## ------------------------------------------------
-## Method `specify_prior_bsvarTVP$get_prior`
+## Method `PriorBSVARTVP$get_prior()`
 ## ------------------------------------------------
 
 # a prior for 3-variable example
@@ -31,162 +31,157 @@ prior$get_prior() # show the prior as list
 
 }
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{A}}{an \code{NxK} matrix, the mean of the normal prior distribution for the parameter matrix \eqn{A}.}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{A}}{an \code{NxK} matrix, the mean of the normal prior distribution for the parameter matrix \eqn{A}.}
 
-\item{\code{A_V_inv}}{a \code{KxK} precision matrix of the normal prior distribution for each of 
+    \item{\code{A_V_inv}}{a \code{KxK} precision matrix of the normal prior distribution for each of 
 the row of the parameter matrix \eqn{A}. This precision matrix is equation invariant.}
 
-\item{\code{B_V_inv}}{an \code{NxN} precision matrix of the generalised-normal prior distribution 
+    \item{\code{B_V_inv}}{an \code{NxN} precision matrix of the generalised-normal prior distribution 
 for the structural matrix \eqn{B}. This precision matrix is equation invariant.}
 
-\item{\code{B_nu}}{a positive integer greater of equal than \code{N}, a shape parameter of 
+    \item{\code{B_nu}}{a positive integer greater of equal than \code{N}, a shape parameter of 
 the generalised-normal prior distribution for the structural matrix \eqn{B}.}
 
-\item{\code{VB0}}{an \code{NxN} containing in columns diagonal element of the diagonal 
+    \item{\code{VB0}}{an \code{NxN} containing in columns diagonal element of the diagonal 
 covariance matrix of the normal prior distribution 
 for the structural matrix \eqn{\Theta_0}.}
 
-\item{\code{B0}}{an \code{NxN} matrix in columns containing the mean of the normal prior distribution 
+    \item{\code{B0}}{an \code{NxN} matrix in columns containing the mean of the normal prior distribution 
 for the structural matrix \eqn{\Theta_0}.}
 
-\item{\code{hyper_nu_B}}{a positive scalar, the shape parameter of the inverted-gamma 2 prior
+    \item{\code{hyper_nu_B}}{a positive scalar, the shape parameter of the inverted-gamma 2 prior
 for the overall shrinkage parameter for matrix \eqn{B}.}
 
-\item{\code{hyper_a_B}}{a positive scalar, the shape parameter of the gamma prior
+    \item{\code{hyper_a_B}}{a positive scalar, the shape parameter of the gamma prior
 for the second-level hierarchy for the overall shrinkage parameter for matrix \eqn{B}.}
 
-\item{\code{hyper_s_BB}}{a positive scalar, the scale parameter of the inverted-gamma 2 prior
+    \item{\code{hyper_s_BB}}{a positive scalar, the scale parameter of the inverted-gamma 2 prior
 for the third-level of hierarchy for overall shrinkage parameter for matrix \eqn{B}.}
 
-\item{\code{hyper_nu_BB}}{a positive scalar, the shape parameter of the inverted-gamma 2 prior
+    \item{\code{hyper_nu_BB}}{a positive scalar, the shape parameter of the inverted-gamma 2 prior
 for the third-level of hierarchy for overall shrinkage parameter for matrix \eqn{B}.}
 
-\item{\code{hyper_nu_A}}{a positive scalar, the shape parameter of the inverted-gamma 2 prior 
+    \item{\code{hyper_nu_A}}{a positive scalar, the shape parameter of the inverted-gamma 2 prior 
 for the overall shrinkage parameter for matrix \eqn{A}.}
 
-\item{\code{hyper_a_A}}{a positive scalar, the shape parameter of the gamma prior
+    \item{\code{hyper_a_A}}{a positive scalar, the shape parameter of the gamma prior
 for the second-level hierarchy for the overall shrinkage parameter for matrix \eqn{A}.}
 
-\item{\code{hyper_s_AA}}{a positive scalar, the scale parameter of the inverted-gamma 2 prior
+    \item{\code{hyper_s_AA}}{a positive scalar, the scale parameter of the inverted-gamma 2 prior
 for the third-level of hierarchy for overall shrinkage parameter for matrix \eqn{A}.}
 
-\item{\code{hyper_nu_AA}}{a positive scalar, the shape parameter of the inverted-gamma 2 prior
+    \item{\code{hyper_nu_AA}}{a positive scalar, the shape parameter of the inverted-gamma 2 prior
 for the third-level of hierarchy for overall shrinkage parameter for matrix \eqn{A}.}
 
-\item{\code{sv_a_}}{a positive scalar, the shape parameter of the gamma prior in 
+    \item{\code{sv_a_}}{a positive scalar, the shape parameter of the gamma prior in 
 the hierarchical prior for \eqn{\sigma^2_{\omega}}.}
 
-\item{\code{sv_s_}}{a positive scalar, the scale parameter of the gamma prior in 
+    \item{\code{sv_s_}}{a positive scalar, the scale parameter of the gamma prior in 
 the hierarchical prior for \eqn{\sigma^2_{\omega}}.}
 
-\item{\code{PR_TR}}{an \code{MxM} matrix, the matrix of hyper-parameters of the 
+    \item{\code{PR_TR}}{an \code{MxM} matrix, the matrix of hyper-parameters of the 
 row-specific Dirichlet prior distribution for transition probabilities 
 matrix \eqn{P} of the Markov process \eqn{s_t}.}
 
-\item{\code{df_a}}{a positive scalar, the rate parameter of the shifted exponential 
+    \item{\code{df_a}}{a positive scalar, the rate parameter of the shifted exponential 
 prior distribution for the degrees of freedom parameters of the Student-t 
 distribution for structural shocks.}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-PriorBSVARTVP-new}{\code{specify_prior_bsvarTVP$new()}}
-\item \href{#method-PriorBSVARTVP-get_prior}{\code{specify_prior_bsvarTVP$get_prior()}}
-\item \href{#method-PriorBSVARTVP-clone}{\code{specify_prior_bsvarTVP$clone()}}
-}
+  \itemize{
+    \item \href{#method-PriorBSVARTVP-initialize}{\code{PriorBSVARTVP$new()}}
+    \item \href{#method-PriorBSVARTVP-get_prior}{\code{PriorBSVARTVP$get_prior()}}
+    \item \href{#method-PriorBSVARTVP-clone}{\code{PriorBSVARTVP$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PriorBSVARTVP-new"></a>}}
-\if{latex}{\out{\hypertarget{method-PriorBSVARTVP-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new prior specification PriorBSVARTVP
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_prior_bsvarTVP$new(
+\if{html}{\out{<a id="method-PriorBSVARTVP-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-PriorBSVARTVP-initialize}{}}}
+\subsection{\code{PriorBSVARTVP$new()}}{
+  Create a new prior specification PriorBSVARTVP
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{PriorBSVARTVP$new(
   train_data = NULL,
   N,
   M,
   p,
   d = 0,
   stationary = rep(FALSE, N)
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{train_data}}{a \code{T_train x N} matrix of training sample for the 
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{train_data}}{a \code{T_train x N} matrix of training sample for the 
 \eqn{B} matrix prior distribution.}
-
-\item{\code{N}}{a positive integer - the number of dependent variables in the model.}
-
-\item{\code{M}}{a positive integer - the number of Markov regimes.}
-
-\item{\code{p}}{a positive integer - the autoregressive lag order of the SVAR model.}
-
-\item{\code{d}}{a positive integer - the number of \code{exogenous} variables in 
+      \item{\code{N}}{a positive integer - the number of dependent variables in the model.}
+      \item{\code{M}}{a positive integer - the number of Markov regimes.}
+      \item{\code{p}}{a positive integer - the autoregressive lag order of the SVAR model.}
+      \item{\code{d}}{a positive integer - the number of \code{exogenous} variables in 
 the model.}
-
-\item{\code{stationary}}{an \code{N} logical vector - its element set to \code{FALSE} 
+      \item{\code{stationary}}{an \code{N} logical vector - its element set to \code{FALSE} 
 sets the prior mean for the autoregressive parameters of the \code{N}th 
 equation to the white noise process, otherwise to random walk.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new prior specification PriorBSVARTVP
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{# a prior for 3-variable example with one lag
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new prior specification PriorBSVARTVP
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{# a prior for 3-variable example with one lag
 prior = specify_prior_bsvarTVP$new(us_fiscal_lsuw[1:10,], N = 3, M = 2, p = 1)
 prior$A # show autoregressive prior mean
-
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PriorBSVARTVP-get_prior"></a>}}
 \if{latex}{\out{\hypertarget{method-PriorBSVARTVP-get_prior}{}}}
-\subsection{Method \code{get_prior()}}{
-Returns the elements of the prior specification PriorBSVARTVP as a \code{list}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_prior_bsvarTVP$get_prior()}\if{html}{\out{</div>}}
-}
-
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{# a prior for 3-variable example
+\subsection{\code{PriorBSVARTVP$get_prior()}}{
+  Returns the elements of the prior specification PriorBSVARTVP as a \code{list}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{PriorBSVARTVP$get_prior()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{# a prior for 3-variable example
 prior = specify_prior_bsvarTVP$new(us_fiscal_lsuw[1:10,], N = 3, M = 2, p = 1)
 prior$get_prior() # show the prior as list
-
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PriorBSVARTVP-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-PriorBSVARTVP-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_prior_bsvarTVP$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{PriorBSVARTVP$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{PriorBSVARTVP$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

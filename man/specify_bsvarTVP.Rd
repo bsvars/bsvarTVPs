@@ -11,137 +11,138 @@ spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 
 
 ## ------------------------------------------------
-## Method `specify_bsvarTVP$add_restriction_B`
+## Method `BSVARTVP$add_restriction_B()`
 ## ------------------------------------------------
 
 spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$add_restriction_B(c(TRUE, FALSE, TRUE), shock = 2)
 
 ## ------------------------------------------------
-## Method `specify_bsvarTVP$add_restriction_Theta0`
+## Method `BSVARTVP$add_restriction_Theta0()`
 ## ------------------------------------------------
 
 spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$add_restriction_Theta0(c(TRUE, FALSE, TRUE), shock = 2)
 
 ## ------------------------------------------------
-## Method `specify_bsvarTVP$get_normal`
+## Method `BSVARTVP$get_normal()`
 ## ------------------------------------------------
 
 spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_normal()
 
 ## ------------------------------------------------
-## Method `specify_bsvarTVP$get_sv`
+## Method `BSVARTVP$get_sv()`
 ## ------------------------------------------------
 
 spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_sv()
 
 ## ------------------------------------------------
-## Method `specify_bsvarTVP$get_M`
+## Method `BSVARTVP$get_M()`
 ## ------------------------------------------------
 
 spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_M()
 
 ## ------------------------------------------------
-## Method `specify_bsvarTVP$get_estimate_hyper`
+## Method `BSVARTVP$get_estimate_hyper()`
 ## ------------------------------------------------
 
 spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_estimate_hyper()
 
 ## ------------------------------------------------
-## Method `specify_bsvarTVP$get_finiteM`
+## Method `BSVARTVP$get_finiteM()`
 ## ------------------------------------------------
 
 spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_finiteM()
 
 ## ------------------------------------------------
-## Method `specify_bsvarTVP$get_p`
+## Method `BSVARTVP$get_p()`
 ## ------------------------------------------------
 
 spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_p()
 
 ## ------------------------------------------------
-## Method `specify_bsvarTVP$get_msa`
+## Method `BSVARTVP$get_msa()`
 ## ------------------------------------------------
 
 spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_msa()
 
 ## ------------------------------------------------
-## Method `specify_bsvarTVP$get_data_matrices`
+## Method `BSVARTVP$get_data_matrices()`
 ## ------------------------------------------------
 
 spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_data_matrices()
 
 ## ------------------------------------------------
-## Method `specify_bsvarTVP$get_identification`
+## Method `BSVARTVP$get_identification()`
 ## ------------------------------------------------
 
 spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_identification()
 
 ## ------------------------------------------------
-## Method `specify_bsvarTVP$get_prior`
+## Method `BSVARTVP$get_prior()`
 ## ------------------------------------------------
 
 spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_prior()
 
 ## ------------------------------------------------
-## Method `specify_bsvarTVP$get_starting_values`
+## Method `BSVARTVP$get_starting_values()`
 ## ------------------------------------------------
 
 spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_starting_values()
 }
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{identification}}{an object IdentificationBSVARTVIs with the identifying restrictions.}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{identification}}{an object IdentificationBSVARTVIs with the identifying restrictions.}
 
-\item{\code{prior}}{an object PriorBSVARTVP with the prior specification.}
+    \item{\code{prior}}{an object PriorBSVARTVP with the prior specification.}
 
-\item{\code{data_matrices}}{an object DataMatricesBSVAR with the data matrices.}
+    \item{\code{data_matrices}}{an object DataMatricesBSVAR with the data matrices.}
 
-\item{\code{starting_values}}{an object StartingValuesBSVARTVPMS or 
+    \item{\code{starting_values}}{an object StartingValuesBSVARTVPMS or 
 StartingValuesBSVARTVPMSA with the starting values.}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-BSVARTVP-new}{\code{specify_bsvarTVP$new()}}
-\item \href{#method-BSVARTVP-add_restriction_B}{\code{specify_bsvarTVP$add_restriction_B()}}
-\item \href{#method-BSVARTVP-add_restriction_Theta0}{\code{specify_bsvarTVP$add_restriction_Theta0()}}
-\item \href{#method-BSVARTVP-get_normal}{\code{specify_bsvarTVP$get_normal()}}
-\item \href{#method-BSVARTVP-get_sv}{\code{specify_bsvarTVP$get_sv()}}
-\item \href{#method-BSVARTVP-get_M}{\code{specify_bsvarTVP$get_M()}}
-\item \href{#method-BSVARTVP-get_estimate_hyper}{\code{specify_bsvarTVP$get_estimate_hyper()}}
-\item \href{#method-BSVARTVP-get_finiteM}{\code{specify_bsvarTVP$get_finiteM()}}
-\item \href{#method-BSVARTVP-get_p}{\code{specify_bsvarTVP$get_p()}}
-\item \href{#method-BSVARTVP-get_msa}{\code{specify_bsvarTVP$get_msa()}}
-\item \href{#method-BSVARTVP-get_data_matrices}{\code{specify_bsvarTVP$get_data_matrices()}}
-\item \href{#method-BSVARTVP-get_identification}{\code{specify_bsvarTVP$get_identification()}}
-\item \href{#method-BSVARTVP-get_prior}{\code{specify_bsvarTVP$get_prior()}}
-\item \href{#method-BSVARTVP-get_starting_values}{\code{specify_bsvarTVP$get_starting_values()}}
-\item \href{#method-BSVARTVP-clone}{\code{specify_bsvarTVP$clone()}}
-}
+  \itemize{
+    \item \href{#method-BSVARTVP-initialize}{\code{BSVARTVP$new()}}
+    \item \href{#method-BSVARTVP-add_restriction_B}{\code{BSVARTVP$add_restriction_B()}}
+    \item \href{#method-BSVARTVP-add_restriction_Theta0}{\code{BSVARTVP$add_restriction_Theta0()}}
+    \item \href{#method-BSVARTVP-get_normal}{\code{BSVARTVP$get_normal()}}
+    \item \href{#method-BSVARTVP-get_sv}{\code{BSVARTVP$get_sv()}}
+    \item \href{#method-BSVARTVP-get_M}{\code{BSVARTVP$get_M()}}
+    \item \href{#method-BSVARTVP-get_estimate_hyper}{\code{BSVARTVP$get_estimate_hyper()}}
+    \item \href{#method-BSVARTVP-get_finiteM}{\code{BSVARTVP$get_finiteM()}}
+    \item \href{#method-BSVARTVP-get_p}{\code{BSVARTVP$get_p()}}
+    \item \href{#method-BSVARTVP-get_msa}{\code{BSVARTVP$get_msa()}}
+    \item \href{#method-BSVARTVP-get_data_matrices}{\code{BSVARTVP$get_data_matrices()}}
+    \item \href{#method-BSVARTVP-get_identification}{\code{BSVARTVP$get_identification()}}
+    \item \href{#method-BSVARTVP-get_prior}{\code{BSVARTVP$get_prior()}}
+    \item \href{#method-BSVARTVP-get_starting_values}{\code{BSVARTVP$get_starting_values()}}
+    \item \href{#method-BSVARTVP-clone}{\code{BSVARTVP$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-BSVARTVP-new"></a>}}
-\if{latex}{\out{\hypertarget{method-BSVARTVP-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new specification of the bsvarTVP model.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$new(
+\if{html}{\out{<a id="method-BSVARTVP-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-BSVARTVP-initialize}{}}}
+\subsection{\code{BSVARTVP$new()}}{
+  Create a new specification of the bsvarTVP model.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BSVARTVP$new(
   data,
   p = 1L,
   M = 2L,
@@ -155,348 +156,337 @@ Create a new specification of the bsvarTVP model.
   exogenous = NULL,
   stationary = rep(FALSE, ncol(data)),
   finiteM = TRUE
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{data}}{a \code{(T+p)xN} matrix with time series data.}
-
-\item{\code{p}}{a positive integer providing model's autoregressive lag order.}
-
-\item{\code{M}}{a positive integer specifying the number of Markov regimes.}
-
-\item{\code{B}}{a logical \code{NxN} matrix containing value \code{TRUE} for the elements of 
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{data}}{a \code{(T+p)xN} matrix with time series data.}
+      \item{\code{p}}{a positive integer providing model's autoregressive lag order.}
+      \item{\code{M}}{a positive integer specifying the number of Markov regimes.}
+      \item{\code{B}}{a logical \code{NxN} matrix containing value \code{TRUE} for the elements of 
 the structural matrix \eqn{B} to be estimated and value \code{FALSE} for exclusion restrictions 
 to be set to zero.}
-
-\item{\code{Theta0}}{a logical \code{NxN} matrix containing value \code{TRUE} for the elements of 
+      \item{\code{Theta0}}{a logical \code{NxN} matrix containing value \code{TRUE} for the elements of 
 the structural matrix \eqn{\Theta_0} to be estimated and value \code{FALSE} for exclusion restrictions 
 to be set to zero.}
-
-\item{\code{train_data}}{a positive integer specifying the number of initial observations
+      \item{\code{train_data}}{a positive integer specifying the number of initial observations
 to be used as training sample to be used to train the prior distribution for \eqn{B}.}
-
-\item{\code{distribution}}{a character string specifying the conditional distribution 
+      \item{\code{distribution}}{a character string specifying the conditional distribution 
 of structural shocks. Value \code{"norm"} sets it to the normal distribution, 
 while value \code{"t"} sets the Student-t distribution.}
-
-\item{\code{volatility}}{a logical vector specifying the process for conditional variances 
+      \item{\code{volatility}}{a logical vector specifying the process for conditional variances 
 of structural shocks. Value \code{"TRUE"} sets it to the non-centred Stochastic Volatility model, 
 while value \code{"FALSE"} sets it to time invariant specification.}
-
-\item{\code{ms4ar}}{a logical value - if \code{TRUE} the Markov switching is implemented
+      \item{\code{ms4ar}}{a logical value - if \code{TRUE} the Markov switching is implemented
 in both matrices \eqn{A} and \eqn{B}, otherwise only in matrix \eqn{B}.}
-
-\item{\code{estimate_hyper}}{a logical value - if \code{TRUE} the hyper-parameters for the prior of \eqn{A} and \eqn{B}
+      \item{\code{estimate_hyper}}{a logical value - if \code{TRUE} the hyper-parameters for the prior of \eqn{A} and \eqn{B}
 are estimated, otherwise they are fixed.}
-
-\item{\code{exogenous}}{a \code{(T+p)xd} matrix of exogenous variables.}
-
-\item{\code{stationary}}{an \code{N} logical vector - its element set to \code{FALSE} sets 
+      \item{\code{exogenous}}{a \code{(T+p)xd} matrix of exogenous variables.}
+      \item{\code{stationary}}{an \code{N} logical vector - its element set to \code{FALSE} sets 
 the prior mean for the autoregressive parameters of the \code{N}th equation to the white noise process, 
 otherwise to random walk.}
-
-\item{\code{finiteM}}{a logical value - if true a stationary Markov switching 
+      \item{\code{finiteM}}{a logical value - if true a stationary Markov switching 
 model is estimated. Otherwise, a sparse Markov switching model is estimated 
 in which \code{M=20} and the number of visited states is estimated.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new complete specification for the bsvarTVP model.
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new complete specification for the bsvarTVP model.
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BSVARTVP-add_restriction_B"></a>}}
 \if{latex}{\out{\hypertarget{method-BSVARTVP-add_restriction_B}{}}}
-\subsection{Method \code{add_restriction_B()}}{
-Adds a new restriction to the restrictions identifying the structural matrix \eqn{B} 
+\subsection{\code{BSVARTVP$add_restriction_B()}}{
+  Adds a new restriction to the restrictions identifying the structural matrix \eqn{B} 
 for the shock as specified in \code{shock} for the model to select from.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$add_restriction_B(restriction, shock)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{restriction}}{an \code{N}-logical vector with values \code{TRUE} for 
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BSVARTVP$add_restriction_B(restriction, shock)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{restriction}}{an \code{N}-logical vector with values \code{TRUE} for 
 the parameters to be estimated and \code{FALSE} for the parameters to be 
 restricted to zero.}
-
-\item{\code{shock}}{a positive integer specifying to which shock add the restriction.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+      \item{\code{shock}}{a positive integer specifying to which shock add the restriction.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$add_restriction_B(c(TRUE, FALSE, TRUE), shock = 2)
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BSVARTVP-add_restriction_Theta0"></a>}}
 \if{latex}{\out{\hypertarget{method-BSVARTVP-add_restriction_Theta0}{}}}
-\subsection{Method \code{add_restriction_Theta0()}}{
-Adds a new restriction to the restrictions identifying the structural matrix \eqn{\Theta_0} 
+\subsection{\code{BSVARTVP$add_restriction_Theta0()}}{
+  Adds a new restriction to the restrictions identifying the structural matrix \eqn{\Theta_0} 
 for the shock as specified in \code{shock} for the model to select from.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$add_restriction_Theta0(restriction, shock)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{restriction}}{an \code{N}-logical vector with values \code{TRUE} for 
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BSVARTVP$add_restriction_Theta0(restriction, shock)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{restriction}}{an \code{N}-logical vector with values \code{TRUE} for 
 the parameters to be estimated and \code{FALSE} for the parameters to be 
 restricted to zero.}
-
-\item{\code{shock}}{a positive integer specifying to which shock add the restriction.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+      \item{\code{shock}}{a positive integer specifying to which shock add the restriction.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$add_restriction_Theta0(c(TRUE, FALSE, TRUE), shock = 2)
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BSVARTVP-get_normal"></a>}}
 \if{latex}{\out{\hypertarget{method-BSVARTVP-get_normal}{}}}
-\subsection{Method \code{get_normal()}}{
-Returns the logical value of whether the conditional shock distribution is normal.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_normal()}\if{html}{\out{</div>}}
-}
-
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+\subsection{\code{BSVARTVP$get_normal()}}{
+  Returns the logical value of whether the conditional shock distribution is normal.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BSVARTVP$get_normal()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_normal()
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BSVARTVP-get_sv"></a>}}
 \if{latex}{\out{\hypertarget{method-BSVARTVP-get_sv}{}}}
-\subsection{Method \code{get_sv()}}{
-Returns the logical value of whether the shock conditional variances should 
+\subsection{\code{BSVARTVP$get_sv()}}{
+  Returns the logical value of whether the shock conditional variances should 
 follow non-centred SV of be constant.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_sv()}\if{html}{\out{</div>}}
-}
-
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BSVARTVP$get_sv()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_sv()
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BSVARTVP-get_M"></a>}}
 \if{latex}{\out{\hypertarget{method-BSVARTVP-get_M}{}}}
-\subsection{Method \code{get_M()}}{
-Returns the number of Markov switching regimes.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_M()}\if{html}{\out{</div>}}
-}
-
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+\subsection{\code{BSVARTVP$get_M()}}{
+  Returns the number of Markov switching regimes.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BSVARTVP$get_M()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_M()
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BSVARTVP-get_estimate_hyper"></a>}}
 \if{latex}{\out{\hypertarget{method-BSVARTVP-get_estimate_hyper}{}}}
-\subsection{Method \code{get_estimate_hyper()}}{
-Returns the logical value of whether to estimate the hyper-parameters
+\subsection{\code{BSVARTVP$get_estimate_hyper()}}{
+  Returns the logical value of whether to estimate the hyper-parameters
 (fixing them is the alternative).
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_estimate_hyper()}\if{html}{\out{</div>}}
-}
-
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BSVARTVP$get_estimate_hyper()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_estimate_hyper()
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BSVARTVP-get_finiteM"></a>}}
 \if{latex}{\out{\hypertarget{method-BSVARTVP-get_finiteM}{}}}
-\subsection{Method \code{get_finiteM()}}{
-Returns the logical value of whether Markov switching is stationary 
+\subsection{\code{BSVARTVP$get_finiteM()}}{
+  Returns the logical value of whether Markov switching is stationary 
 (sparse is the alternative).
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_finiteM()}\if{html}{\out{</div>}}
-}
-
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BSVARTVP$get_finiteM()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_finiteM()
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BSVARTVP-get_p"></a>}}
 \if{latex}{\out{\hypertarget{method-BSVARTVP-get_p}{}}}
-\subsection{Method \code{get_p()}}{
-Returns the autoregressive lag order of the model.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_p()}\if{html}{\out{</div>}}
-}
-
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+\subsection{\code{BSVARTVP$get_p()}}{
+  Returns the autoregressive lag order of the model.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BSVARTVP$get_p()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_p()
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BSVARTVP-get_msa"></a>}}
 \if{latex}{\out{\hypertarget{method-BSVARTVP-get_msa}{}}}
-\subsection{Method \code{get_msa()}}{
-Returns the logical value of whether autoregressive matrix follows Markov switching.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_msa()}\if{html}{\out{</div>}}
-}
-
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+\subsection{\code{BSVARTVP$get_msa()}}{
+  Returns the logical value of whether autoregressive matrix follows Markov switching.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BSVARTVP$get_msa()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_msa()
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BSVARTVP-get_data_matrices"></a>}}
 \if{latex}{\out{\hypertarget{method-BSVARTVP-get_data_matrices}{}}}
-\subsection{Method \code{get_data_matrices()}}{
-Returns the data matrices as the DataMatricesBSVAR object.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_data_matrices()}\if{html}{\out{</div>}}
-}
-
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+\subsection{\code{BSVARTVP$get_data_matrices()}}{
+  Returns the data matrices as the DataMatricesBSVAR object.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BSVARTVP$get_data_matrices()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_data_matrices()
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BSVARTVP-get_identification"></a>}}
 \if{latex}{\out{\hypertarget{method-BSVARTVP-get_identification}{}}}
-\subsection{Method \code{get_identification()}}{
-Returns the identifying restrictions as the IdentificationBSVARTVIs object.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_identification()}\if{html}{\out{</div>}}
-}
-
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+\subsection{\code{BSVARTVP$get_identification()}}{
+  Returns the identifying restrictions as the IdentificationBSVARTVIs object.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BSVARTVP$get_identification()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_identification()
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BSVARTVP-get_prior"></a>}}
 \if{latex}{\out{\hypertarget{method-BSVARTVP-get_prior}{}}}
-\subsection{Method \code{get_prior()}}{
-Returns the prior specification as the PriorBSVARTVP object.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_prior()}\if{html}{\out{</div>}}
-}
-
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+\subsection{\code{BSVARTVP$get_prior()}}{
+  Returns the prior specification as the PriorBSVARTVP object.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BSVARTVP$get_prior()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_prior()
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BSVARTVP-get_starting_values"></a>}}
 \if{latex}{\out{\hypertarget{method-BSVARTVP-get_starting_values}{}}}
-\subsection{Method \code{get_starting_values()}}{
-Returns the starting values as the StartingValuesBSVAR object.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$get_starting_values()}\if{html}{\out{</div>}}
-}
-
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
+\subsection{\code{BSVARTVP$get_starting_values()}}{
+  Returns the starting values as the StartingValuesBSVAR object.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BSVARTVP$get_starting_values()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{spec = specify_bsvarTVP$new(us_fiscal_lsuw)
 spec$get_starting_values()
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BSVARTVP-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-BSVARTVP-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specify_bsvarTVP$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{BSVARTVP$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BSVARTVP$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }
