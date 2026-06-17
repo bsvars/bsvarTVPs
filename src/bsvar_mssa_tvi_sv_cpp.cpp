@@ -32,7 +32,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
 ) {
   
   const bool debug = false;
-  if ( debug ) Rcout << " " << endl;
+  if ( debug ) Rcout << " start!" << endl;
   
   // // Progress bar setup
   vec prog_rep_points = arma::round(arma::linspace(0, SS, 50));
@@ -218,21 +218,21 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     if ( hyper_select == 1 ) {
       
       try {
-        aux_hyper           = sample_hyperparameter_mssa_s4_horseshoe(aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
+        aux_hyper           = sample_hyperparameter_mssa_s4_horseshoe(aux_hyper, aux_B, aux_A, VB, aux_SL.slice(0), prior);
         precisionB          = hyper2precisionB_mss_horseshoe(aux_hyper);
         precisionA          = hyper2precisionA_msa_horseshoe(aux_hyper);
       } catch (std::runtime_error &e) {}
       
     } else if ( hyper_select == 2 ) {
       
-      aux_hyper           = sample_hyperparameters_mssa_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, true);
+      aux_hyper           = sample_hyperparameters_mssa_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL.slice(0), prior, true);
       precisionB          = hyper2precisionB_mss_boost(aux_hyper, prior);
       precisionA          = hyper2precisionA_msa_boost(aux_hyper, prior);
       
     } else if ( hyper_select == 3 ) {
       
       try {
-        aux_hyper           = sample_hyperparameters_mssa_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, false);
+        aux_hyper           = sample_hyperparameters_mssa_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL.slice(0), prior, false);
         precisionB          = hyper2precisionB_mss_boost(aux_hyper, prior);
         precisionA          = hyper2precisionA_msa_boost(aux_hyper, prior);
       } catch (std::runtime_error &e) {}
@@ -250,24 +250,29 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     
     // sample aux_B, aux_SL
     if ( debug ) Rcout<<" sample aux_Theta0, aux_SL"<< endl;
-    mat shocks;
+    vec      Tm       = sum(aux_xi, 1);
     for (int m=0; m<M; m++) {
+      
+      if ( debug ) Rcout<<" m " << m << endl;
+      mat shocks(N, Tm(m)), aux_sigma_m(N, Tm(m));
+      
+      int tind = 0;
       for (int t=0; t<T; t++){
         if (aux_xi(m,t)==1) {
-          shocks.col(t)   = Y.col(t) - aux_A.slice(m) * X.col(t);
+          shocks.col(tind)       = Y.col(t) - aux_A.slice(m) * X.col(t);
+          aux_sigma_m.col(tind)  = aux_hetero.col(t);
+          tind++;
         }
       }
-      
+      if ( debug ) Rcout<<" sample aux_Theta0"<< endl;  
       try {
-        TSL             = sample_Theta0_mss_s4( aux_Theta0, aux_SL.slice(1), aux_B, shocks, aux_sigma, aux_xi, prior, VTheta0 );
-        aux_Theta0      = as<cube>(TSL["aux_Theta0"]);
-        aux_SL.slice(1) = as<imat>(TSL["aux_SL"]);
+        TSL                     = sample_Theta0_Hou24_heterosk1_s4 ( aux_Theta0.slice(m), aux_SL.slice(m).col(1), shocks, aux_sigma_m, prior, VTheta0 );
+        aux_Theta0.slice(m)     = as<mat>(TSL["aux_Theta0"]);
+        aux_SL.slice(1).col(m)  = as<ivec>(TSL["aux_SL"]);
       } catch (std::runtime_error &e) {}
-    }
-    
-    for (int m=0; m<M; m++) {
-      aux_Theta0_inv.slice(m) = inv(aux_Theta0.slice(m));
-      aux_struc.slice(m)      = aux_Theta0_inv.slice(m) * aux_B.slice(m);
+      
+      aux_Theta0_inv.slice(m)   = inv(aux_Theta0.slice(m));
+      aux_struc.slice(m)        = aux_Theta0_inv.slice(m) * aux_B.slice(m);
     }
     
     // sample aux_A
