@@ -5,3 +5,4 @@
 ^\.github$
 ^\.positai$
 ^\.claude$
+^inst/varia$
