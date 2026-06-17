@@ -121,7 +121,7 @@ estimate.BSVARTVP <- function(specification, S, thin = 1, show_progress = TRUE) 
   specification$starting_values$set_starting_values(output$last_draw)
   output              = specify_posterior_bsvarTVP$new(specification, output$posterior)
   
-  # output              = normalise(output)
+  output              = normalise(output)
   
   return(output)
 }
@@ -170,7 +170,7 @@ estimate.PosteriorBSVARTVP <- function(specification, S, thin = 1, show_progress
   specification$last_draw$starting_values$set_starting_values(output$last_draw)
   output              = specify_posterior_bsvarTVP$new(specification$last_draw, output$posterior)
  
-  # output              = normalise(output)
+  output              = normalise(output)
   
   return(output)
 }

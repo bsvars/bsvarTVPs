@@ -56,7 +56,7 @@ normalise.PosteriorBSVARTVP <- function(posterior, B_benchmark = NULL) {
   }
   
   TVI_indicator = field1_to_array(posterior$posterior$S4_indicator)
-  dim(TVI_indicator)
+  
   for (m in 1:M) {
     for (component in 1:comp[TVI_equation]) {
       
