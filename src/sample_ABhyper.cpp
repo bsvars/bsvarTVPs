@@ -290,7 +290,9 @@ Rcpp::List sample_B_heterosk1_s4 (
         ll                    = Lm_cs(n-1) + l;
       }
       try {
+        if ( debug ) Rcout<<" sample B before: "<<l<<endl;
         aux_B_tmp               = sample_B_heterosk1_rown( n, aux_B, shocks, aux_sigma, prior_precision(n), prior, VB(ll) );
+        if ( debug ) Rcout<<" sample B after: "<<l<<endl;
       } catch (std::runtime_error &e) {}
       
       aux_B_nL.row(l)         = aux_B_tmp.row(n);
@@ -368,11 +370,12 @@ Rcpp::List sample_B_mss_s4 (
         ii++;
       }
     }
-  
+    
     shocks                  = Y_m - aux_A * X_m;
     List BSL_m              = sample_B_heterosk1_s4( aux_B.slice(m), aux_SL.col(m), aux_Theta0.slice(m), aux_Theta0_inv.slice(m), shocks, aux_sigma_m, prior_precision.col(m), prior, VB );
     aux_B.slice(m)          = as<mat>(BSL_m["aux_B"]);
     aux_SL.col(m)           = as<ivec>(BSL_m["aux_SL"]);
+    
   }
   
   return List::create(
