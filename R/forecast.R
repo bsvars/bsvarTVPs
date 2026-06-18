@@ -35,20 +35,20 @@ generics::forecast
 #' Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, <doi:10.48550/arXiv.2502.19659>.
 #' 
 #' @examples
-#' # simple workflow
-#' ############################################################
-#' spec   = specify_bsvarTVP$new(us_fiscal_lsuw)    # specify the model
-#' burn   = estimate(spec, 5)                       # run the burn-in for convergence
-#' post   = estimate(burn, 10)                      # estimate the model
-#' fore   = forecast(post, horizon = 2)             # forecast 2 periods ahead
+#' # # simple workflow
+#' # ############################################################
+#' # spec   = specify_bsvarTVP$new(us_fiscal_lsuw)    # specify the model
+#' # burn   = estimate(spec, 5)                       # run the burn-in for convergence
+#' # post   = estimate(burn, 10)                      # estimate the model
+#' # fore   = forecast(post, horizon = 2)             # forecast 2 periods ahead
 #' 
-#' # workflow with the pipe |>
-#' ############################################################
-#' us_fiscal_lsuw |>
-#'   specify_bsvarTVP$new() |>
-#'   estimate(S = 5) |> 
-#'   estimate(S = 10) -> post
-#' post |> forecast(horizon = 2) -> fore
+#' # # workflow with the pipe |>
+#' # ############################################################
+#' # us_fiscal_lsuw |>
+#' #   specify_bsvarTVP$new() |>
+#' #   estimate(S = 5) |>
+#' #   estimate(S = 10) -> post
+#' # post |> forecast(horizon = 2) -> fore
 #' 
 #' @export
 forecast.PosteriorBSVARTVP <- function(
