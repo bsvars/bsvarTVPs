@@ -157,7 +157,7 @@ StartingValuesBSVARTVPMSA with the starting values.}
   B,
   Theta0,
   train_data = 0L,
-  distribution = c("norm", "t"),
+  distribution = rep("norm", ncol(data)),
   volatility = rep(FALSE, ncol(data)),
   ms4ar = FALSE,
   estimate_hyper = TRUE,
@@ -182,9 +182,12 @@ the structural matrix \eqn{\Theta_0} to be estimated and value \code{FALSE} for 
 to be set to zero.}
       \item{\code{train_data}}{a positive integer specifying the number of initial observations
 to be used as training sample to be used to train the prior distribution for \eqn{B}.}
-      \item{\code{distribution}}{a character string specifying the conditional distribution 
+      \item{\code{distribution}}{a character vector of length \code{N} specifying the conditional distribution 
 of structural shocks. Value \code{"norm"} sets it to the normal distribution, 
-while value \code{"t"} sets the Student-t distribution.}
+while value \code{"t"} sets the Student-t distribution. Only, model with 
+provided vector argument \code{fixed_regime} may have various values in 
+different elements of the vector \code{distribution}. Otherwise, the same 
+value is required for all elements.}
       \item{\code{volatility}}{a logical vector specifying the process for conditional variances 
 of structural shocks. Value \code{"TRUE"} sets it to the non-centred Stochastic Volatility model, 
 while value \code{"FALSE"} sets it to time invariant specification.}
