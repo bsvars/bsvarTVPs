@@ -773,7 +773,7 @@ specify_bsvarTVP = R6::R6Class(
   "BSVARTVP",
   
   private = list(
-    normal = TRUE,      # if TRUE - normal shocks, if FALSE - Student-t shocks
+    normal = logical(), # if TRUE - normal shocks, if FALSE - Student-t shocks
     sv     = logical(), # if TRUE - non-centred SV, if FALSE - homoskedasticity
     msa    = FALSE,     # if TRUE - MSSA, if FALSE - MSS
     estimate_hyper = TRUE,  # if TRUE - estimate hyper-parameters, if FALSE - fix them
@@ -812,9 +812,12 @@ specify_bsvarTVP = R6::R6Class(
     #' to be set to zero.
     #' @param train_data a positive integer specifying the number of initial observations
     #' to be used as training sample to be used to train the prior distribution for \eqn{B}.
-    #' @param distribution a character string specifying the conditional distribution 
+    #' @param distribution a character vector of length \code{N} specifying the conditional distribution 
     #' of structural shocks. Value \code{"norm"} sets it to the normal distribution, 
-    #' while value \code{"t"} sets the Student-t distribution.
+    #' while value \code{"t"} sets the Student-t distribution. Only, model with 
+    #' provided vector argument \code{fixed_regime} may have various values in 
+    #' different elements of the vector \code{distribution}. Otherwise, the same 
+    #' value is required for all elements.
     #' @param volatility a logical vector specifying the process for conditional variances 
     #' of structural shocks. Value \code{"TRUE"} sets it to the non-centred Stochastic Volatility model, 
     #' while value \code{"FALSE"} sets it to time invariant specification.
@@ -842,7 +845,7 @@ specify_bsvarTVP = R6::R6Class(
       B,
       Theta0,
       train_data = 0L,
-      distribution = c("norm","t"),
+      distribution = rep("norm", ncol(data)),
       volatility = rep(FALSE, ncol(data)),
       ms4ar = FALSE,
       estimate_hyper = TRUE,
@@ -866,14 +869,19 @@ specify_bsvarTVP = R6::R6Class(
       
       stopifnot("Argument ms4A has to be a logical value." = is.logical(ms4ar) & length(ms4ar) == 1)
       
-      distribution  = match.arg(distribution)
-      if (distribution == "t") {
-        private$normal = FALSE
-      }
-      
       N             = ncol(data)
       private$N     = N
       
+      stopifnot("Argument distribution has to be of length N." = length(distribution) == N)
+      stopifnot("Argument distribution must include values `norm` or `t` only." = all(distribution %in% c("norm", "t")))
+      private$normal = distribution == rep("norm", N)
+      
+      if (is.null(fixed_regime)) {
+         stopifnot("Argument distribution must have the same value for all its elements if fixed_regime is not provided." = length(unique(distribution)) == 1)
+      }
+      
+      stopifnot("Argument volatility has to be a logical vector of length N." 
+                = length(volatility) == N & is.logical(volatility) & all(is.na(volatility) == FALSE))
       if (missing(volatility)) {
         volatility  = rep(FALSE, N)
       }

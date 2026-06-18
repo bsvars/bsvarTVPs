@@ -10,8 +10,9 @@ using namespace arma;
 // [[Rcpp::export]]
 arma::mat sample_lambda_ms (
     const arma::mat&    aux_df,     // NxM
-    const arma::mat&    aux_xi,      // MxT
-    arma::mat&    U           // NxT
+    const arma::mat&    aux_xi,     // MxT
+    arma::mat&          U,          // NxT
+    const arma::uvec    studentt    // Nx1, {FALSE - normal, TRUE - Student-t};
 ) {
   
   const int N           = aux_df.n_rows;
@@ -21,16 +22,17 @@ arma::mat sample_lambda_ms (
   
   mat       nu_lambda   = aux_df + 1;
   mat       s_lambda    = square(U) - 2;
-  mat       aux_lambda(N, T);
+  mat       aux_lambda(N, T, fill::ones);
   
   for (int n=0; n<N; n++) {
+    if (studentt(n) == 0) continue;         // skip normal errors
     for (int t=0; t<T; t++) {
       int     m         = aux_xi.col(t).index_max();
       double  draw      =  chi2rnd(nu_lambda(n, m));
       aux_lambda(n, t)  = (nu_lambda(n, m) + s_lambda(n, t)) / draw;
     }
   }
-  
+
   return aux_lambda;
 } // END sample_lambda_ms
 
@@ -67,7 +69,8 @@ Rcpp::List sample_df_ms (
     const Rcpp::List& prior,              // hyper-parameter for exponential prior for aux_df
     const int&        s,                  // MCMC iteration
     arma::mat&        adaptive_scale,     // NxM
-    const arma::vec&  adptive_alpha_gamma // 2x1 vector with target acceptance rate and step size
+    const arma::vec&  adptive_alpha_gamma,// 2x1 vector with target acceptance rate and step size
+    const arma::uvec  studentt            // Nx1, {FALSE - normal, TRUE - Student-t};
 ) {
   
   int N = aux_df.n_rows;
@@ -80,6 +83,7 @@ Rcpp::List sample_df_ms (
   // by sampling from truncated normal it is assumed that the asymmetry from truncation 
   // is negligible for alpha computation
   for (int n = 0; n < N; n++){
+    if (studentt(n) == 0) continue;         // skip normal errors
     for (int m = 0; m < M; m++){
       
       aux_df_star(n, m)       = RcppTN::rtn1( aux_df(n, m), adaptive_scale(n), 2, R_PosInf );

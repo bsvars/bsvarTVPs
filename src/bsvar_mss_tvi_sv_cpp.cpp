@@ -23,7 +23,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     const Rcpp::List&             VTheta0,              // restrictions on Theta0
     const Rcpp::List&             starting_values,
     const arma::uvec              sv_select,            // Nx1, for each equation: {1 - non-centred, 2 - centred, 3 - homoskedastic};
-    const bool                    studentt,             // {FALSE - normal, TRUE - Student-t};
+    const arma::uvec              studentt,             // Nx1, {FALSE - normal, TRUE - Student-t};
     const int                     thin = 100,           // introduce thinning
     const int                     hyper_select = 3,     // {1 - horseshoe, 2 - boost, 3 - fixed}
     const bool                    finiteM = true,       // {true - stationary MS, false - overfitted};
@@ -165,27 +165,25 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     // sample aux_lambda and aux_df
     if ( debug ) Rcout<<" sample aux_lambda and aux_df"<<endl;
     mat E             = (Y - aux_A * X);
-    if ( studentt ) {
-      
-      mat U           = E;
-      for (int t=0; t<T; t++) {
-        int   m       = aux_xi.col(t).index_max();
-        U.col(t)      = aux_struc.slice(m) * (Y.col(t) - aux_A * X.col(t));
-      }
-      U              /= aux_sigma;
-      
-      try {
-        aux_lambda      = sample_lambda_ms(aux_df, aux_xi, U);
-        aux_lambda_sqrt = sqrt(aux_lambda);
-        aux_hetero      = aux_sigma % aux_lambda_sqrt;
-      } catch (std::runtime_error &e) {}
-      
-      try {
-        aux_df_tmp      = sample_df_ms (aux_df, aux_lambda, aux_xi, U, prior, ss, adaptive_scale, adptive_alpha_gamma);
-        aux_df          = as<mat>(aux_df_tmp["aux_df"]);
-        adaptive_scale  = as<mat>(aux_df_tmp["adaptive_scale"]);
-      } catch (std::runtime_error &e) {}
-    } // END studentt
+    
+    mat U           = E;
+    for (int t=0; t<T; t++) {
+      int   m       = aux_xi.col(t).index_max();
+      U.col(t)      = aux_struc.slice(m) * (Y.col(t) - aux_A * X.col(t));
+    }
+    U              /= aux_sigma;
+    
+    try {
+      aux_lambda      = sample_lambda_ms(aux_df, aux_xi, U, studentt);
+      aux_lambda_sqrt = sqrt(aux_lambda);
+      aux_hetero      = aux_sigma % aux_lambda_sqrt;
+    } catch (std::runtime_error &e) {}
+    
+    try {
+      aux_df_tmp      = sample_df_ms (aux_df, aux_lambda, aux_xi, U, prior, ss, adaptive_scale, adptive_alpha_gamma, studentt);
+      aux_df          = as<mat>(aux_df_tmp["aux_df"]);
+      adaptive_scale  = as<mat>(aux_df_tmp["adaptive_scale"]);
+    } catch (std::runtime_error &e) {}
     
     // sample aux_xi
     if ( debug ) Rcout<<" sample aux_xi"<<endl;
@@ -200,7 +198,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
           }
         }
       } // END loop m
-      if ( studentt ) {
+      if ( all(studentt == 1) ) {
         try {
           aux_xi        = sample_Markov_process_studentt(Z, aux_xi, aux_PR_TR, aux_pi_0, aux_df, finiteM);
         } catch (std::runtime_error &e) {
@@ -253,12 +251,12 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
     if ( debug ) Rcout<<" sample aux_h, aux_omega and aux_S, aux_sigma2_omega"<<endl;
-    mat U(N, T);
+    mat UU(N, T);
     E = Y - aux_A * X;
     for (int m=0; m<M; m++) {
       for (int t=0; t<T; t++) {
         if (aux_xi(m,t)==1) {
-          U.col(t)      = aux_struc.slice(m) * E.col(t) / aux_lambda_sqrt.col(t);
+          UU.col(t)      = aux_struc.slice(m) * E.col(t) / aux_lambda_sqrt.col(t);
         }
       }
     }
@@ -271,7 +269,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
         rowvec  omega_tmp   = aux_omega.row(n);
         rowvec  sigma2v_tmp = square(aux_omega.row(n));
         urowvec S_tmp       = aux_S.row(n);
-        rowvec  U_tmp       = U.row(n);
+        rowvec  U_tmp       = UU.row(n);
         double  s2o_tmp     = aux_sigma2_omega(n);
         double  s_n         = aux_s_(n);
         
@@ -328,7 +326,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     if ( debug ) Rcout<<" sample aux_Theta0, aux_SL"<< endl;
     try {
       mat shocks      = Y - aux_A * X;
-      TSL             = sample_Theta0_mss_s4( aux_Theta0, aux_SL.slice(1), aux_B, shocks, aux_sigma, aux_xi, prior, VTheta0 );
+      TSL             = sample_Theta0_mss_s4( aux_Theta0, aux_SL.slice(1), aux_B, shocks, aux_hetero, aux_xi, prior, VTheta0 );
       aux_Theta0      = as<cube>(TSL["aux_Theta0"]);
       aux_SL.slice(1) = as<imat>(TSL["aux_SL"]);
       

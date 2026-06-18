@@ -13,7 +13,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     const Rcpp::List&             VTheta0,              // restrictions on Theta0
     const Rcpp::List&             starting_values,
     const arma::uvec              sv_select,            // Nx1, for each equation: {1 - non-centred, 2 - centred, 3 - homoskedastic};
-    const bool                    studentt,             // {FALSE - normal, TRUE - Student-t};
+    const arma::uvec              studentt,             // Nx1, {FALSE - normal, TRUE - Student-t};
     const int                     thin = 100,           // introduce thinning
     const int                     hyper_select = 3,     // {1 - horseshoe, 2 - boost, 3 - fixed}
     const bool                    finiteM = true,       // {true - stationary MS, false - overfitted};
