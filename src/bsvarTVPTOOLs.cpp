@@ -41,6 +41,7 @@ arma::cube bsvars_ir1 (
 // [[Rcpp::export]]
 arma::field<arma::cube> bsvarTVPs_ir_ms (
     arma::field<arma::cube>&  posterior_B,        // (S)(N, N, M)
+    arma::field<arma::cube>&  posterior_Theta0,   // (S)(N, N, M)
     arma::cube&               posterior_A,        // (N, K, S)
     const int                 horizon,
     const int                 p,
@@ -53,10 +54,12 @@ arma::field<arma::cube> bsvarTVPs_ir_ms (
   
   cube            aux_irfs(N, N, horizon + 1);
   field<cube>     irfs(S, M);
+  mat             aux_struc(N, N);
   
   for (int s=0; s<S; s++) {
     for (int m=0; m<M; m++) {
-      aux_irfs            = bsvars_ir1( posterior_B(s).slice(m), posterior_A.slice(s), horizon, p , standardise);
+      aux_struc           = solve(posterior_Theta0(s).slice(m), posterior_B(s).slice(m));
+      aux_irfs            = bsvars_ir1( aux_struc, posterior_A.slice(s), horizon, p , standardise);
       irfs(s, m)          = aux_irfs;
     } // END m loop
   } // END s loop
@@ -70,6 +73,7 @@ arma::field<arma::cube> bsvarTVPs_ir_ms (
 // [[Rcpp::export]]
 arma::field<arma::cube> bsvarTVPs_ir_mssa (
     arma::field<arma::cube>&  posterior_B,        // (S)(N, N, M)
+    arma::field<arma::cube>&  posterior_Theta0,   // (S)(N, N, M)
     arma::field<arma::cube>&  posterior_A,        // (S)(N, K, S)
     const int                 horizon,
     const int                 p,
@@ -82,10 +86,12 @@ arma::field<arma::cube> bsvarTVPs_ir_mssa (
   
   cube            aux_irfs(N, N, horizon + 1);
   field<cube>     irfs(S, M);
+  mat             aux_struc(N, N);
   
   for (int s=0; s<S; s++) {
     for (int m=0; m<M; m++) {
-      aux_irfs            = bsvars_ir1( posterior_B(s).slice(m), posterior_A(s).slice(m), horizon, p , standardise);
+      aux_struc           = solve(posterior_Theta0(s).slice(m), posterior_B(s).slice(m));
+      aux_irfs            = bsvars_ir1( aux_struc, posterior_A(s).slice(m), horizon, p , standardise);
       irfs(s, m)          = aux_irfs;
     } // END m loop
   } // END s loop
