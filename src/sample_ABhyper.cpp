@@ -10,6 +10,39 @@ using namespace arma;
 
 
 
+
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+arma::vec mvnrnd_prec_cond (
+    arma::vec x,          // Nx1 vector to be filled with conditional normal draws when missing == 1
+    arma::vec mu,         // Nx1 mean vector
+    arma::mat precision,  // NxN precision matrix
+    arma::vec to_sample   // Nx1 with 1 for missing observations
+) {
+  // Gibbs sampler for multivariate normal with precision matrix, conditional on some observations
+  int   N         = x.n_elem;
+  uvec  ind_miss  = find(to_sample);
+  int   NN        = ind_miss.n_elem;
+  mat   aj        = eye(N, N);
+  
+  for (int i=0; i<NN; i++) {
+    int     this_one  = ind_miss(i);
+    rowvec  prec12    = precision.row(this_one);
+    prec12.shed_col(this_one);
+    vec     x2        = x;
+    x2.shed_row(this_one);
+    vec     mu2       = mu;
+    mu2.shed_row(this_one);
+    double  Vto       = 1 / precision(this_one, this_one);
+    double  Eto       = mu(this_one) - Vto * dot(prec12, (x2 - mu2));
+    x(this_one)       = randn(distr_param(Eto, sqrt(Vto)));
+  }
+  
+  return x;
+} // END mvnrnd_prec_cond
+
+
+
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
 arma::mat orthogonal_complement_matrix_TW (const arma::mat& x) {
