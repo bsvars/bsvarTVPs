@@ -112,7 +112,9 @@ distribution for structural shocks.}
   M,
   p,
   d = 0,
-  stationary = rep(FALSE, N)
+  stationary = rep(FALSE, N),
+  ar_sigma2 = rep(1, N),
+  kappa = c(0.2^2, 10^2)
 )}
     \if{html}{\out{</div>}}
   }
@@ -129,6 +131,13 @@ the model.}
       \item{\code{stationary}}{an \code{N} logical vector - its element set to \code{FALSE} 
 sets the prior mean for the autoregressive parameters of the \code{N}th 
 equation to the white noise process, otherwise to random walk.}
+      \item{\code{ar_sigma2}}{a positive \code{N}-vector with the autoregressive variance
+estimates for each variable to be used in the Minnesota prior for the autoregressive
+parameters.}
+      \item{\code{kappa}}{a positive \code{2}-vector with the hyperparameters of
+the Minnesota prior for the autoregressive parameters - the first element 
+is the overall tightness hyperparameter, while the second element is the 
+tightness of the prior on the constant and exogenous variable coefficients.}
     }
     \if{html}{\out{</div>}}
   }

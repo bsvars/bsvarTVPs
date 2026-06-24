@@ -21,6 +21,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     const Rcpp::List&             prior,                // a list of priors - original dimensions
     const arma::field<arma::mat>& VB,                   // restrictions on B0
     const Rcpp::List&             VTheta0,              // restrictions on Theta0
+    const arma::field<arma::mat>& VA,                   // restrictions on A
     const Rcpp::List&             starting_values,
     const arma::uvec              sv_select,            // Nx1, for each equation: {1 - non-centred, 2 - centred, 3 - homoskedastic};
     const arma::uvec              studentt,             // Nx1, {FALSE - normal, TRUE - Student-t};
@@ -299,7 +300,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     // sample aux_A
     if ( debug ) Rcout << " sample aux_A" << endl;
     try {
-      aux_A             = sample_A_heterosk1_mssa(aux_A, aux_struc, aux_xi, precisionA, aux_hetero, Y, X, prior);
+      aux_A             = sample_A_heterosk1_mssa(aux_A, aux_struc, aux_xi, precisionA, aux_hetero, Y, X, prior, VA);
     } catch (std::runtime_error &e) {}
     
     

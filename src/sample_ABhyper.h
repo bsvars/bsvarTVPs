@@ -112,7 +112,8 @@ arma::mat sample_A_heterosk1_mss (
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  Y,              // NxT dependent variables
     const arma::mat&  X,              // KxT dependent variables
-    const Rcpp::List& prior           // a list of priors - original dimensions
+    const Rcpp::List& prior,          // a list of priors - original dimensions
+    const arma::field<arma::mat>& VA  // restrictions on A
 );
 
 
@@ -124,7 +125,8 @@ arma::cube sample_A_heterosk1_mssa (
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  Y,              // NxT dependent variables
     const arma::mat&  X,              // KxT dependent variables
-    const Rcpp::List& prior           // a list of priors - original dimensions
+    const Rcpp::List& prior,          // a list of priors - original dimensions
+    const arma::field<arma::mat>& VA  // restrictions on A
 );
 
 

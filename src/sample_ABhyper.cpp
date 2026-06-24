@@ -542,7 +542,8 @@ arma::mat sample_A_heterosk1_mss (
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  Y,              // NxT dependent variables
     const arma::mat&  X,              // KxT dependent variables
-    const Rcpp::List& prior           // a list of priors - original dimensions
+    const Rcpp::List& prior,          // a list of priors - original dimensions
+    const arma::field<arma::mat>& VA  // restrictions on A
 ) {
   // the function draws the value of aux_A
   const int N         = aux_A.n_rows;
@@ -596,16 +597,15 @@ arma::mat sample_A_heterosk1_mss (
     mat     precision = prior_precision(n) + trans(Wn_sigma) * Wn_sigma;
     precision         = 0.5 * (precision + precision.t());
     rowvec  location  = prior_A_mean.row(n) * prior_precision(n) + trans(zn_sigma) * Wn_sigma;
+    vec     mean      = solve(precision, location.t(), solve_opts::likely_sympd);
     
-    mat     precision_chol(size(precision));
-    try {
-      precision_chol = trimatu(chol(precision));
-    } catch (std::runtime_error &e) {
-      // Rcout << "   Cholesky failure " << endl;
-      continue; 
-    }
-    vec     draw      = solve(precision_chol, 
-                              solve(trans(precision_chol), trans(location)) + as<vec>(rnorm(K)));
+    vec     draw      = mvnrnd_prec_cond ( 
+                          trans(aux_A.row(n)),
+                          mean,
+                          precision,
+                          trans(sum(VA(n)))
+    );
+    
     aux_A.row(n)      = trans(draw);
   } // END n loop
   
@@ -626,7 +626,8 @@ arma::cube sample_A_heterosk1_mssa (
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  Y,              // NxT dependent variables
     const arma::mat&  X,              // KxT dependent variables
-    const Rcpp::List& prior           // a list of priors - original dimensions
+    const Rcpp::List& prior,          // a list of priors - original dimensions
+    const arma::field<arma::mat>& VA  // restrictions on A
 ) {
   // the function changes the value of aux_A by reference
   const int N         = aux_A.n_rows;
@@ -676,11 +677,15 @@ arma::cube sample_A_heterosk1_mssa (
       mat     precision = prior_precision(n, m) + trans(Wn_sigma) * Wn_sigma;
       precision         = 0.5 * (precision + precision.t());
       rowvec  location  = prior_A_mean.row(n) * prior_precision(n, m) + trans(zn_sigma) * Wn_sigma;
+      vec     mean      = solve(precision, location.t(), solve_opts::likely_sympd);
       
-      mat     precision_chol = trimatu(chol(precision));
-      vec     xx(K, fill::randn);
-      vec     draw          = solve(precision_chol, 
-                                solve(trans(precision_chol), trans(location)) + xx);
+      vec     draw      = mvnrnd_prec_cond ( 
+        trans(aux_A.slice(m).row(n)),
+        mean,
+        precision,
+        trans(sum(VA(n)))
+      );
+      
       aux_A.slice(m).row(n) = trans(draw);
     } // END n loop
   } // END m loop

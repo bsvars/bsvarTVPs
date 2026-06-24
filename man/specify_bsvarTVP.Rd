@@ -156,6 +156,7 @@ StartingValuesBSVARTVPMSA with the starting values.}
   M = 2L,
   B,
   Theta0,
+  A,
   train_data = 0L,
   distribution = rep("norm", ncol(data)),
   volatility = rep(FALSE, ncol(data)),
@@ -179,6 +180,9 @@ the structural matrix \eqn{B} to be estimated and value \code{FALSE} for exclusi
 to be set to zero.}
       \item{\code{Theta0}}{a logical \code{NxN} matrix containing value \code{TRUE} for the elements of 
 the structural matrix \eqn{\Theta_0} to be estimated and value \code{FALSE} for exclusion restrictions 
+to be set to zero.}
+      \item{\code{A}}{a logical \code{NxK} matrix containing value \code{TRUE} for the elements of 
+the autoregressive matrix \eqn{A} to be estimated and value \code{FALSE} for exclusion restrictions 
 to be set to zero.}
       \item{\code{train_data}}{a positive integer specifying the number of initial observations
 to be used as training sample to be used to train the prior distribution for \eqn{B}.}

@@ -362,6 +362,7 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
       
       self$A              = matrix(0, N, K)
       diag(self$A)[diag(A[,1:N])] = runif(sum(diag(A[,1:N])))
+      
       self$hyper          = list(
         aux_hyper = matrix(20, 2 * N + 1, 2)
       )
@@ -827,6 +828,9 @@ specify_bsvarTVP = R6::R6Class(
     #' @param Theta0 a logical \code{NxN} matrix containing value \code{TRUE} for the elements of 
     #' the structural matrix \eqn{\Theta_0} to be estimated and value \code{FALSE} for exclusion restrictions 
     #' to be set to zero.
+    #' @param A a logical \code{NxK} matrix containing value \code{TRUE} for the elements of 
+    #' the autoregressive matrix \eqn{A} to be estimated and value \code{FALSE} for exclusion restrictions 
+    #' to be set to zero.
     #' @param train_data a positive integer specifying the number of initial observations
     #' to be used as training sample to be used to train the prior distribution for \eqn{B}.
     #' @param distribution a character vector of length \code{N} specifying the conditional distribution 
@@ -861,6 +865,7 @@ specify_bsvarTVP = R6::R6Class(
       M = 2L,
       B,
       Theta0,
+      A,
       train_data = 0L,
       distribution = rep("norm", ncol(data)),
       volatility = rep(FALSE, ncol(data)),
@@ -948,6 +953,11 @@ specify_bsvarTVP = R6::R6Class(
         Theta0        = matrix(FALSE, N, N)
         diag(Theta0)  = TRUE
       }
+      
+      if (missing(A)) {
+        A     = matrix(TRUE, N, K)
+      }
+      stopifnot("Incorrectly specified argument A." = (is.matrix(A) & is.logical(A)) | (length(A) == 1 & is.na(A)))
       
       if (!is.null(fixed_regime)) {
         fixed_regime = fixed_regime[-(1:p)]
