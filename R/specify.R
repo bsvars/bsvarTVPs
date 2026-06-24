@@ -101,13 +101,30 @@ specify_prior_bsvarTVP = R6::R6Class(
     #' @param stationary an \code{N} logical vector - its element set to \code{FALSE} 
     #' sets the prior mean for the autoregressive parameters of the \code{N}th 
     #' equation to the white noise process, otherwise to random walk.
+    #' @param ar_sigma2 a positive \code{N}-vector with the autoregressive variance
+    #' estimates for each variable to be used in the Minnesota prior for the autoregressive
+    #' parameters.
+    #' @param kappa a positive \code{2}-vector with the hyperparameters of
+    #' the Minnesota prior for the autoregressive parameters - the first element 
+    #' is the overall tightness hyperparameter, while the second element is the 
+    #' tightness of the prior on the constant and exogenous variable coefficients.
+    #' 
     #' @return A new prior specification PriorBSVARTVP
     #' @examples 
     #' # a prior for 3-variable example with one lag
     #' prior = specify_prior_bsvarTVP$new(us_fiscal_lsuw[1:10,], N = 3, M = 2, p = 1)
     #' prior$A # show autoregressive prior mean
     #' 
-    initialize = function(train_data = NULL, N, M, p, d = 0, stationary = rep(FALSE, N)){
+    initialize = function(
+      train_data = NULL, 
+      N, 
+      M, 
+      p, 
+      d = 0, 
+      stationary = rep(FALSE, N),
+      ar_sigma2 = rep(1, N),
+      kappa = c(0.2^2, 10^2)
+    ){
       
       stopifnot("Argument N must be a positive integer number." = N > 0 & N %% 1 == 0)
       stopifnot("Argument M must be a positive integer number." = M > 0 & M %% 1 == 0)
@@ -131,7 +148,7 @@ specify_prior_bsvarTVP = R6::R6Class(
       
       K                 = N * p + 1 + d
       self$A            = cbind(A1, matrix(0, N, K - N))
-      self$A_V_inv      = diag(c(kronecker((1:p)^2, rep(1, N) ), rep(1, d + 1)))
+      self$A_V_inv      = diag( 1 / c(kappa[1] / (kronecker((1:p)^2, ar_sigma2)), rep(kappa[2], 1 + d)) )
       self$B_V_inv      = S_inv
       self$B_nu         = T_train + N + 1
       self$VB0          = matrix(1, N, N)
@@ -948,11 +965,12 @@ specify_bsvarTVP = R6::R6Class(
       }
       TT            = nrow(data_estimate)
       T             = TT - p
-      A             = matrix(TRUE, N, K)
+      
+      ar_sigma2     = apply(data, 2, function(x){sum(ar(x, aic = FALSE, order.max = 12)$resid^2, na.rm = TRUE) / (dim(data)[1] - 5)})
       
       self$data_matrices   = specify_data_matrices$new(data_estimate, p, exogenous)
       self$identification  = specify_identification_bsvarsTVI$new(B, Theta0, A, N, K)
-      self$prior           = specify_prior_bsvarTVP$new(data_train, N, M, p, d, stationary)
+      self$prior           = specify_prior_bsvarTVP$new(data_train, N, M, p, d, stationary, ar_sigma2)
       if ( ms4ar ) {
         sv = specify_starting_values_bsvarTVPmsa$new(A, B, N, M, T, p, d, finiteM, fixed_regime)
       } else {
