@@ -13,7 +13,7 @@ using namespace arma;
 
 // [[Rcpp::interfaces(cpp)]]
 // [[Rcpp::export]]
-arma::vec mvnrnd_prec_cond (
+arma::vec mvnrnd_prec_cond_gibbs (
     arma::vec x,          // Nx1 vector to be filled with conditional normal draws when missing == 1
     arma::vec mu,         // Nx1 mean vector
     arma::mat precision,  // NxN precision matrix
@@ -24,7 +24,7 @@ arma::vec mvnrnd_prec_cond (
   uvec  ind_miss  = find(to_sample);
   int   NN        = ind_miss.n_elem;
   mat   aj        = eye(N, N);
-  
+
   for (int i=0; i<NN; i++) {
     int     this_one  = ind_miss(i);
     rowvec  prec12    = precision.row(this_one);
@@ -37,9 +37,41 @@ arma::vec mvnrnd_prec_cond (
     double  Eto       = mu(this_one) - Vto * dot(prec12, (x2 - mu2));
     x(this_one)       = randn(distr_param(Eto, sqrt(Vto)));
   }
-  
+
   return x;
+} // END mvnrnd_prec_cond_gibbs
+
+
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+arma::vec mvnrnd_prec_cond (
+    arma::vec x,          // Nx1 vector to be filled with conditional normal draws when missing == 1
+    arma::vec mu,         // Nx1 mean vector
+    arma::mat precision,  // NxN precision matrix
+    arma::vec to_sample   // Nx1 with 1 for missing observations
+) {
+  
+  int   N         = x.n_elem;
+  uvec  ind       = find( to_sample == 0 );
+  uvec  ind_miss  = find(to_sample);
+  mat   aj        = eye(N, N);
+  
+  vec   x2        = x(ind); 
+  
+  vec   mu1       = mu(ind_miss);
+  vec   mu2       = mu(ind);
+  mat   prec11    = precision(ind_miss, ind_miss);
+  mat   prec12    = precision(ind_miss, ind);
+   
+  mat   prec11_inv = inv_sympd(prec11);
+  vec   mu_cond   = mu1 + prec11_inv * prec12 * (x2 - mu2);
+  vec   draw      = mvnrnd( mu_cond, prec11_inv );
+  
+  vec   out       = aj.cols(ind_miss) * draw + aj.cols(ind) * x2;
+  return out;
 } // END mvnrnd_prec_cond
+
+
 
 
 

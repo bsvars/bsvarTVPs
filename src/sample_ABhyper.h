@@ -5,6 +5,14 @@
 #include <RcppArmadillo.h>
 
 
+arma::vec mvnrnd_prec_cond_gibbs (
+    arma::vec x,          // Nx1 vector to be filled with conditional normal draws when missing == 1
+    arma::vec mu,         // Nx1 mean vector
+    arma::mat precision,  // NxN precision matrix
+    arma::vec to_sample   // Nx1 with 1 for missing observations
+);
+
+
 arma::vec mvnrnd_prec_cond (
     arma::vec x,          // Nx1 vector to be filled with conditional normal draws when missing == 1
     arma::vec mu,         // Nx1 mean vector
