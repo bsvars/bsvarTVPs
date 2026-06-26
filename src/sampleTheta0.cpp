@@ -1,6 +1,7 @@
 
 #include <RcppArmadillo.h>
 #include "sample_sv_ms.h"
+#include "sample_ABhyper.h"
 
 using namespace Rcpp;
 using namespace arma;
@@ -747,3 +748,65 @@ Rcpp::List sample_Theta0_mss_s4 (
     _["aux_SL"]     = aux_SL
   );
 } // END sample_B_mss_s4
+
+
+
+
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+Rcpp::List sample_BTheta0_tvi (
+    arma::cube&                   aux_B,          // NxNxM
+    arma::cube                    aux_Theta0,     // NxNxM
+    arma::icube                   aux_SL,         // NxMx2 row-specific S4 indicators
+    const arma::mat&              shocks,         // NxT shocks = Y - aux_A * X;
+    const arma::mat&              aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+    const arma::mat&              aux_xi,         // MxT
+    const Rcpp::List&             prior,          // a list of priors - original dimensions
+    arma::field<arma::mat>        prior_precision, // (N,M)(N,N)
+    const arma::field<arma::mat>& VB, // restrictions on B0
+    const Rcpp::List&             VTheta0
+) {
+  const int T         = shocks.n_cols;
+  const int N         = shocks.n_rows;
+  const int M         = aux_Theta0.n_slices;
+  const vec T_m       = sum(aux_xi,1);
+  imat aux_SL_B       = aux_SL.slice(0);
+  imat aux_SL_Theta0  = aux_SL.slice(1);
+  cube aux_Theta0_inv(N, N, M);
+  cube aux_struc(N, N, M);
+  
+  for (int m=0; m<M; m++) {
+    int ii = 0;
+    mat aux_sigma_m(N, T_m(m));
+    mat shocks_m(N, T_m(m));
+    
+    for (int t=0; t<T; t++){
+      if (aux_xi(m,t)==1) {
+        aux_sigma_m.col(ii) = aux_sigma.col(t);
+        shocks_m.col(ii)    = aux_B.slice(m) * shocks.col(t);
+        ii++;
+      }
+    }
+    
+    List Theta0SL_m         = sample_Theta0_Hou24_heterosk1_s4( aux_Theta0.slice(m), aux_SL_Theta0.col(m), shocks_m, aux_sigma_m, prior, VTheta0 );
+    aux_Theta0.slice(m)     = as<mat>(Theta0SL_m["aux_Theta0"]);
+    aux_SL_Theta0.col(m)    = as<ivec>(Theta0SL_m["aux_SL"]);
+    aux_Theta0_inv.slice(m) = inv(aux_Theta0.slice(m));
+    
+    List BSL_m              = sample_B_heterosk1_s4( aux_B.slice(m), aux_SL_B.col(m), aux_Theta0.slice(m), aux_Theta0_inv.slice(m), shocks_m, aux_sigma_m, prior_precision.col(m), prior, VB );
+    aux_B.slice(m)          = as<mat>(BSL_m["aux_B"]);
+    aux_SL_B.col(m)         = as<ivec>(BSL_m["aux_SL"]);
+    
+    aux_struc.slice(m)      = aux_Theta0_inv.slice(m) * aux_B.slice(m);
+    
+  }
+  aux_SL.slice(0)       = aux_SL_B;
+  aux_SL.slice(1)       = aux_SL_Theta0;
+  
+  return List::create(
+    _["aux_B"]          = aux_B,
+    _["aux_Theta0"]     = aux_Theta0,
+    _["aux_struc"]      = aux_struc,
+    _["aux_SL"]         = aux_SL
+  );
+} // END sample_BTheta0_tvi

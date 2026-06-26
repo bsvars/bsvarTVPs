@@ -127,10 +127,8 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
   vec   acceptance_count(4 + N);
   List  BSL = List::create(
     _["aux_B"]      = aux_B,
-    _["aux_SL"]     = aux_SL
-  );
-  List  TSL = List::create(
     _["aux_Theta0"] = aux_Theta0,
+    _["aux_struc"]  = aux_struc,
     _["aux_SL"]     = aux_SL
   );
   List  sv_n = List::create(
@@ -314,29 +312,18 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     
     
     // sample aux_B, aux_SL
-    if ( debug ) Rcout<<" sample aux_B, aux_SL"<< endl;
+    if ( debug ) Rcout<<" sample aux_B, aux_Theta0, aux_SL"<< endl;
     try {
       
-      BSL             = sample_B_mss_s4 (aux_B, aux_SL.slice(0), aux_Theta0, aux_Theta0_inv, aux_A,
-                                         precisionB, aux_hetero, aux_xi, Y, X, prior, VB);
+      mat shocks      = Y - aux_A * X;
+      BSL             = sample_BTheta0_tvi ( aux_B, aux_Theta0, aux_SL, shocks, aux_hetero, aux_xi, prior, precisionB, VB, VTheta0 );
       aux_B           = as<cube>(BSL["aux_B"]);
-      aux_SL.slice(0) = as<imat>(BSL["aux_SL"]);
+      aux_Theta0      = as<cube>(BSL["aux_Theta0"]);
+      aux_struc       = as<cube>(BSL["aux_struc"]);
+      aux_SL          = as<icube>(BSL["aux_SL"]);
+      
     } catch (std::runtime_error &e) {}
     
-    // sample aux_Theta0, aux_SL
-    if ( debug ) Rcout<<" sample aux_Theta0, aux_SL"<< endl;
-    try {
-      mat shocks      = Y - aux_A * X;
-      TSL             = sample_Theta0_mss_s4( aux_Theta0, aux_SL.slice(1), aux_B, shocks, aux_hetero, aux_xi, prior, VTheta0 );
-      aux_Theta0      = as<cube>(TSL["aux_Theta0"]);
-      aux_SL.slice(1) = as<imat>(TSL["aux_SL"]);
-      
-      for (int m=0; m<M; m++) {
-        aux_Theta0_inv.slice(m) = inv(aux_Theta0.slice(m));
-        aux_struc.slice(m)      = aux_Theta0_inv.slice(m) * aux_B.slice(m);
-      }
-    } catch (std::runtime_error &e) {}
-  
     
     if ( debug ) Rcout<<" save in posterior"<<endl;
     if (ss % thin == 0) {

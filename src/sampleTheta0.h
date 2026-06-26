@@ -107,4 +107,18 @@ Rcpp::List sample_Theta0_mss_s4 (
 );
 
 
+Rcpp::List sample_BTheta0_tvi (
+    arma::cube&                   aux_B,          // NxNxM
+    arma::cube                    aux_Theta0,     // NxNxM
+    arma::icube                   aux_SL,         // NxM row-specific S4 indicators
+    const arma::mat&              shocks,         // NxT shocks = Y - aux_A * X;
+    const arma::mat&              aux_sigma,      // NxT conditional STANDARD DEVIATIONS
+    const arma::mat&              aux_xi,         // MxT
+    const Rcpp::List&             prior,          // a list of priors - original dimensions
+    arma::field<arma::mat>        prior_precision, // (N,M)(N,N)
+    const arma::field<arma::mat>& VB, // restrictions on B0
+    const Rcpp::List&             VTheta0
+);
+
+
 #endif
