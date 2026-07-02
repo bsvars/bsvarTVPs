@@ -976,11 +976,12 @@ specify_bsvarTVP = R6::R6Class(
       TT            = nrow(data_estimate)
       T             = TT - p
       
-      ar_sigma2     = apply(data, 2, function(x){sum(ar(x, aic = FALSE, order.max = 12)$resid^2, na.rm = TRUE) / (dim(data)[1] - 5)})
+      # ar_sigma2     = apply(data, 2, function(x){sum(ar(x, aic = FALSE, order.max = 12)$resid^2, na.rm = TRUE) / (dim(data)[1] - 5)})
+      ar_sigma2     = rep(1, N)
       
       self$data_matrices   = specify_data_matrices$new(data_estimate, p, exogenous)
       self$identification  = specify_identification_bsvarsTVI$new(B, Theta0, A, N, K)
-      self$prior           = specify_prior_bsvarTVP$new(data_train, N, M, p, d, stationary, ar_sigma2)
+      self$prior           = specify_prior_bsvarTVP$new(data_train, N, M, p, d, stationary, ar_sigma2, c(1, 10^2))
       if ( ms4ar ) {
         sv = specify_starting_values_bsvarTVPmsa$new(A, B, N, M, T, p, d, finiteM, fixed_regime)
       } else {
