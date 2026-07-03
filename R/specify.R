@@ -918,10 +918,6 @@ specify_bsvarTVP = R6::R6Class(
       }
       
       d             = 0
-      if (!is.null(exogenous)) {
-        d           = ncol(exogenous)
-        exogenous   = exogenous[-(1:train_data),]
-      }
       K             = N * p + 1 + d
       
       if (is.null(fixed_regime)) {
@@ -963,14 +959,23 @@ specify_bsvarTVP = R6::R6Class(
         fixed_regime = fixed_regime[-(1:p)]
       }
       
+      if (!is.null(exogenous)) {
+        d           = ncol(exogenous)
+        exogenous   = exogenous[-(1:train_data),]
+      }
+      
       if (train_data == 0) {
         data_train    = NULL
         data_estimate = data
+        
       } else {
         data_train    = data[1:train_data,]
         data_estimate = data[-(1:train_data),]
         if (!is.null(fixed_regime)) {
           fixed_regime = fixed_regime[-(1:train_data)]
+        }
+        if (!is.null(exogenous)) {
+          exogenous   = exogenous[-(1:train_data),]
         }
       }
       TT            = nrow(data_estimate)
