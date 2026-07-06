@@ -2,7 +2,7 @@
 #include <RcppArmadilloExtensions/sample.h>
 #include <RcppArmadillo.h>
 #include "RcppTN.h"
-#include "sample_ABhyper.h"
+#include "sample_ABTheta0hyper.h"
 
 using namespace Rcpp;
 using namespace arma;

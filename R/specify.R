@@ -624,7 +624,7 @@ specify_identification_bsvarsTVI = R6::R6Class(
       }
       self$VB[[N + 1]] <- as.matrix(rep(1, N))
       
-      restrictions_Theta0 <- .Call(`_bsvarTVPs_construct_LR`, Theta0, Theta0_sign)
+      restrictions_Theta0 <- .Call(`_bsvarTVPs_construct_LR`, Theta0)
       
       VTheta0     = list(5)
       VTheta0_R_E = list()

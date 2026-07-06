@@ -3,8 +3,7 @@
 #include "progress.hpp"
 #include "bsvars.h"
 
-#include "sample_ABhyper.h"
-#include "sampleTheta0.h"
+#include "sample_ABTheta0hyper.h"
 #include "sample_sv_ms.h"
 #include "sample_mst.h"
 
@@ -26,7 +25,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     const arma::uvec              sv_select,            // Nx1, for each equation: {1 - non-centred, 2 - centred, 3 - homoskedastic};
     const arma::uvec              studentt,             // Nx1, {FALSE - normal, TRUE - Student-t};
     const int                     thin = 100,           // introduce thinning
-    const int                     hyper_select = 3,     // {1 - horseshoe, 2 - boost, 3 - fixed}
+    const int                     hyper_select = 3,     // {2 - boost, 3 - fixed} 1 - horseshoe - never to be selected
     const bool                    finiteM = true,       // {true - stationary MS, false - overfitted};
     const bool                    fixed_regime = false, // {true - don't estimate MS, false - estimate MS};
     const bool                    show_progress = true
@@ -79,7 +78,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
   umat  aux_S       = as<umat>(starting_values["S"]);
   vec   aux_sigma2_omega = as<vec>(starting_values["sigma2_omega"]);
   vec   aux_s_      = as<vec>(starting_values["s_"]);
-  icube aux_SL      = as<icube>(starting_values["S4_indicator"]) - 1;      // NxMx2 S4 indicator matrix
+  icube aux_SL      = as<icube>(starting_values["S4_indicator"]) - 1; // NxMx2 S4 indicator matrix
   mat   aux_sigma   = as<mat>(starting_values["sigma"]);
   mat   aux_lambda  = as<mat>(starting_values["lambda"]);
   mat   aux_lambda_sqrt = sqrt(aux_lambda);
@@ -87,7 +86,8 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
   mat   aux_hetero  = aux_sigma % aux_lambda_sqrt;
   
   const int M       = aux_PR_TR.n_cols;
-  vec      Tm       = sum(aux_xi, 1);
+  cube  aux_SLlpr(N, M, 2, fill::ones);        // NxNx2 matrix of log posterior probabilities of S4 indicators in the current interation
+  vec   Tm          = sum(aux_xi, 1);
   for (int m=0; m<M; m++) {
     aux_Theta0_inv.slice(m) = inv(aux_Theta0.slice(m));
     aux_struc.slice(m)      = aux_Theta0.slice(m) * aux_B.slice(m);
@@ -129,7 +129,8 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     _["aux_B"]      = aux_B,
     _["aux_Theta0"] = aux_Theta0,
     _["aux_struc"]  = aux_struc,
-    _["aux_SL"]     = aux_SL
+    _["aux_SL"]     = aux_SL,
+    _["aux_SLlpr"]   = aux_SLlpr
   );
   List  sv_n = List::create(
     _["aux_h_n"]              = aux_h.row(0),
@@ -224,17 +225,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     
     // sample aux_hyper
     if ( debug ) Rcout<<" sample aux_hyper"<<endl;
-    if ( hyper_select == 1 ) {
-
-      try {
-        aux_hyper     = sample_hyperparameter_mss_s4_horseshoe(aux_hyper, aux_B, aux_A, VB, aux_SL.slice(0), prior);
-        precisionB    = hyper2precisionB_mss_horseshoe(aux_hyper);
-        precisionA    = hyper2precisionA_horseshoe(aux_hyper);
-      } catch (std::logic_error &e) {
-        Rcout << "   sample_hyperparameter_mss_s4_horseshoe failure " << endl;
-      }
-
-    } else if ( hyper_select == 2 ) {
+    if ( hyper_select == 2 ) {
 
       aux_hyper       = sample_hyperparameters_mss_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL.slice(0), prior, true);
       precisionB      = hyper2precisionB_mss_boost(aux_hyper, prior);
@@ -306,23 +297,24 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     
     // sample aux_A
     if ( debug ) Rcout<<" sample aux_A"<<endl;
-    try {
+    // try {
       aux_A           = sample_A_heterosk1_mss(aux_A, aux_struc, aux_xi, precisionA, aux_hetero, Y, X, prior, VA);
-    } catch (std::runtime_error &e) {}
+    // } catch (std::runtime_error &e) {}
     
     
     // sample aux_B, aux_SL
     if ( debug ) Rcout<<" sample aux_B, aux_Theta0, aux_SL"<< endl;
-    try {
+    // try {
       
       mat shocks      = Y - aux_A * X;
-      BSL             = sample_BTheta0_tvi ( aux_B, aux_Theta0, aux_SL, shocks, aux_hetero, aux_xi, prior, precisionB, VB, VTheta0 );
+      BSL             = sample_BTheta0_tvi ( aux_B, aux_Theta0, aux_SL, aux_SLlpr, shocks, aux_hetero, aux_xi, prior, precisionB, VB, VTheta0 );
       aux_B           = as<cube>(BSL["aux_B"]);
       aux_Theta0      = as<cube>(BSL["aux_Theta0"]);
       aux_struc       = as<cube>(BSL["aux_struc"]);
       aux_SL          = as<icube>(BSL["aux_SL"]);
+      aux_SLlpr       = as<cube>(BSL["aux_SLlpr"]);
       
-    } catch (std::runtime_error &e) {}
+    // } catch (std::runtime_error &e) {}
     
     
     if ( debug ) Rcout<<" save in posterior"<<endl;
