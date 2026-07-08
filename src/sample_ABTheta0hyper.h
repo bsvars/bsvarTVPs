@@ -130,22 +130,11 @@ Rcpp::List construct_LR (
 double log_posterior_kernel_Theta0 (
     const int n,
     const arma::mat& aux_Theta0,
+    const arma::mat& aux_B,
     const arma::mat& shocks,
     const arma::mat& aux_sigma,
     const arma::mat& prior_B0,
     const arma::mat& prior_VB0
-);
-
-
-arma::mat sample_Theta0_Hou24_heterosk1 (
-    arma::mat&        aux_Theta0,     // NxN
-    const arma::mat&  aux_A,          // NxK
-    const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&  Y,              // NxT dependent variables
-    const arma::mat&  X,              // KxT dependent variables
-    const Rcpp::List& prior,          // a list of priors - original dimensions
-    const Rcpp::List& restrictions,   // output of construct_LR
-    const bool        debug = false
 );
 
 
@@ -162,6 +151,7 @@ arma::mat sample_Theta0_Hou24_heterosk1_coln (
 
 Rcpp::List sample_Theta0_Hou24_heterosk1_s4 (
     arma::mat                     aux_Theta0,     // NxN
+    arma::mat                     aux_B,          // NxN
     arma::ivec                    aux_SL,         // Nx1 row-specific S4 indicators aux_SL.slice(1).col(m)
     arma::vec                     aux_SLlpr,       // N col os S4 indicators probs aux_SL.slice(1).col(m)
     const arma::mat&              shocks,         // NxT B(Y-AX)

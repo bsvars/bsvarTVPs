@@ -266,7 +266,7 @@ Rcpp::List sample_B_heterosk1_s4 (
     if (Lm(n) > 1) {
       // Compute S4 components probabilities
       vec lpks_norm           = lpks_new - lpks_new.max();
-      pr_s4                   = exp(lpks_norm)/accu(exp(lpks_new));
+      pr_s4                   = exp(lpks_norm)/accu(exp(lpks_norm));
     
       // Sample S4 indicator
       NumericVector seq_1S    = wrap(seq_len(Lm(n)) - 1);
@@ -947,6 +947,7 @@ Rcpp::List sample_Theta0_Hou24_heterosk1_s4 (
   mat aux_Theta0_tmp_inv;
   
   for (int n=0; n<N; n++) {
+    if ( debug ) Rcout << " n: " << n << endl;
     
     mat     aux_Theta0_nL(N, Lm(n));
     vec     log_posterior_kernel_nL(Lm(n));
@@ -976,17 +977,18 @@ Rcpp::List sample_Theta0_Hou24_heterosk1_s4 (
     
     // Sample S4 indicator
     int     index_s4          = 0;
-    vec     pr_s4(Lm(n), fill::value(1/Lm(n)));
-    
+    double  lmn = Lm(n);
+    vec     pr_s4(Lm(n), fill::value(1/lmn));
     if (Lm(n) > 1) {
       // Compute S4 components probabilities
-      log_posterior_kernel_nL = log_posterior_kernel_nL.max();
+      log_posterior_kernel_nL -= log_posterior_kernel_nL.max();
       pr_s4                   = exp(log_posterior_kernel_nL)/accu(exp(log_posterior_kernel_nL));
       
       // Sample S4 indicator
       NumericVector seq_1S    = wrap(seq_len(Lm(n)) - 1);
       index_s4                = csample_num1(seq_1S, wrap(pr_s4));
     }
+    
     double lprs               = log(pr_s4(index_s4));
     if ( exp((log_posterior_kernel_nL(index_s4) + lprs) - lpk_old) > randu() ) {
       aux_SL(n)                 = index_s4;
