@@ -718,17 +718,17 @@ namespace bsvarTVPs {
         return Rcpp::as<Rcpp::List >(rcpp_result_gen);
     }
 
-    inline double log_posterior_kernel_Theta0(const int n, const arma::mat& aux_Theta0, const arma::mat& shocks, const arma::mat& aux_sigma, const arma::mat& prior_B0, const arma::mat& prior_VB0) {
-        typedef SEXP(*Ptr_log_posterior_kernel_Theta0)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+    inline double log_posterior_kernel_Theta0(const int n, const arma::mat& aux_Theta0, const arma::mat& aux_B, const arma::mat& shocks, const arma::mat& aux_sigma, const arma::mat& prior_B0, const arma::mat& prior_VB0) {
+        typedef SEXP(*Ptr_log_posterior_kernel_Theta0)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_log_posterior_kernel_Theta0 p_log_posterior_kernel_Theta0 = NULL;
         if (p_log_posterior_kernel_Theta0 == NULL) {
-            validateSignature("double(*log_posterior_kernel_Theta0)(const int,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&)");
+            validateSignature("double(*log_posterior_kernel_Theta0)(const int,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&)");
             p_log_posterior_kernel_Theta0 = (Ptr_log_posterior_kernel_Theta0)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_log_posterior_kernel_Theta0");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_log_posterior_kernel_Theta0(Shield<SEXP>(Rcpp::wrap(n)), Shield<SEXP>(Rcpp::wrap(aux_Theta0)), Shield<SEXP>(Rcpp::wrap(shocks)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(prior_B0)), Shield<SEXP>(Rcpp::wrap(prior_VB0)));
+            rcpp_result_gen = p_log_posterior_kernel_Theta0(Shield<SEXP>(Rcpp::wrap(n)), Shield<SEXP>(Rcpp::wrap(aux_Theta0)), Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(shocks)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(prior_B0)), Shield<SEXP>(Rcpp::wrap(prior_VB0)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -760,17 +760,17 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::mat >(rcpp_result_gen);
     }
 
-    inline Rcpp::List sample_Theta0_Hou24_heterosk1_s4(arma::mat aux_Theta0, arma::ivec aux_SL, arma::vec aux_SLlpr, const arma::mat& shocks, const arma::mat& aux_sigma, const Rcpp::List& prior, const Rcpp::List& restrictions) {
-        typedef SEXP(*Ptr_sample_Theta0_Hou24_heterosk1_s4)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+    inline Rcpp::List sample_Theta0_Hou24_heterosk1_s4(arma::mat aux_Theta0, arma::mat aux_B, arma::ivec aux_SL, arma::vec aux_SLlpr, const arma::mat& shocks, const arma::mat& aux_sigma, const Rcpp::List& prior, const Rcpp::List& restrictions) {
+        typedef SEXP(*Ptr_sample_Theta0_Hou24_heterosk1_s4)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_sample_Theta0_Hou24_heterosk1_s4 p_sample_Theta0_Hou24_heterosk1_s4 = NULL;
         if (p_sample_Theta0_Hou24_heterosk1_s4 == NULL) {
-            validateSignature("Rcpp::List(*sample_Theta0_Hou24_heterosk1_s4)(arma::mat,arma::ivec,arma::vec,const arma::mat&,const arma::mat&,const Rcpp::List&,const Rcpp::List&)");
+            validateSignature("Rcpp::List(*sample_Theta0_Hou24_heterosk1_s4)(arma::mat,arma::mat,arma::ivec,arma::vec,const arma::mat&,const arma::mat&,const Rcpp::List&,const Rcpp::List&)");
             p_sample_Theta0_Hou24_heterosk1_s4 = (Ptr_sample_Theta0_Hou24_heterosk1_s4)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_Theta0_Hou24_heterosk1_s4");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_sample_Theta0_Hou24_heterosk1_s4(Shield<SEXP>(Rcpp::wrap(aux_Theta0)), Shield<SEXP>(Rcpp::wrap(aux_SL)), Shield<SEXP>(Rcpp::wrap(aux_SLlpr)), Shield<SEXP>(Rcpp::wrap(shocks)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(prior)), Shield<SEXP>(Rcpp::wrap(restrictions)));
+            rcpp_result_gen = p_sample_Theta0_Hou24_heterosk1_s4(Shield<SEXP>(Rcpp::wrap(aux_Theta0)), Shield<SEXP>(Rcpp::wrap(aux_B)), Shield<SEXP>(Rcpp::wrap(aux_SL)), Shield<SEXP>(Rcpp::wrap(aux_SLlpr)), Shield<SEXP>(Rcpp::wrap(shocks)), Shield<SEXP>(Rcpp::wrap(aux_sigma)), Shield<SEXP>(Rcpp::wrap(prior)), Shield<SEXP>(Rcpp::wrap(restrictions)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();

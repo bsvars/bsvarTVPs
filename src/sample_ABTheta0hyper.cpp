@@ -89,6 +89,7 @@ double log_posterior_kernel_B (
   double sign_;
   log_det(abs_log_det_B, sign_, aux_B); 
   
+  int       T     = aux_sigma.n_cols;
   const int N     = aux_B.n_rows;
   mat bdiag_prior_precision(N*N, N*N);
   
@@ -102,7 +103,7 @@ double log_posterior_kernel_B (
   S               = S.each_col() / vectorise(aux_sigma.t());
   vec aux_Bt_vec  = vectorise(aux_B.t());
   double out      = - 0.5 * as_scalar( aux_Bt_vec.t() *(S.t() * S + bdiag_prior_precision) * aux_Bt_vec );
-  out            += abs_log_det_B;
+  out            += T * abs_log_det_B;
   
   return out;
 } // END log_posterior_kernel_B
@@ -273,10 +274,11 @@ Rcpp::List sample_B_heterosk1_s4 (
     }
     
     lpk_new                   = lpks_new(index_s4);
+    double lprs               = log(pr_s4(index_s4)); 
     // MH gate
-    if (exp((lpk_new + pr_s4(index_s4)) - lpk_old) > randu()) {
+    if (exp((lpk_new + lprs) - lpk_old) > randu()) {
       aux_SL(n)                 = index_s4;
-      aux_SLlpr(n)              = pr_s4(index_s4);
+      aux_SLlpr(n)              = lprs;
       aux_B.row(n)              = aux_B_nL.row(index_s4);
     }
     
@@ -759,6 +761,7 @@ Rcpp::List construct_LR (
 double log_posterior_kernel_Theta0 (
     const int n,
     const arma::mat& aux_Theta0,
+    const arma::mat& aux_B,
     const arma::mat& shocks,
     const arma::mat& aux_sigma,
     const arma::mat& prior_B0,
@@ -770,9 +773,12 @@ double log_posterior_kernel_Theta0 (
   double  ldet_sign;
   log_det( ldet, ldet_sign, aux_Theta0 );
   
-  double  lpk = accu(square(solve(aux_Theta0, shocks) / aux_sigma));                   // likelihood
+  mat struc_shocks = solve(aux_Theta0, aux_B * shocks);
+  struc_shocks.each_row() /= aux_sigma.row(n);
+  
+  double  lpk = - 0.5 * accu(square(struc_shocks));                   // likelihood
   lpk        -= T * ldet;                                                              // likelihood log determinant term
-  lpk        += accu(square(aux_Theta0 - prior_B0) / prior_VB0);  // prior
+  lpk        -= 0.5 * accu(square(aux_Theta0 - prior_B0) / prior_VB0);  // prior
   
   return lpk;
 } // END log_posterior_kernel_Theta0_n
@@ -915,6 +921,7 @@ arma::mat sample_Theta0_Hou24_heterosk1_coln (
 // [[Rcpp::export]]
 Rcpp::List sample_Theta0_Hou24_heterosk1_s4 (
     arma::mat                     aux_Theta0,     // NxN
+    arma::mat                     aux_B,          // NxN
     arma::ivec                    aux_SL,         // Nx1 row-specific S4 indicators aux_SL.slice(1).col(m)
     arma::vec                     aux_SLlpr,       // N col os S4 indicators probs aux_SL.slice(1).col(m)
     const arma::mat&              shocks,         // NxT B(Y-AX)
@@ -944,7 +951,7 @@ Rcpp::List sample_Theta0_Hou24_heterosk1_s4 (
     mat     aux_Theta0_nL(N, Lm(n));
     vec     log_posterior_kernel_nL(Lm(n));
     mat     aux_Theta0_tmp    = aux_Theta0;
-    double  lpk_old           = aux_SLlpr(n) + log_posterior_kernel_Theta0 ( n, aux_Theta0_tmp, shocks, aux_sigma, prior_B0, prior_VB0 );
+    double  lpk_old           = aux_SLlpr(n) + log_posterior_kernel_Theta0 ( n, aux_Theta0_tmp, aux_B, shocks, aux_sigma, prior_B0, prior_VB0 );
     
     for (int l=0; l<Lm(n); l++) {
       int ll = 0;
@@ -963,7 +970,7 @@ Rcpp::List sample_Theta0_Hou24_heterosk1_s4 (
       if ( debug ) Rcout << " after sample_Theta0_Hou24_heterosk1_coln" << endl;
       
       // posterior kernel
-      log_posterior_kernel_nL(l)  = log_posterior_kernel_Theta0 ( n, aux_Theta0_tmp, shocks, aux_sigma, prior_B0, prior_VB0 );
+      log_posterior_kernel_nL(l)  = log_posterior_kernel_Theta0 ( n, aux_Theta0_tmp, aux_B, shocks, aux_sigma, prior_B0, prior_VB0 );
       
     } // END loop l
     
@@ -980,10 +987,10 @@ Rcpp::List sample_Theta0_Hou24_heterosk1_s4 (
       NumericVector seq_1S    = wrap(seq_len(Lm(n)) - 1);
       index_s4                = csample_num1(seq_1S, wrap(pr_s4));
     }
-    
-    if ( exp((log_posterior_kernel_nL(index_s4) + pr_s4(index_s4)) - lpk_old) > randu() ) {
+    double lprs               = log(pr_s4(index_s4));
+    if ( exp((log_posterior_kernel_nL(index_s4) + lprs) - lpk_old) > randu() ) {
       aux_SL(n)                 = index_s4;
-      aux_SLlpr(n)               = pr_s4(index_s4);
+      aux_SLlpr(n)              = lprs;  
       aux_Theta0.col(n)         = aux_Theta0_nL.col(index_s4);
     }
     
@@ -1040,7 +1047,7 @@ Rcpp::List sample_BTheta0_tvi (
     }
     
     if ( debug ) Rcout << " aux_Theta0" << endl;
-    List Theta0SL_m         = sample_Theta0_Hou24_heterosk1_s4( aux_Theta0.slice(m), aux_SL_Theta0.col(m), aux_SLlpr.slice(1).col(m), shocks_m, aux_sigma_m, prior, VTheta0 );
+    List Theta0SL_m         = sample_Theta0_Hou24_heterosk1_s4( aux_Theta0.slice(m), aux_B.slice(m), aux_SL_Theta0.col(m), aux_SLlpr.slice(1).col(m), shocks_m, aux_sigma_m, prior, VTheta0 );
     aux_Theta0.slice(m)     = as<mat>(Theta0SL_m["aux_Theta0"]);
     aux_Theta0_inv.slice(m) = inv(aux_Theta0.slice(m));
     aux_SL_Theta0.col(m)    = as<ivec>(Theta0SL_m["aux_SL"]);
