@@ -155,7 +155,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
   
   for (int ss=0; ss<SS; ss++) {
     
-    if ( debug ) Rcout<<" s: "<< s <<endl;
+    if ( debug ) Rcout<<" ss: "<< ss <<endl;
     
     // Increment progress bar
     if (any(prog_rep_points == ss)) p.increment();
