@@ -297,14 +297,14 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     
     // sample aux_A
     if ( debug ) Rcout<<" sample aux_A"<<endl;
-    // try {
+    try {
       aux_A           = sample_A_heterosk1_mss(aux_A, aux_struc, aux_xi, precisionA, aux_hetero, Y, X, prior, VA);
-    // } catch (std::runtime_error &e) {}
+    } catch (std::runtime_error &e) {}
     
     
     // sample aux_B, aux_SL
     if ( debug ) Rcout<<" sample aux_B, aux_Theta0, aux_SL"<< endl;
-    // try {
+    try {
       
       mat shocks      = Y - aux_A * X;
       BSL             = sample_BTheta0_tvi ( aux_B, aux_Theta0, aux_SL, aux_SLlpr, shocks, aux_hetero, aux_xi, prior, precisionB, VB, VTheta0 );
@@ -314,7 +314,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
       aux_SL          = as<icube>(BSL["aux_SL"]);
       aux_SLlpr       = as<cube>(BSL["aux_SLlpr"]);
       
-    // } catch (std::runtime_error &e) {}
+    } catch (std::runtime_error &e) {}
     
     
     if ( debug ) Rcout<<" save in posterior"<<endl;

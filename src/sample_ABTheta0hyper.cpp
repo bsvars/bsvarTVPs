@@ -41,6 +41,7 @@ arma::vec mvnrnd_prec_cond (
   vec   mu1       = mu(ind_miss);
   vec   mu2       = mu(ind);
   mat   prec11    = precision(ind_miss, ind_miss);
+  prec11          = 0.5 * ( prec11 + prec11.t() );
   mat   prec12    = precision(ind_miss, ind);
    
   mat   prec11_inv = inv_sympd(prec11);
@@ -846,7 +847,9 @@ arma::mat sample_Theta0_Hou24_heterosk1_coln (
   mat Ytilde          = Y_XA * Ti.t();
   mat CStilde         = kron(Ytilde, eye(N, N));
   vec w0              = Ti * b10;
-  mat invVw0          = inv_sympd(Ti * Vb10 * Ti.t());
+  mat Vw0             = Ti * Vb10 * Ti.t();
+  Vw0                 = 0.5 * (Vw0 + Vw0.t());
+  mat invVw0          = inv_sympd(Vw0);
   mat invBtilde22     = inv(Btilde.submat(1, 1, N - 1, N - 1));
   
   // initialize w (w1 and w_1)
@@ -893,7 +896,9 @@ arma::mat sample_Theta0_Hou24_heterosk1_coln (
   
   // sample w_11 (or w_1)    
   if (debug) {Rcout << " sample w_11 (or w_1)" << endl;}
-  mat Dw_11           = inv_sympd(Z_w11.t() * Z_w11 + invVw_110);
+  mat Dw_11_inv       = Z_w11.t() * Z_w11 + invVw_110;
+  Dw_11_inv           = 0.5 * (Dw_11_inv + Dw_11_inv.t());
+  mat Dw_11           = inv_sympd(Dw_11_inv);
   Dw_11               = 0.5 * (Dw_11 + Dw_11.t());
   vec w_11hat         = Dw_11 * (Z_w11.t() * q_w11 + invVw_110 * w_110);
   vec w_11, neww_11;
