@@ -66,11 +66,15 @@ forecast.PosteriorBSVARTVP <- function(
   X_T             = object$last_draw$data_matrices$X[,T]
   K               = length(X_T)
   d               = K - N * object$last_draw$get_p() - 1
+  # The first forecast conditions on Y_T, followed by the remaining lag blocks.
+  X_T             = c(object$last_draw$data_matrices$Y[,T],
+                      X_T[seq_len(N * (object$last_draw$get_p() - 1))],
+                      tail(X_T, 1 + d))
   posterior_B     = object$posterior$structural_cpp
   posterior_A     = object$posterior$A_cpp
   posterior_PR_TR = object$posterior$PR_TR
   posterior_xi_T  = matrix(object$posterior$xi[,T,], ncol = S)
-  posterior_h_T   = object$posterior$h[,T,]
+  posterior_h_T   = matrix(object$posterior$h[,T,], nrow = N, ncol = S)
   posterior_rho   = object$posterior$rho
   posterior_omega = object$posterior$omega
   posterior_df    = object$posterior$df

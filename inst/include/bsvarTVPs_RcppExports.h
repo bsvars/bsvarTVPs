@@ -445,11 +445,11 @@ namespace bsvarTVPs {
         return Rcpp::as<Rcpp::List >(rcpp_result_gen);
     }
 
-    inline Rcpp::List forecast_mssa_sv(arma::field<arma::cube>& posterior_B, arma::field<arma::cube>& posterior_A, arma::cube& posterior_PR_TR, arma::mat& posterior_xi_T, arma::mat& posterior_h_T, arma::mat& posterior_rho, arma::cube& posterior_omega, arma::cube& posterior_df, arma::vec& X_T, arma::mat& exogenous_forecast, const int& horizon, const arma::uvec sv_select, const bool studentt = false) {
+    inline Rcpp::List forecast_mssa_sv(arma::field<arma::cube>& posterior_B, arma::field<arma::cube>& posterior_A, arma::cube& posterior_PR_TR, arma::mat& posterior_xi_T, arma::mat& posterior_h_T, arma::mat& posterior_rho, arma::cube& posterior_omega, arma::cube& posterior_df, arma::vec& X_T, arma::mat& exogenous_forecast, const int& horizon, const arma::uvec sv_select, const arma::uvec studentt) {
         typedef SEXP(*Ptr_forecast_mssa_sv)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_forecast_mssa_sv p_forecast_mssa_sv = NULL;
         if (p_forecast_mssa_sv == NULL) {
-            validateSignature("Rcpp::List(*forecast_mssa_sv)(arma::field<arma::cube>&,arma::field<arma::cube>&,arma::cube&,arma::mat&,arma::mat&,arma::mat&,arma::cube&,arma::cube&,arma::vec&,arma::mat&,const int&,const arma::uvec,const bool)");
+            validateSignature("Rcpp::List(*forecast_mssa_sv)(arma::field<arma::cube>&,arma::field<arma::cube>&,arma::cube&,arma::mat&,arma::mat&,arma::mat&,arma::cube&,arma::cube&,arma::vec&,arma::mat&,const int&,const arma::uvec,const arma::uvec)");
             p_forecast_mssa_sv = (Ptr_forecast_mssa_sv)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_forecast_mssa_sv");
         }
         RObject rcpp_result_gen;
@@ -466,11 +466,11 @@ namespace bsvarTVPs {
         return Rcpp::as<Rcpp::List >(rcpp_result_gen);
     }
 
-    inline Rcpp::List forecast_mss_sv(arma::field<arma::cube>& posterior_B, arma::cube& posterior_A, arma::cube& posterior_PR_TR, arma::mat& posterior_xi_T, arma::mat& posterior_h_T, arma::mat& posterior_rho, arma::cube& posterior_omega, arma::cube& posterior_df, arma::vec& X_T, arma::mat& exogenous_forecast, const int& horizon, const arma::uvec sv_select, const bool studentt = false) {
+    inline Rcpp::List forecast_mss_sv(arma::field<arma::cube>& posterior_B, arma::cube& posterior_A, arma::cube& posterior_PR_TR, arma::mat& posterior_xi_T, arma::mat& posterior_h_T, arma::mat& posterior_rho, arma::cube& posterior_omega, arma::cube& posterior_df, arma::vec& X_T, arma::mat& exogenous_forecast, const int& horizon, const arma::uvec sv_select, const arma::uvec studentt) {
         typedef SEXP(*Ptr_forecast_mss_sv)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_forecast_mss_sv p_forecast_mss_sv = NULL;
         if (p_forecast_mss_sv == NULL) {
-            validateSignature("Rcpp::List(*forecast_mss_sv)(arma::field<arma::cube>&,arma::cube&,arma::cube&,arma::mat&,arma::mat&,arma::mat&,arma::cube&,arma::cube&,arma::vec&,arma::mat&,const int&,const arma::uvec,const bool)");
+            validateSignature("Rcpp::List(*forecast_mss_sv)(arma::field<arma::cube>&,arma::cube&,arma::cube&,arma::mat&,arma::mat&,arma::mat&,arma::cube&,arma::cube&,arma::vec&,arma::mat&,const int&,const arma::uvec,const arma::uvec)");
             p_forecast_mss_sv = (Ptr_forecast_mss_sv)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_forecast_mss_sv");
         }
         RObject rcpp_result_gen;

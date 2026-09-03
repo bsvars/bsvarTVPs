@@ -20,7 +20,7 @@ Rcpp::List forecast_mssa_sv (
     arma::mat&                exogenous_forecast,   // (horizon, d)
     const int&                horizon,
     const arma::uvec          sv_select,            // {1 - non-centred, 2 - centred, 3 - homoskedastic};
-    const bool                studentt = false      // {true - normal, false - Student-t};
+    const arma::uvec          studentt              // Nx1, {0 - normal, 1 - Student-t};
 ) {
   const int   N = posterior_h_T.n_rows;
   const int   K = X_T.n_elem;
@@ -29,6 +29,7 @@ Rcpp::List forecast_mssa_sv (
   const int   d = exogenous_forecast.n_cols;
   
   bool        do_exog = exogenous_forecast.is_finite();
+  const int   Np = K - 1 - (do_exog ? d : 0);
   vec         x_t;
   if ( do_exog ) {
     x_t       = X_T.rows(0, K - 1 - d);
@@ -67,20 +68,23 @@ Rcpp::List forecast_mssa_sv (
       // predict MS regime
       PR_ST       = trans(posterior_PR_TR.slice(s)) * PR_ST;
       ST          = csample_num1(zeroM, wrap(PR_ST));
+      PR_ST.zeros();
+      PR_ST(ST)   = 1; // condition the next transition on the sampled regime
       
       // predict SV
       for (int n=0; n<N; n++) {
         if (sv_select(n) != 3) {
-          HT          = posterior_omega.slice(s).col(ST) % HT + randn(N);
-          sigma2_tmp  = exp(posterior_omega.slice(s).col(ST) % HT); 
+          HT(n)        = posterior_rho(n, s) * HT(n) + randn();
+          sigma2_tmp(n) = exp(posterior_omega(n, ST, s) * HT(n));
         }
       }
       
       // predict Student-t
-      if (studentt) {
-        vec df_s    = posterior_df.slice(s).col(ST);
-        lambda_tmp  = df_s - 2;
-        lambda_tmp  = lambda_tmp / chi2rnd(df_s);
+      for (int n=0; n<N; n++) {
+        if (studentt(n)) {
+          double df_s   = posterior_df(n, ST, s);
+          lambda_tmp(n) = (df_s - 2) / chi2rnd(df_s);
+        }
       }
       
       sigmaT        = sqrt(sigma2_tmp % lambda_tmp);
@@ -101,11 +105,10 @@ Rcpp::List forecast_mssa_sv (
       
       // create Xs
       if ( h != horizon - 1 ) {
-        if ( do_exog ) {
-          Xt          = join_cols( out_forecast.slice(s).col(h), Xt.subvec(N, K - 1 - d), trans(exogenous_forecast.row(h + 1)) );
-        } else {
-          Xt          = join_cols( out_forecast.slice(s).col(h), Xt.subvec(N, K - 1) );
-        }
+        // Shift lag blocks, retaining the intercept and replacing exogenous values.
+        if (Np > N) Xt.subvec(N, Np - 1) = Xt.head(Np - N).eval();
+        Xt.head(N) = draw;
+        if ( do_exog ) Xt.tail(d) = trans(exogenous_forecast.row(h + 1));
       } // END if h
       
     } // END h loop
@@ -137,7 +140,7 @@ Rcpp::List forecast_mss_sv (
     arma::mat&                exogenous_forecast, // (horizon, d)
     const int&                horizon,
     const arma::uvec          sv_select,            // {1 - non-centred, 2 - centred, 3 - homoskedastic};
-    const bool                studentt = false      // {true - normal, false - Student-t};
+    const arma::uvec          studentt              // Nx1, {0 - normal, 1 - Student-t};
 ) {
   const int   N = posterior_h_T.n_rows;
   const int   K = X_T.n_elem;
@@ -146,6 +149,7 @@ Rcpp::List forecast_mss_sv (
   const int   d = exogenous_forecast.n_cols;
   
   bool        do_exog = exogenous_forecast.is_finite();
+  const int   Np = K - 1 - (do_exog ? d : 0);
   vec         x_t;
   if ( do_exog ) {
     x_t       = X_T.rows(0, K - 1 - d);
@@ -184,20 +188,23 @@ Rcpp::List forecast_mss_sv (
       // predict MS regime
       PR_ST       = trans(posterior_PR_TR.slice(s)) * PR_ST;
       ST          = csample_num1(zeroM, wrap(PR_ST));
+      PR_ST.zeros();
+      PR_ST(ST)   = 1; // condition the next transition on the sampled regime
       
       // predict SV
       for (int n=0; n<N; n++) {
         if (sv_select(n) != 3) {
-          HT          = posterior_omega.slice(s).col(ST) % HT + randn(N);
-          sigma2_tmp  = exp(posterior_omega.slice(s).col(ST) % HT); 
+          HT(n)        = posterior_rho(n, s) * HT(n) + randn();
+          sigma2_tmp(n) = exp(posterior_omega(n, ST, s) * HT(n));
         }
       }
       
       // predict Student-t
-      if (studentt) {
-        vec df_s    = posterior_df.slice(s).col(ST);
-        lambda_tmp  = df_s - 2;
-        lambda_tmp  = lambda_tmp / chi2rnd(df_s);
+      for (int n=0; n<N; n++) {
+        if (studentt(n)) {
+          double df_s   = posterior_df(n, ST, s);
+          lambda_tmp(n) = (df_s - 2) / chi2rnd(df_s);
+        }
       }
       
       sigmaT        = sqrt(sigma2_tmp % lambda_tmp);
@@ -218,11 +225,10 @@ Rcpp::List forecast_mss_sv (
       
       // create Xs
       if ( h != horizon - 1 ) {
-        if ( do_exog ) {
-          Xt          = join_cols( out_forecast.slice(s).col(h), Xt.subvec(N, K - 1 - d), trans(exogenous_forecast.row(h + 1)) );
-        } else {
-          Xt          = join_cols( out_forecast.slice(s).col(h), Xt.subvec(N, K - 1) );
-        }
+        // Shift lag blocks, retaining the intercept and replacing exogenous values.
+        if (Np > N) Xt.subvec(N, Np - 1) = Xt.head(Np - N).eval();
+        Xt.head(N) = draw;
+        if ( do_exog ) Xt.tail(d) = trans(exogenous_forecast.row(h + 1));
       } // END if h
       
     } // END h loop

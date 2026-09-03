@@ -16,7 +16,7 @@ Rcpp::List forecast_mssa_sv (
     arma::mat&                exogenous_forecast,   // (horizon, d)
     const int&                horizon,
     const arma::uvec          sv_select,            // {1 - non-centred, 2 - centred, 3 - homoskedastic};
-    const bool                studentt = false      // {true - normal, false - Student-t};
+    const arma::uvec          studentt              // Nx1, {0 - normal, 1 - Student-t};
 );
 
 
@@ -33,7 +33,7 @@ Rcpp::List forecast_mss_sv (
     arma::mat&                exogenous_forecast, // (horizon, d)
     const int&                horizon,
     const arma::uvec          sv_select,            // {1 - non-centred, 2 - centred, 3 - homoskedastic};
-    const bool                studentt = false      // {true - normal, false - Student-t};
+    const arma::uvec          studentt              // Nx1, {0 - normal, 1 - Student-t};
 );
 
 

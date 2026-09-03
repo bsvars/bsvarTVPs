@@ -763,7 +763,7 @@ RcppExport SEXP _bsvarTVPs_bsvar_mssa_tvi_sv_cpp(SEXP SSSEXP, SEXP YSEXP, SEXP X
     return rcpp_result_gen;
 }
 // forecast_mssa_sv
-Rcpp::List forecast_mssa_sv(arma::field<arma::cube>& posterior_B, arma::field<arma::cube>& posterior_A, arma::cube& posterior_PR_TR, arma::mat& posterior_xi_T, arma::mat& posterior_h_T, arma::mat& posterior_rho, arma::cube& posterior_omega, arma::cube& posterior_df, arma::vec& X_T, arma::mat& exogenous_forecast, const int& horizon, const arma::uvec sv_select, const bool studentt);
+Rcpp::List forecast_mssa_sv(arma::field<arma::cube>& posterior_B, arma::field<arma::cube>& posterior_A, arma::cube& posterior_PR_TR, arma::mat& posterior_xi_T, arma::mat& posterior_h_T, arma::mat& posterior_rho, arma::cube& posterior_omega, arma::cube& posterior_df, arma::vec& X_T, arma::mat& exogenous_forecast, const int& horizon, const arma::uvec sv_select, const arma::uvec studentt);
 static SEXP _bsvarTVPs_forecast_mssa_sv_try(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP posterior_PR_TRSEXP, SEXP posterior_xi_TSEXP, SEXP posterior_h_TSEXP, SEXP posterior_rhoSEXP, SEXP posterior_omegaSEXP, SEXP posterior_dfSEXP, SEXP X_TSEXP, SEXP exogenous_forecastSEXP, SEXP horizonSEXP, SEXP sv_selectSEXP, SEXP studenttSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -779,7 +779,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat& >::type exogenous_forecast(exogenous_forecastSEXP);
     Rcpp::traits::input_parameter< const int& >::type horizon(horizonSEXP);
     Rcpp::traits::input_parameter< const arma::uvec >::type sv_select(sv_selectSEXP);
-    Rcpp::traits::input_parameter< const bool >::type studentt(studenttSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec >::type studentt(studenttSEXP);
     rcpp_result_gen = Rcpp::wrap(forecast_mssa_sv(posterior_B, posterior_A, posterior_PR_TR, posterior_xi_T, posterior_h_T, posterior_rho, posterior_omega, posterior_df, X_T, exogenous_forecast, horizon, sv_select, studentt));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
@@ -809,7 +809,7 @@ RcppExport SEXP _bsvarTVPs_forecast_mssa_sv(SEXP posterior_BSEXP, SEXP posterior
     return rcpp_result_gen;
 }
 // forecast_mss_sv
-Rcpp::List forecast_mss_sv(arma::field<arma::cube>& posterior_B, arma::cube& posterior_A, arma::cube& posterior_PR_TR, arma::mat& posterior_xi_T, arma::mat& posterior_h_T, arma::mat& posterior_rho, arma::cube& posterior_omega, arma::cube& posterior_df, arma::vec& X_T, arma::mat& exogenous_forecast, const int& horizon, const arma::uvec sv_select, const bool studentt);
+Rcpp::List forecast_mss_sv(arma::field<arma::cube>& posterior_B, arma::cube& posterior_A, arma::cube& posterior_PR_TR, arma::mat& posterior_xi_T, arma::mat& posterior_h_T, arma::mat& posterior_rho, arma::cube& posterior_omega, arma::cube& posterior_df, arma::vec& X_T, arma::mat& exogenous_forecast, const int& horizon, const arma::uvec sv_select, const arma::uvec studentt);
 static SEXP _bsvarTVPs_forecast_mss_sv_try(SEXP posterior_BSEXP, SEXP posterior_ASEXP, SEXP posterior_PR_TRSEXP, SEXP posterior_xi_TSEXP, SEXP posterior_h_TSEXP, SEXP posterior_rhoSEXP, SEXP posterior_omegaSEXP, SEXP posterior_dfSEXP, SEXP X_TSEXP, SEXP exogenous_forecastSEXP, SEXP horizonSEXP, SEXP sv_selectSEXP, SEXP studenttSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -825,7 +825,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat& >::type exogenous_forecast(exogenous_forecastSEXP);
     Rcpp::traits::input_parameter< const int& >::type horizon(horizonSEXP);
     Rcpp::traits::input_parameter< const arma::uvec >::type sv_select(sv_selectSEXP);
-    Rcpp::traits::input_parameter< const bool >::type studentt(studenttSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec >::type studentt(studenttSEXP);
     rcpp_result_gen = Rcpp::wrap(forecast_mss_sv(posterior_B, posterior_A, posterior_PR_TR, posterior_xi_T, posterior_h_T, posterior_rho, posterior_omega, posterior_df, X_T, exogenous_forecast, horizon, sv_select, studentt));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
@@ -2636,8 +2636,8 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
         signatures.insert("arma::vec(*bsvars_normalisation_wz20031_diag)(arma::mat,const arma::mat&)");
         signatures.insert("Rcpp::List(*bsvar_mss_tvi_sv_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const arma::uvec,const arma::uvec,const int,const int,const bool,const bool,const bool)");
         signatures.insert("Rcpp::List(*bsvar_mssa_tvi_sv_cpp)(const int&,const arma::mat&,const arma::mat&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const arma::field<arma::mat>&,const Rcpp::List&,const arma::uvec,const arma::uvec,const int,const int,const bool,const bool,const bool)");
-        signatures.insert("Rcpp::List(*forecast_mssa_sv)(arma::field<arma::cube>&,arma::field<arma::cube>&,arma::cube&,arma::mat&,arma::mat&,arma::mat&,arma::cube&,arma::cube&,arma::vec&,arma::mat&,const int&,const arma::uvec,const bool)");
-        signatures.insert("Rcpp::List(*forecast_mss_sv)(arma::field<arma::cube>&,arma::cube&,arma::cube&,arma::mat&,arma::mat&,arma::mat&,arma::cube&,arma::cube&,arma::vec&,arma::mat&,const int&,const arma::uvec,const bool)");
+        signatures.insert("Rcpp::List(*forecast_mssa_sv)(arma::field<arma::cube>&,arma::field<arma::cube>&,arma::cube&,arma::mat&,arma::mat&,arma::mat&,arma::cube&,arma::cube&,arma::vec&,arma::mat&,const int&,const arma::uvec,const arma::uvec)");
+        signatures.insert("Rcpp::List(*forecast_mss_sv)(arma::field<arma::cube>&,arma::cube&,arma::cube&,arma::mat&,arma::mat&,arma::mat&,arma::cube&,arma::cube&,arma::vec&,arma::mat&,const int&,const arma::uvec,const arma::uvec)");
         signatures.insert("double(*rig_inv1)(double,double)");
         signatures.insert("arma::vec(*mvnrnd_prec_cond)(arma::vec,arma::vec,arma::mat,arma::vec)");
         signatures.insert("arma::mat(*orthogonal_complement_matrix_TW)(const arma::mat&)");
