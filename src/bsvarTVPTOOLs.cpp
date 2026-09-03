@@ -154,22 +154,37 @@ arma::cube bsvarTVPs_filter_forecast_smooth (
   cube  filtered_probabilities(M, T, S);
   cube  for_smo_probabilities(M, T, S);
   cube  shocks(N, T, M);
+  mat   log_density(M, T);
   
   for (int s=0; s<S; s++) {
     for (int m=0; m<M; m++) {
       shocks.slice(m)     = pow(posterior_sigma.slice(s), -1) % (posterior_B(s).slice(m) * ( Y - posterior_A.slice(s) * X ));
+      double log_det_B, sign_det_B;
+      log_det(log_det_B, sign_det_B, posterior_B(s).slice(m));
+      // The Gaussian constant and common sigma Jacobian cancel across regimes.
+      log_density.row(m) = log_det_B - 0.5 * sum(square(shocks.slice(m)), 0);
     }
     
-    filtered_probabilities.slice(s)   = filtering(
-      shocks, 
+    filtered_probabilities.slice(s)   = filtering_log_density(
+      log_density,
       posterior_PR_TR.slice(s), 
       posterior_pi_0.col(s)
     );
     
     if (forecasted) {
-      for_smo_probabilities.slice(s)  = posterior_PR_TR.slice(s) * filtered_probabilities.slice(s);
+      for_smo_probabilities.slice(s)  = posterior_PR_TR.slice(s).t() * filtered_probabilities.slice(s);
     } else if (smoothed) {
-      for_smo_probabilities.slice(s)  = smoothing(filtered_probabilities.slice(s), posterior_PR_TR.slice(s));
+      mat smoothed_prob = filtered_probabilities.slice(s);
+      for (int t=T-2; t>=0; t--) {
+        vec predicted = posterior_PR_TR.slice(s).t() * filtered_probabilities.slice(s).col(t);
+        vec ratio(M, fill::zeros);
+        // An unreachable next state contributes zero, avoiding 0/0.
+        uvec reachable = find(predicted > 0);
+        vec next_prob = smoothed_prob.col(t+1);
+        ratio.elem(reachable) = next_prob.elem(reachable) / predicted.elem(reachable);
+        smoothed_prob.col(t) = filtered_probabilities.slice(s).col(t) % (posterior_PR_TR.slice(s) * ratio);
+      }
+      for_smo_probabilities.slice(s) = smoothed_prob;
     }
   } // END s loop
   
