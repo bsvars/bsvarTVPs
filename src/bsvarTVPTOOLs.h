@@ -16,12 +16,21 @@ arma::cube bsvars_ir1 (
 
 arma::field<arma::cube> bsvarTVPs_ir_ms (
     arma::field<arma::cube>&  posterior_B,        // (S)(N, N, M)
+    arma::field<arma::cube>&  posterior_Theta0,   // (S)(N, N, M)
     arma::cube&               posterior_A,        // (N, K, S)
     const int                 horizon,
     const int                 p,
     const bool                standardise = false
 );
 
+arma::field<arma::cube> bsvarTVPs_ir_mssa (
+    arma::field<arma::cube>&  posterior_B,        // (S)(N, N, M)
+    arma::field<arma::cube>&  posterior_Theta0,   // (S)(N, N, M)
+    arma::field<arma::cube>&  posterior_A,        // (S)(N, K, S)
+    const int                 horizon,
+    const int                 p,
+    const bool                standardise = false
+);
 
 arma::field<arma::cube> bsvarTVPs_ir (
     arma::cube&               posterior_B,        // (N, N, S)

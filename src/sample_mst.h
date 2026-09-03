@@ -7,7 +7,9 @@
 
 arma::mat sample_lambda_ms (
     const arma::mat&    aux_df,     // NxM
-    const arma::mat&    aux_xi      // MxT
+    const arma::mat&    aux_xi,     // MxT
+    arma::mat&          U,          // NxT
+    const arma::uvec    studentt    // Nx1, {FALSE - normal, TRUE - Student-t};
 );
 
 
@@ -26,7 +28,8 @@ Rcpp::List sample_df_ms (
     const Rcpp::List& prior,              // hyper-parameter for exponential prior for aux_df
     const int&        s,                  // MCMC iteration
     arma::mat&        adaptive_scale,     // NxM
-    const arma::vec&  adptive_alpha_gamma // 2x1 vector with target acceptance rate and step size
+    const arma::vec&  adptive_alpha_gamma,// 2x1 vector with target acceptance rate and step size
+    const arma::uvec  studentt            // Nx1, {FALSE - normal, TRUE - Student-t};
 );
 
 

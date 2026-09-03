@@ -10,12 +10,15 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     const arma::mat&              X,                    // KxT explanatory variables
     const Rcpp::List&             prior,                // a list of priors - original dimensions
     const arma::field<arma::mat>& VB,                   // restrictions on B0
+    const Rcpp::List&             VTheta0,              // restrictions on Theta0
+    const arma::field<arma::mat>& VA,                   // restrictions on A
     const Rcpp::List&             starting_values,
+    const arma::uvec              sv_select,            // Nx1, for each equation: {1 - non-centred, 2 - centred, 3 - homoskedastic};
+    const arma::uvec              studentt,             // Nx1, {FALSE - normal, TRUE - Student-t};
     const int                     thin = 100,           // introduce thinning
-    const int                     sv_select = 1,        // {1 - non-centred, 2 - centred, 3 - homoskedastic};
-    const int                     hyper_select = 1,     // {1 - horseshoe, 2 - boost, 3 - fixed}
+    const int                     hyper_select = 3,     // {1 - horseshoe, 2 - boost, 3 - fixed}
     const bool                    finiteM = true,       // {true - stationary MS, false - overfitted};
-    const bool                    studentt = false,     // {true - normal, false - Student-t};
+    const bool                    fixed_regime = false, // {true - don't estimate MS, false - estimate MS};
     const bool                    show_progress = true
 );
 

@@ -35,20 +35,20 @@ generics::forecast
 #' Camehl, A. & Woźniak, T. (2025) Time-Varying Identification of Structural Vector Autoregressions, <doi:10.48550/arXiv.2502.19659>.
 #' 
 #' @examples
-#' # simple workflow
-#' ############################################################
-#' spec   = specify_bsvarTVP$new(us_fiscal_lsuw)    # specify the model
-#' burn   = estimate(spec, 5)                       # run the burn-in for convergence
-#' post   = estimate(burn, 10)                      # estimate the model
-#' fore   = forecast(post, horizon = 2)             # forecast 2 periods ahead
+#' # # simple workflow
+#' # ############################################################
+#' # spec   = specify_bsvarTVP$new(us_fiscal_lsuw)    # specify the model
+#' # burn   = estimate(spec, 5)                       # run the burn-in for convergence
+#' # post   = estimate(burn, 10)                      # estimate the model
+#' # fore   = forecast(post, horizon = 2)             # forecast 2 periods ahead
 #' 
-#' # workflow with the pipe |>
-#' ############################################################
-#' us_fiscal_lsuw |>
-#'   specify_bsvarTVP$new() |>
-#'   estimate(S = 5) |> 
-#'   estimate(S = 10) -> post
-#' post |> forecast(horizon = 2) -> fore
+#' # # workflow with the pipe |>
+#' # ############################################################
+#' # us_fiscal_lsuw |>
+#' #   specify_bsvarTVP$new() |>
+#' #   estimate(S = 5) |>
+#' #   estimate(S = 10) -> post
+#' # post |> forecast(horizon = 2) -> fore
 #' 
 #' @export
 forecast.PosteriorBSVARTVP <- function(
@@ -66,7 +66,7 @@ forecast.PosteriorBSVARTVP <- function(
   X_T             = object$last_draw$data_matrices$X[,T]
   K               = length(X_T)
   d               = K - N * object$last_draw$get_p() - 1
-  posterior_B     = object$posterior$B_cpp
+  posterior_B     = object$posterior$structural_cpp
   posterior_A     = object$posterior$A_cpp
   posterior_PR_TR = object$posterior$PR_TR
   posterior_xi_T  = matrix(object$posterior$xi[,T,], ncol = S)
@@ -86,11 +86,10 @@ forecast.PosteriorBSVARTVP <- function(
     stopifnot("Argument exogenous cannot include missing values." = sum(is.na(exogenous_forecast)) == 0 )
   }
   
-  if (object$last_draw$get_sv()) {
-    sv_select     = 1
-  } else {
-    sv_select     = 3
-  }
+  volatility          = object$last_draw$get_sv()
+  sv_select           = rep(1, length(volatility))
+  sv_select[!volatility] = 3
+  
   studentt        = !object$last_draw$get_normal()
   
   if (object$last_draw$get_msa()) {

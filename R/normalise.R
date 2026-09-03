@@ -50,19 +50,20 @@ normalise.PosteriorBSVARTVP <- function(posterior, B_benchmark = NULL) {
   M             = dim(posterior$posterior$xi)[1]
   N             = length(comp)
   
-  if (is.null(B_benchmark)) {
+  set_B_benchmark = is.null(B_benchmark) 
+  if (set_B_benchmark) {
     B_benchmark         = array(NA, c(N, N, M, comp[TVI_equation]))
   }
   
-  TVI_indicator = posterior$posterior$S4_indicator
+  TVI_indicator = field1_to_array(posterior$posterior$S4_indicator)
   
   for (m in 1:M) {
     for (component in 1:comp[TVI_equation]) {
       
-      TVI_indices    = which(TVI_indicator[TVI_equation, m, ] == component) #
+      TVI_indices    = which(TVI_indicator[TVI_equation, m, 1,] == component) #
       if ( length(TVI_indices) == 0 ) next
       
-      if (is.null(B_benchmark)) {
+      if (set_B_benchmark) {
         B_benchmark_tmp               = posterior$posterior$B_cpp[utils::tail(TVI_indices,1),1][[1]][,,m] #
         B_benchmark[,,m,component]    = diag(sign(diag(B_benchmark_tmp))) %*% B_benchmark_tmp
       }
@@ -80,7 +81,7 @@ normalise.PosteriorBSVARTVP <- function(posterior, B_benchmark = NULL) {
       }
       
       # last_draw
-      if ( component == posterior$last_draw$starting_values$S4_indicator[TVI_equation,m] ) {
+      if ( component == posterior$last_draw$starting_values$S4_indicator[TVI_equation,m,1] ) {
         posterior$last_draw$starting_values$B[,,m]    = .Call(`_bsvarTVPs_bsvars_normalisation_wz20031`, posterior$last_draw$starting_values$B[,,m], B_benchmark[,,m,component])
       }
       
