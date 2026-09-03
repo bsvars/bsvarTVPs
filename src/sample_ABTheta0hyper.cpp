@@ -251,11 +251,11 @@ Rcpp::List sample_B_heterosk1_s4 (
         vec Lm_cs             = cumsum(Lm);
         ll                    = Lm_cs(n-1) + l;
       }
-      try {
+      // try {
         if ( debug ) Rcout<<" sample B before: "<<l<<endl;
         aux_B_tmp               = sample_B_heterosk1_rown( n, aux_B, shocks, aux_sigma, prior_precision(n), prior, VB(ll) );
         if ( debug ) Rcout<<" sample B after: "<<l<<endl;
-      } catch (std::runtime_error &e) {}
+      // } catch (std::runtime_error &e) {}
       
       aux_B_nL.row(l)         = aux_B_tmp.row(n);
       lpks_new(l)             = log_posterior_kernel_B( aux_B, aux_Theta0_inv, shocks, aux_sigma, prior_precision );
@@ -969,10 +969,10 @@ Rcpp::List sample_Theta0_Hou24_heterosk1_s4 (
       }
       
       if ( debug ) Rcout << " before sample_Theta0_Hou24_heterosk1_coln" << endl;
-      try {
+      // try {
         aux_Theta0_tmp        = sample_Theta0_Hou24_heterosk1_coln( n, aux_Theta0_tmp, shocks, aux_sigma, prior, RE(ll), D_E(ll) );
         aux_Theta0_nL.col(l)  = aux_Theta0_tmp.col(n);
-      } catch (std::runtime_error &e) {}
+      // } catch (std::runtime_error &e) {}
       if ( debug ) Rcout << " after sample_Theta0_Hou24_heterosk1_coln" << endl;
       
       // posterior kernel
