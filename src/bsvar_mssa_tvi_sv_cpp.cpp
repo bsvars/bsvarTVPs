@@ -181,25 +181,29 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     // sample aux_xi
     if ( debug ) Rcout << " sample aux_xi" << endl;
     if (!fixed_regime) {
+      
       cube Z(N, T, M);
+      mat log_jacobian(M, T);
+      
       for (int m=0; m<M; m++) {
+        
+        double log_det_B, sign_det_B;
+        log_det(log_det_B, sign_det_B, aux_B.slice(m));
+        log_jacobian.row(m).fill(log_det_B);
+        
         Z.slice(m)     = aux_B.slice(m) * (Y - aux_A.slice(m) * X);
+        
         for (int n=0; n<N; n++) {
           if ( sv_select(n) != 3 ) {
+            log_jacobian.row(m) -= 0.5 * aux_omega(n,m) * aux_h.row(n);
             aux_sigma_tmp_m.row(n) = exp(0.5 * aux_omega(n,m) * aux_h.row(n));
             Z.slice(m).row(n)     /= aux_sigma_tmp_m.row(n);
           }
         }
       }
-      if ( all(studentt == 1) ) {
-        // try {
-          aux_xi            = sample_Markov_process_studentt(Z, aux_xi, aux_PR_TR, aux_pi_0, aux_df, finiteM);
-        // } catch (std::runtime_error &e) {}
-      } else {
-        // try {
-          aux_xi            = sample_Markov_process(Z, aux_xi, aux_PR_TR, aux_pi_0, finiteM);
-        // } catch (std::runtime_error &e) {}
-      } // END if ( studentt )
+      
+      aux_xi = sample_Markov_process_sv(Z, log_jacobian, aux_lambda, aux_df,
+        studentt, aux_xi, aux_PR_TR, aux_pi_0, finiteM);
     } // END if( !fixed_regime )  
     
     // sample aux_PR_TR and aux_pi_0

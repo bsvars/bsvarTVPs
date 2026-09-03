@@ -56,6 +56,54 @@ arma::vec precision_sampler_ar1(
 );
 
 
+double sample_sv_rho(
+    const arma::rowvec& h
+);
+
+
+arma::rowvec sample_sv_omega_nc(
+    arma::rowvec omega,
+    const arma::rowvec& h,
+    const arma::rowvec& demeaned,
+    const arma::rowvec& precision,
+    const arma::urowvec& state,
+    const double sigma2_omega
+);
+
+
+arma::rowvec sample_sv_omega_ce(
+    arma::rowvec omega,
+    const arma::rowvec& g,
+    const arma::urowvec& state,
+    const double rho,
+    const double sigma2_omega
+);
+
+
+arma::rowvec sample_sv_latent(
+    const arma::rowvec& omega_T,
+    const arma::rowvec& demeaned,
+    const arma::rowvec& precision,
+    const double rho,
+    const bool centred
+);
+
+
+Rcpp::List svar_asis(
+    arma::rowvec& h,
+    double& rho,
+    arma::rowvec& omega,
+    arma::rowvec& sigma2v,
+    double& sigma2_omega,
+    double& s,
+    arma::urowvec& S,
+    const arma::mat& xi,
+    const arma::rowvec& u,
+    const Rcpp::List& prior,
+    const bool centred
+);
+
+
 Rcpp::List svar_nc1 (
     arma::rowvec    aux_h_n,                  // 1xT
     double          aux_rho_n,
@@ -97,7 +145,7 @@ Rcpp::List svar_ce1 (
 
 
 Rcpp::List svar_ce1_mss (
-    arma::rowvec&       aux_h_n,            // 1xT
+    arma::rowvec&       aux_h_tilde,        // 1xT
     double&             aux_rho_n,
     arma::rowvec&       aux_omega_n,        // 1xM nth equation regime-dependent omegas
     arma::rowvec&       aux_sigma2v_n,      // 1xM nth equation regime-dependent omegas^2
@@ -117,6 +165,13 @@ arma::mat count_regime_transitions (
 
 arma::rowvec rDirichlet1 (
     const arma::rowvec&   alpha     // Kx1
+);
+
+
+arma::mat filtering_log_density(
+    const arma::mat& log_density,
+    const arma::mat& transition,
+    const arma::vec& pi_0
 );
 
 
@@ -141,6 +196,14 @@ arma::mat smoothing (
 );
 
 
+arma::mat sample_markov_filtered(
+    const arma::mat& filtered,
+    const arma::mat& aux_xi,
+    const arma::mat& transition,
+    const bool finiteM
+);
+
+
 arma::mat sample_Markov_process (
     const arma::cube& Z,                  // NxTxM
     arma::mat         aux_xi,             // MxT
@@ -157,6 +220,19 @@ arma::mat sample_Markov_process_studentt (
     const arma::vec&  aux_pi_0,           // Mx1
     const arma::mat&  aux_df,             // NxM
     const bool        finiteM = true
+);
+
+
+arma::mat sample_Markov_process_sv (
+    const arma::cube& Z,
+    const arma::mat& log_jacobian,
+    const arma::mat& aux_lambda,
+    const arma::mat& aux_df,
+    const arma::uvec& studentt,
+    const arma::mat& aux_xi,
+    const arma::mat& aux_PR_TR,
+    const arma::vec& aux_pi_0,
+    const bool finiteM
 );
 
 

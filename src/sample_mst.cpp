@@ -18,10 +18,11 @@ arma::mat sample_lambda_ms (
   const int N           = aux_df.n_rows;
   const int T           = aux_xi.n_cols;
   
+  U                     = square( U );
   U.each_col()         /= sum(U, 1) / T;        // normalisation E[u] = 1
   
   mat       nu_lambda   = aux_df + 1;
-  mat       s_lambda    = square(U) - 2;
+  mat       s_lambda    = U - 2; // + aux_df(n,m) done below
   mat       aux_lambda(N, T, fill::ones);
   
   for (int n=0; n<N; n++) {
@@ -29,7 +30,8 @@ arma::mat sample_lambda_ms (
     for (int t=0; t<T; t++) {
       int     m         = aux_xi.col(t).index_max();
       double  draw      =  chi2rnd(nu_lambda(n, m));
-      aux_lambda(n, t)  = (nu_lambda(n, m) + s_lambda(n, t)) / draw;
+      // lambda | U, df ~ IG((df+1)/2, (df-2+U^2)/2), with shape/scale parameters.
+      aux_lambda(n, t)  = (aux_df(n, m) + s_lambda(n, t)) / draw;
     }
   }
 
@@ -80,23 +82,26 @@ Rcpp::List sample_df_ms (
   
   double  prior_df_a          = as<double>(prior["df_a"]);
   
-  // by sampling from truncated normal it is assumed that the asymmetry from truncation 
-  // is negligible for alpha computation
+  // Account for the asymmetry of the normal proposal truncated below at df=2.
   for (int n = 0; n < N; n++){
     if (studentt(n) == 0) continue;         // skip normal errors
     for (int m = 0; m < M; m++){
       
-      aux_df_star(n, m)       = RcppTN::rtn1( aux_df(n, m), adaptive_scale(n), 2, R_PosInf );
+      const double proposal_sd = adaptive_scale(n, m);
+      aux_df_star(n, m)       = RcppTN::rtn1( aux_df(n, m), proposal_sd, 2, R_PosInf );
       
       uvec    aux_xi_m        = find(aux_xi.row(m));
       rowvec  lambda_tmp      = aux_lambda.row(n);
       rowvec  lambda          = lambda_tmp.cols(aux_xi_m);
       
-      double  kernel_ratio     = exp( log_kernel_df_ms_nm(aux_df_star(n, m), lambda, prior_df_a) - log_kernel_df_ms_nm(aux_df(n, m), lambda, prior_df_a) );
-      kernel_ratio            *= RcppTN::dtn1(aux_df_star(n, m), aux_df(n, m), adaptive_scale(n), 2, R_PosInf) / RcppTN::dtn1(aux_df(n, m), aux_df_star(n, m), adaptive_scale(n), 2, R_PosInf);
+      double log_ratio = log_kernel_df_ms_nm(aux_df_star(n, m), lambda, prior_df_a)
+        - log_kernel_df_ms_nm(aux_df(n, m), lambda, prior_df_a);
+      // q(old | new) / q(new | old) = Phi((old-2)/sd) / Phi((new-2)/sd).
+      log_ratio += R::pnorm5((aux_df(n, m)-2)/proposal_sd, 0, 1, true, true)
+        - R::pnorm5((aux_df_star(n, m)-2)/proposal_sd, 0, 1, true, true);
       
-      if ( kernel_ratio < 1 ) alpha(n, m) = kernel_ratio;
-      if ( R::runif(0, 1) < alpha(n, m) ) {
+      if (log_ratio < 0) alpha(n, m) = exp(log_ratio);
+      if (std::log(R::runif(0, 1)) < log_ratio) {
         aux_df(n, m) = aux_df_star(n, m);
       }
       if (s > 1) {
