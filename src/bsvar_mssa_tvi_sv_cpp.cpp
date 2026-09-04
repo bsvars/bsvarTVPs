@@ -90,7 +90,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
   vec      Tm       = sum(aux_xi, 1);
   for (int m=0; m<M; m++) {
     aux_Theta0_inv.slice(m) = inv(aux_Theta0.slice(m));
-    aux_struc.slice(m)      = aux_Theta0.slice(m) * aux_B.slice(m);
+    aux_struc.slice(m)      = aux_Theta0_inv.slice(m) * aux_B.slice(m);
   }
   
   // parameters for adaptive sampling of degrees of freedom
