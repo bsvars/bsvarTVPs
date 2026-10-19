@@ -11,7 +11,7 @@ Rcpp::List forecast_mssa_sv (
     arma::field<arma::cube>&  posterior_B,          // (S)(N,N,M)
     arma::field<arma::cube>&  posterior_A,          // (S)(N,K,M)
     arma::cube&               posterior_PR_TR,      // (M,M,S)
-    arma::mat&                posterior_xi_T,       // (M,S)
+    arma::mat&                posterior_xi_T,       // (1,S)
     arma::mat&                posterior_h_T,        // (N,S)
     arma::mat&                posterior_rho,        // (N,S)
     arma::cube&               posterior_omega,      // (N,M,S)
@@ -54,7 +54,8 @@ Rcpp::List forecast_mssa_sv (
     } // END if do_exog
     
     int       ST(M);
-    vec       PR_ST   = posterior_xi_T.col(s);
+    vec       PR_ST(M, fill::zeros);
+    PR_ST(posterior_xi_T(0,s)) = 1;
     vec       HT      = posterior_h_T.col(s);  
     mat       BT_inv_sigma(N, N);
     cube      SigmaT(N, N, horizon);
@@ -125,7 +126,7 @@ Rcpp::List forecast_mss_sv (
     arma::field<arma::cube>&  posterior_B,          // (S)(N,N,M)
     arma::cube&               posterior_A,          // (N,K,S)
     arma::cube&               posterior_PR_TR,      // (M,M,S)
-    arma::mat&                posterior_xi_T,       // (M,S)
+    arma::mat&                posterior_xi_T,       // (1,S)
     arma::mat&                posterior_h_T,        // (N,S)
     arma::mat&                posterior_rho,        // (N,S)
     arma::cube&               posterior_omega,      // (N,M,S)
@@ -168,7 +169,8 @@ Rcpp::List forecast_mss_sv (
     } // END if do_exog
     
     int       ST(M);
-    vec       PR_ST   = posterior_xi_T.col(s);
+    vec       PR_ST(M, fill::zeros);
+    PR_ST(posterior_xi_T(0,s)) = 1;
     vec       HT      = posterior_h_T.col(s);  
     mat       BT_inv_sigma(N, N);
     cube      SigmaT(N, N, horizon);

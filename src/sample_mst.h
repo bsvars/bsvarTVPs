@@ -7,7 +7,7 @@
 
 arma::mat sample_lambda_ms (
     const arma::mat&    aux_df,     // NxM
-    const arma::mat&    aux_xi,     // MxT
+    const arma::mat&    aux_xi,     // 1xT
     const arma::mat&    U           // NxT
 );
 
@@ -22,7 +22,7 @@ double log_kernel_df_ms_nm (
 Rcpp::List sample_df_ms (
     arma::mat&        aux_df,             // NxM
     const arma::mat&  aux_lambda,         // NxT
-    const arma::mat&  aux_xi,             // MxT
+    const arma::mat&  aux_xi,             // 1xT
     const arma::mat&  U,                  // NxT
     const Rcpp::List& prior,              // hyper-parameter for exponential prior for aux_df
     const int&        s,                  // MCMC iteration

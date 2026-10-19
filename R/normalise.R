@@ -47,7 +47,7 @@ normalise.PosteriorBSVARTVP <- function(posterior, B_benchmark = NULL) {
   TVI_equation  = which.max(VB[length(VB)][[1]])
   comp          = VB[length(VB)][[1]]
   
-  M             = dim(posterior$posterior$xi)[1]
+  M             = dim(posterior$posterior$PR_TR)[1]
   N             = length(comp)
   
   set_B_benchmark = is.null(B_benchmark) 

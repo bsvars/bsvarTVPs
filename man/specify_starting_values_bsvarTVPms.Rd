@@ -87,7 +87,7 @@ standard deviations.}
 
 \item{\code{pi_0}}{an \code{M}-vector of starting values for initial regime probabilities.}
 
-\item{\code{xi}}{a \code{MxT} matrix of starting values for regime allocations.}
+\item{\code{xi}}{a \code{1xT} matrix of starting values for regime allocations coded as integers from 0 to \code{M-1}.}
 
 \item{\code{lambda}}{a \code{NxT} matrix of starting values for latent variables.}
 

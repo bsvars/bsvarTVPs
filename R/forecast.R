@@ -69,7 +69,7 @@ forecast.PosteriorBSVARTVP <- function(
   posterior_B     = object$posterior$B_cpp
   posterior_A     = object$posterior$A_cpp
   posterior_PR_TR = object$posterior$PR_TR
-  posterior_xi_T  = matrix(object$posterior$xi[,T,], ncol = S)
+  posterior_xi_T  = matrix(object$posterior$xi[1,T,], 1, S)
   posterior_h_T   = object$posterior$h[,T,]
   posterior_rho   = object$posterior$rho
   posterior_omega = object$posterior$omega

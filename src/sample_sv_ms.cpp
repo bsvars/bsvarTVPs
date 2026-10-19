@@ -314,7 +314,7 @@ Rcpp::List svar_nc1_mss (
     double&               aux_sigma2_omega_n, // omega prior hyper-parameter 
     double&               aux_s_n,            // scale of IG2 prior for aux_sigma2_omega_n
     arma::urowvec&        aux_S_n,            // 1xT
-    const arma::mat&      aux_xi,             // MxT
+    const arma::mat&      aux_xi,             // 1xT
     const arma::rowvec&   u,                  // 1xT
     const Rcpp::List&     prior
 ) {
@@ -326,9 +326,10 @@ Rcpp::List svar_nc1_mss (
   
   // sample h and omega of the non-centered SV including ASIS step
   const int     T = u.n_cols;
-  const int     M = aux_xi.n_rows;
+  const int     M = aux_omega_n.n_cols;
   const rowvec  U = log(square(u + ccc));
-  const vec    Tm= sum(aux_xi, 1);
+  vec           Tm(M, fill::zeros);
+  for (int t=0; t<T; t++) Tm(aux_xi(0,t))++;
   
   rowvec        omega_aux(M);
   
@@ -341,7 +342,7 @@ Rcpp::List svar_nc1_mss (
   
   rowvec        omega_T(T);
   for (int t=0; t<T; t++) {
-    omega_T(t)          = aux_omega_n(aux_xi.col(t).index_max());
+    omega_T(t)          = aux_omega_n(aux_xi(0,t));
   }
   
   // sample auxiliary mixture states aux_S
@@ -383,7 +384,7 @@ Rcpp::List svar_nc1_mss (
     
     int ii = 0;
     for (int t=0; t<T; t++) {
-      if (aux_xi(m,t)==1) {
+      if (aux_xi(0,t)==m) {
         aux_h_n_m(ii)   = aux_h_n(t);
         U_m(ii)         = U(t);
         alpha_S_m(ii)   = alpha_S(t);
@@ -404,7 +405,7 @@ Rcpp::List svar_nc1_mss (
   } // END m loop
   
   for (int t=0; t<T; t++) {
-    omega_T(t)          = omega_aux(aux_xi.col(t).index_max());
+    omega_T(t)          = omega_aux(aux_xi(0,t));
   }
   
   // sample aux_h
@@ -419,7 +420,7 @@ Rcpp::List svar_nc1_mss (
   for (int m=0; m<M; m++) {
     double  hHHh = 0;
     for (int t=0; t<T; t++) {
-      if (aux_xi(m,t)==1) {
+      if (aux_xi(0,t)==m) {
         hHHh           += pow(aux_h_tilde(t), 2);
       }
     }
@@ -431,7 +432,7 @@ Rcpp::List svar_nc1_mss (
   } // END m loop
   
   for (int t=0; t<T; t++) {
-    omega_T(t)          = aux_omega_n(aux_xi.col(t).index_max());
+    omega_T(t)          = aux_omega_n(aux_xi(0,t));
   }
   aux_h_n               = aux_h_tilde % pow(omega_T, -1);
   
@@ -553,7 +554,7 @@ Rcpp::List svar_ce1_mss (
     double&             aux_sigma2_omega_n, // omega prior hyper-parameter 
     double&             aux_s_n,             // scale of IG2 prior for aux_sigma2_omega_n
     arma::urowvec&      aux_S_n,            // 1xT
-    const arma::mat&    aux_xi,             // MxT
+    const arma::mat&    aux_xi,             // 1xT
     const arma::rowvec& u,                  // 1xT
     const Rcpp::List&   prior
 ) {
@@ -568,8 +569,9 @@ Rcpp::List svar_ce1_mss (
   // sample h and omega of the non-centered SV including ASIS step
   const int     T = u.n_cols;
   const rowvec  U = log(pow(u + ccc, 2));
-  const int     M = aux_xi.n_rows;
-  const vec    Tm = sum(aux_xi, 1);
+  const int     M = aux_omega_n.n_cols;
+  vec           Tm(M, fill::zeros);
+  for (int t=0; t<T; t++) Tm(aux_xi(0,t))++;
   
   const double  prior_sv_a_ = prior["sv_a_"];
   const double  prior_sv_s_ = prior["sv_s_"];
@@ -580,7 +582,7 @@ Rcpp::List svar_ce1_mss (
   
   rowvec        sigma2v_T_inv(T);
   for (int t=0; t<T; t++) {
-    sigma2v_T_inv(t)          = pow( aux_sigma2v_n(aux_xi.col(t).index_max()), -1);
+    sigma2v_T_inv(t)          = pow( aux_sigma2v_n(aux_xi(0,t)), -1);
   }
   rowvec  aux_h_n = aux_h_tilde % sqrt(sigma2v_T_inv);
   
@@ -619,7 +621,7 @@ Rcpp::List svar_ce1_mss (
     
     int ii = 0;
     for (int t=0; t<T; t++) {
-      if (aux_xi(m,t)==1) {
+      if (aux_xi(0,t)==m) {
         aux_h_n_m(ii)   = aux_h_n(t);
         ii++;
       }
@@ -633,7 +635,7 @@ Rcpp::List svar_ce1_mss (
   
   aux_omega_n        = sqrt(aux_sigma2v_n);
   for (int t=0; t<T; t++) {
-    sigma2v_T_inv(t)          = pow( aux_sigma2v_n(aux_xi.col(t).index_max()), -1);
+    sigma2v_T_inv(t)          = pow( aux_sigma2v_n(aux_xi(0,t)), -1);
   }
   
   // sample aux_h
@@ -662,15 +664,14 @@ Rcpp::List svar_ce1_mss (
 // [[Rcpp::interfaces(cpp, r)]]
 // [[Rcpp::export]]
 arma::mat count_regime_transitions (
-    const arma::mat& xi
+    const arma::mat& xi,
+    const int M
 ) {
-  const int M = xi.n_rows;
   const int T = xi.n_cols;
-  
+
   mat count(M, M);
-  urowvec s   = index_max( xi, 0 );
   for (int t=1; t<T; t++) {
-    count( s(t-1), s(t))++;
+    count( xi(0,t-1), xi(0,t))++;
   }
   return count;
 } // END count_regime_transitions
@@ -820,7 +821,7 @@ arma::mat smoothing (
 // [[Rcpp::export]]
 arma::mat sample_Markov_process (
     const arma::cube& Z,                  // NxTxM
-    arma::mat         aux_xi,             // MxT
+    arma::mat         aux_xi,             // 1xT
     const arma::mat&  aux_PR_TR,          // MxM
     const arma::vec&  aux_pi_0,           // Mx1
     const bool        finiteM = true
@@ -840,17 +841,16 @@ arma::mat sample_Markov_process (
   
   mat filtered    = filtering(Z, aux_PR_TR, aux_pi_0);
   mat smoothed    = smoothing(filtered, aux_PR_TR);
-  mat    aj       = eye(M, M);
   
-  mat xi(M, T);
   int draw        = csample_num1(wrap(seq_len(M)), wrap(smoothed.col(T-1)));
-  aux_xi_tmp.col(T-1)     = aj.col(draw-1);
+  aux_xi_tmp(0,T-1)       = draw-1;
   
   if ( minimum_regime_occurrences==0 ) {
     for (int t=T-2; t>=0; --t) {
-      vec xi_Tmj    = (aux_PR_TR * (aux_xi.col(t+1)/(aux_PR_TR.t() * filtered.col(t)))) % filtered.col(t);
+      vec xi_Tmj    = aux_PR_TR.col(aux_xi_tmp(0,t+1)) % filtered.col(t);
+      xi_Tmj       /= sum(xi_Tmj);
       draw          = csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
-      aux_xi_tmp.col(t)   = aj.col(draw-1);
+      aux_xi_tmp(0,t)     = draw-1;
     }
     aux_xi_out = aux_xi_tmp;
   } else {
@@ -858,11 +858,12 @@ arma::mat sample_Markov_process (
     int iterations  = 1;
     while ( (regime_occurrences<minimum_regime_occurrences) & (iterations<max_iterations) ) {
       for (int t=T-2; t>=0; --t) {
-        vec xi_Tmj    = (aux_PR_TR * (aux_xi.col(t+1)/(aux_PR_TR.t() * filtered.col(t)))) % filtered.col(t);
+        vec xi_Tmj    = aux_PR_TR.col(aux_xi_tmp(0,t+1)) % filtered.col(t);
+        xi_Tmj       /= sum(xi_Tmj);
         draw          = csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
-        aux_xi_tmp.col(t)   = aj.col(draw-1);
+        aux_xi_tmp(0,t)     = draw-1;
       }
-      mat transitions       = count_regime_transitions(aux_xi_tmp);
+      mat transitions       = count_regime_transitions(aux_xi_tmp, M);
       regime_occurrences    = min(transitions.diag());
       iterations++;
     } // END while
@@ -881,7 +882,7 @@ arma::mat sample_Markov_process (
 // [[Rcpp::export]]
 arma::mat sample_Markov_process_studentt (
     const arma::cube& Z,                  // NxTxM
-    arma::mat         aux_xi,             // MxT
+    arma::mat         aux_xi,             // 1xT
     const arma::mat&  aux_PR_TR,          // MxM
     const arma::vec&  aux_pi_0,           // Mx1
     const arma::mat&  aux_df,             // NxM
@@ -902,17 +903,16 @@ arma::mat sample_Markov_process_studentt (
   
   mat filtered    = filtering_studentt(Z, aux_PR_TR, aux_pi_0, aux_df);
   mat smoothed    = smoothing(filtered, aux_PR_TR);
-  mat    aj       = eye(M, M);
   
-  mat xi(M, T);
   int draw        = csample_num1(wrap(seq_len(M)), wrap(smoothed.col(T-1)));
-  aux_xi_tmp.col(T-1)     = aj.col(draw-1);
+  aux_xi_tmp(0,T-1)       = draw-1;
   
   if ( minimum_regime_occurrences==0 ) {
     for (int t=T-2; t>=0; --t) {
-      vec xi_Tmj    = (aux_PR_TR * (aux_xi.col(t+1)/(aux_PR_TR.t() * filtered.col(t)))) % filtered.col(t);
+      vec xi_Tmj    = aux_PR_TR.col(aux_xi_tmp(0,t+1)) % filtered.col(t);
+      xi_Tmj       /= sum(xi_Tmj);
       draw          = csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
-      aux_xi_tmp.col(t)   = aj.col(draw-1);
+      aux_xi_tmp(0,t)     = draw-1;
     }
     aux_xi_out = aux_xi_tmp;
   } else {
@@ -920,11 +920,12 @@ arma::mat sample_Markov_process_studentt (
     int iterations  = 1;
     while ( (regime_occurrences<minimum_regime_occurrences) & (iterations<max_iterations) ) {
       for (int t=T-2; t>=0; --t) {
-        vec xi_Tmj    = (aux_PR_TR * (aux_xi.col(t+1)/(aux_PR_TR.t() * filtered.col(t)))) % filtered.col(t);
+        vec xi_Tmj    = aux_PR_TR.col(aux_xi_tmp(0,t+1)) % filtered.col(t);
+        xi_Tmj       /= sum(xi_Tmj);
         draw          = csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
-        aux_xi_tmp.col(t)   = aj.col(draw-1);
+        aux_xi_tmp(0,t)     = draw-1;
       }
-      mat transitions       = count_regime_transitions(aux_xi_tmp);
+      mat transitions       = count_regime_transitions(aux_xi_tmp, M);
       regime_occurrences    = min(transitions.diag());
       iterations++;
     } // END while
@@ -945,7 +946,7 @@ arma::mat sample_Markov_process_studentt (
 Rcpp::List sample_transition_probabilities (
     arma::mat           aux_PR_TR,    // MxM 
     arma::vec           aux_pi_0,     // Mx1
-    const arma::mat&    aux_xi,       // MxT
+    const arma::mat&    aux_xi,       // 1xT
     const Rcpp::List&   prior,         // a list of priors - original dimensions
     const bool          MSnotMIX = true
 ) {
@@ -954,20 +955,23 @@ Rcpp::List sample_transition_probabilities (
   const mat   prior_PR_TR = as<mat>(prior["PR_TR"]);
   
   if ( MSnotMIX ) {
-    mat transitions       = count_regime_transitions(aux_xi);
+    vec prob_xi1          = aux_pi_0 % aux_PR_TR.col(aux_xi(0,0));
+    prob_xi1             /= sum(prob_xi1);
+    int S0_draw           = csample_num1(wrap(seq_len(M)), wrap(prob_xi1));
+
+    mat transitions       = count_regime_transitions(aux_xi, M);
+    transitions(S0_draw-1, aux_xi(0,0))++;
     mat posterior_alpha   = transitions + prior_PR_TR;
-    
+
     for (int m=0; m<M; m++) {
       aux_PR_TR.row(m)    = rDirichlet1(posterior_alpha.row(m));
     }
-    vec prob_xi1          = aux_PR_TR *aux_xi.col(0);
-    prob_xi1             /= sum(prob_xi1);
-    int S0_draw           = csample_num1(wrap(seq_len(M)), wrap(prob_xi1));
     rowvec posterior_alpha_0(M, fill::value((1.0)));
     posterior_alpha_0(S0_draw-1)++;
     aux_pi_0              = trans(rDirichlet1(posterior_alpha_0));
   } else {
-    rowvec occurrences    = trans(sum(aux_xi, 1));
+    rowvec occurrences(M, fill::zeros);
+    for (uword t=0; t<aux_xi.n_cols; t++) occurrences(aux_xi(0,t))++;
     rowvec posterior_alpha= occurrences + prior_PR_TR.row(0);
     aux_pi_0              = trans(rDirichlet1(posterior_alpha));
     for (int m=0; m<M; m++) {

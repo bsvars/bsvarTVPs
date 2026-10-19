@@ -10,7 +10,7 @@ using namespace arma;
 // [[Rcpp::export]]
 arma::mat sample_lambda_ms (
     const arma::mat&    aux_df,     // NxM
-    const arma::mat&    aux_xi,     // MxT
+    const arma::mat&    aux_xi,     // 1xT
     const arma::mat&    U           // NxT
 ) {
 
@@ -25,7 +25,7 @@ arma::mat sample_lambda_ms (
   for (int n=0; n<N; n++) {
     for (int t=0; t<T; t++) {
 
-      int     m         = aux_xi.col(t).index_max();
+      int     m         = aux_xi(0,t);
       double  draw      =  chi2rnd(nu_lambda(n, m));
       aux_lambda(n, t)  = (s_lambda(n, t) + aux_df(n, m) - 2) / draw;
   
@@ -63,7 +63,7 @@ double log_kernel_df_ms_nm (
 Rcpp::List sample_df_ms (
     arma::mat&        aux_df,             // NxM
     const arma::mat&  aux_lambda,         // NxT
-    const arma::mat&  aux_xi,             // MxT
+    const arma::mat&  aux_xi,             // 1xT
     const arma::mat&  U,                  // NxT
     const Rcpp::List& prior,              // hyper-parameter for exponential prior for aux_df
     const int&        s,                  // MCMC iteration
@@ -85,7 +85,7 @@ Rcpp::List sample_df_ms (
       
       aux_df_star(n, m)       = RcppTN::rtn1( aux_df(n, m), adaptive_scale(n, m), 2, R_PosInf );
       
-      uvec    aux_xi_m        = find(aux_xi.row(m));
+      uvec    aux_xi_m        = find(aux_xi == m);
       rowvec  lambda_tmp      = aux_lambda.row(n);
       rowvec  lambda          = lambda_tmp.cols(aux_xi_m);
       

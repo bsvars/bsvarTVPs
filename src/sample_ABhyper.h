@@ -39,7 +39,7 @@ arma::cube sample_B_mss (
     const arma::mat&  aux_A,          // NxK
     arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&  aux_xi,         // MxT
+    const arma::mat&  aux_xi,         // 1xT
     const arma::mat&  Y,              // NxT dependent variables
     const arma::mat&  X,              // KxT dependent variables
     const Rcpp::List& prior,          // a list of priors - original dimensions
@@ -52,7 +52,7 @@ Rcpp::List sample_B_mss_s4 (
     const arma::mat&  aux_A,          // NxK
     arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&  aux_xi,         // MxT
+    const arma::mat&  aux_xi,         // 1xT
     const arma::mat&  Y,              // NxT dependent variables
     const arma::mat&  X,              // KxT dependent variables
     const Rcpp::List& prior,          // a list of priors - original dimensions
@@ -66,7 +66,7 @@ Rcpp::List sample_B_mssa_s4 (
     const arma::cube& aux_A,          // NxKxM
     arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&  aux_xi,         // MxT
+    const arma::mat&  aux_xi,         // 1xT
     const arma::mat&  Y,              // NxT dependent variables
     const arma::mat&  X,              // KxT dependent variables
     const Rcpp::List& prior,          // a list of priors - original dimensions
@@ -88,7 +88,7 @@ arma::mat sample_A_heterosk1 (
 arma::mat sample_A_heterosk1_mss (
     arma::mat         aux_A,          // NxK
     const arma::cube& aux_B,          // NxNxM
-    const arma::mat&  aux_xi,         // MxT
+    const arma::mat&  aux_xi,         // 1xT
     arma::field<arma::mat>  prior_precision, // (N)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  Y,              // NxT dependent variables
@@ -100,7 +100,7 @@ arma::mat sample_A_heterosk1_mss (
 arma::cube sample_A_heterosk1_mssa (
     arma::cube        aux_A,          // NxKxM
     const arma::cube& aux_B,          // NxNxM
-    const arma::mat&  aux_xi,         // MxT
+    const arma::mat&  aux_xi,         // 1xT
     arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  Y,              // NxT dependent variables

@@ -80,7 +80,8 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
   mat   aux_hetero  = aux_sigma % aux_lambda_sqrt;
   
   const int M       = aux_PR_TR.n_cols;
-  vec      Tm       = sum(aux_xi, 1);
+  vec      Tm(M, fill::zeros);
+  for (int t=0; t<T; t++) Tm(aux_xi(0,t))++;
   
   // parameters for adaptive sampling of degrees of freedom
   NumericVector aag = {0.44, 0.6};
@@ -98,7 +99,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
   List  posterior_hyper(S);
   cube  posterior_PR_TR(M, M, S);
   mat   posterior_pi_0(M,S);
-  cube  posterior_xi(M, T, S);
+  cube  posterior_xi(1, T, S);
   cube  posterior_h(N, T, S);
   mat   posterior_rho(N, S);
   cube  posterior_omega(N, M, S);
@@ -145,7 +146,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
       
       mat U           = E;
       for (int t=0; t<T; t++) {
-        int   m       = aux_xi.col(t).index_max();
+        int   m       = aux_xi(0,t);
         U.col(t)      = aux_B.slice(m) * (Y.col(t) - aux_A * X.col(t));
       }
       U              /= aux_sigma;
@@ -243,7 +244,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
       E = Y - aux_A * X;
       for (int m=0; m<M; m++) {
         for (int t=0; t<T; t++) {
-          if (aux_xi(m,t)==1) {
+          if (aux_xi(0,t)==m) {
             U.col(t)      = aux_B.slice(m) * E.col(t) / aux_lambda_sqrt.col(t);
           }
         }
@@ -282,7 +283,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
         aux_s_(n)           = as<double>(sv_n["aux_s_n"]);
         
         for (int t=0; t<T; t++){
-          omega_T_n(t)      = aux_omega(n, aux_xi.col(t).index_max());
+          omega_T_n(t)      = aux_omega(n, aux_xi(0,t));
         }
         aux_sigma.row(n)    = exp(0.5 * (aux_h.row(n) % omega_T_n));
         

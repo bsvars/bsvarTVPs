@@ -205,7 +205,7 @@ arma::cube bsvarTVPs_fitted_values (
 arma::cube bsvarTVPs_structural_shocks (
     const arma::field<arma::cube>&  posterior_B,    // (S)(N, N, M)
     const arma::cube&         posterior_A,    // (N, K, S)
-    const arma::cube&         posterior_xi,   // (M, T, S)
+    const arma::cube&         posterior_xi,   // (1, T, S)
     const arma::mat&          Y,              // NxT dependent variables
     const arma::mat&          X               // KxT dependent variables
 ) {
@@ -218,7 +218,7 @@ arma::cube bsvarTVPs_structural_shocks (
   
   for (int s=0; s<S; s++) {
     for (int t=0; t<T; t++) {
-      int m  = index_max(posterior_xi.slice(s).col(t));
+      int m  = posterior_xi(0,t,s);
       structural_shocks.slice(s).col(t)    = posterior_B(s).slice(m) * (Y.col(t) - posterior_A.slice(s) * X.col(t));
     } // END t loop
   } // END s loop
@@ -232,7 +232,7 @@ arma::cube bsvarTVPs_structural_shocks (
 // [[Rcpp::export]]
 arma::field<arma::cube> bsvarTVPs_covariances_rf_mssv (
     const arma::field<arma::cube>&  posterior_B,  // (S)(N, N, M)
-    const arma::cube&         posterior_xi,       // (M, T, S)
+    const arma::cube&         posterior_xi,       // (1, T, S)
     const arma::cube&         posterior_sigma     // (N, T, S)
 ) {
   
@@ -245,7 +245,7 @@ arma::field<arma::cube> bsvarTVPs_covariances_rf_mssv (
   
   for (int s=0; s<S; s++) {
     for (int t=0; t<T; t++) {
-      int m             = index_max(posterior_xi.slice(s).col(t));
+      int m             = posterior_xi(0,t,s);
       mat Bms_inv       = inv(posterior_B(s).slice(m));
       cov_tmp.slice(t)  = Bms_inv * diagmat(square(posterior_sigma.slice(s).col(t))) * Bms_inv.t();
     } // END t loop
@@ -288,7 +288,7 @@ arma::field<arma::cube> bsvarTVPs_covariances_rf_sv (
 // [[Rcpp::export]]
 arma::field<arma::cube> bsvarTVPs_covariances_rf_ms (
     const arma::field<arma::cube>&  posterior_B,  // (S)(N, N, M)
-    const arma::cube&         posterior_xi        // (M, T, S)
+    const arma::cube&         posterior_xi        // (1, T, S)
 ) {
   
   const int       N = posterior_B(0).n_rows;
@@ -300,7 +300,7 @@ arma::field<arma::cube> bsvarTVPs_covariances_rf_ms (
   
   for (int s=0; s<S; s++) {
     for (int t=0; t<T; t++) {
-      int m             = index_max(posterior_xi.slice(s).col(t));
+      int m             = posterior_xi(0,t,s);
       mat Bms_inv       = inv(posterior_B(s).slice(m));
       cov_tmp.slice(t)  = Bms_inv * Bms_inv.t();
     } // END t loop

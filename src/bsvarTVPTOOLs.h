@@ -49,7 +49,7 @@ arma::cube bsvarTVPs_fitted_values (
 
 arma::field<arma::cube> bsvarTVPs_covariances_rf_mssv (
     const arma::field<arma::cube>&  posterior_B,  // (S)(N, N, M)
-    const arma::cube&         posterior_xi,       // (M, T, S)
+    const arma::cube&         posterior_xi,       // (1, T, S)
     const arma::cube&         posterior_sigma     // (N, T, S)
 );
 
@@ -62,7 +62,7 @@ arma::field<arma::cube> bsvarTVPs_covariances_rf_sv (
 
 arma::field<arma::cube> bsvarTVPs_covariances_rf_ms (
     const arma::field<arma::cube>&  posterior_B,  // (S)(N, N, M)
-    const arma::cube&         posterior_xi        // (M, T, S)
+    const arma::cube&         posterior_xi        // (1, T, S)
 );
 
 
@@ -84,7 +84,7 @@ arma::cube bsvarTVPs_cov2sd (
 arma::cube bsvars_structural_shocks (
     const arma::field<arma::cube>&  posterior_B,    // (S)(N, N, M)
     const arma::cube&         posterior_A,    // (N, K, S)
-    const arma::cube&         posterior_xi,   // (M, T, S)
+    const arma::cube&         posterior_xi,   // (1, T, S)
     const arma::mat&          Y,              // NxT dependent variables
     const arma::mat&          X               // KxT dependent variables
 );

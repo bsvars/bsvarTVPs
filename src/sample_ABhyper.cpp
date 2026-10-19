@@ -243,7 +243,7 @@ arma::cube sample_B_mss (
     const arma::mat&  aux_A,          // NxK
     arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&  aux_xi,         // MxT
+    const arma::mat&  aux_xi,         // 1xT
     const arma::mat&  Y,              // NxT dependent variables
     const arma::mat&  X,              // KxT dependent variables
     const Rcpp::List& prior,          // a list of priors - original dimensions
@@ -253,7 +253,8 @@ arma::cube sample_B_mss (
   const int N     = Y.n_rows;
   const int K     = X.n_rows;
   const int M     = aux_B.n_slices;
-  const vec T_m  = sum(aux_xi,1);
+  vec T_m(M, fill::zeros);
+  for (int t=0; t<T; t++) T_m(aux_xi(0,t))++;
   
   // aux_sigma, Y, X
   
@@ -264,7 +265,7 @@ arma::cube sample_B_mss (
     mat X_m(K, T_m(m));
     
     for (int t=0; t<T; t++){
-      if (aux_xi(m,t)==1) {
+      if (aux_xi(0,t)==m) {
         aux_sigma_m.col(ii) = aux_sigma.col(t);
         Y_m.col(ii)         = Y.col(t);
         X_m.col(ii)         = X.col(t);
@@ -293,7 +294,7 @@ Rcpp::List sample_B_mss_s4 (
     const arma::mat&  aux_A,          // NxK
     arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&  aux_xi,         // MxT
+    const arma::mat&  aux_xi,         // 1xT
     const arma::mat&  Y,              // NxT dependent variables
     const arma::mat&  X,              // KxT dependent variables
     const Rcpp::List& prior,          // a list of priors - original dimensions
@@ -303,7 +304,8 @@ Rcpp::List sample_B_mss_s4 (
   const int N     = Y.n_rows;
   const int K     = X.n_rows;
   const int M     = aux_B.n_slices;
-  const vec T_m  = sum(aux_xi,1);
+  vec T_m(M, fill::zeros);
+  for (int t=0; t<T; t++) T_m(aux_xi(0,t))++;
   
   // aux_sigma, Y, X
   
@@ -314,7 +316,7 @@ Rcpp::List sample_B_mss_s4 (
     mat X_m(K, T_m(m));
     
     for (int t=0; t<T; t++){
-      if (aux_xi(m,t)==1) {
+      if (aux_xi(0,t)==m) {
         aux_sigma_m.col(ii) = aux_sigma.col(t);
         Y_m.col(ii)         = Y.col(t);
         X_m.col(ii)         = X.col(t);
@@ -345,7 +347,7 @@ Rcpp::List sample_B_mssa_s4 (
     const arma::cube& aux_A,          // NxKxM
     arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
-    const arma::mat&  aux_xi,         // MxT
+    const arma::mat&  aux_xi,         // 1xT
     const arma::mat&  Y,              // NxT dependent variables
     const arma::mat&  X,              // KxT dependent variables
     const Rcpp::List& prior,          // a list of priors - original dimensions
@@ -355,7 +357,8 @@ Rcpp::List sample_B_mssa_s4 (
   const int N     = Y.n_rows;
   const int K     = X.n_rows;
   const int M     = aux_B.n_slices;
-  const vec T_m  = sum(aux_xi,1);
+  vec T_m(M, fill::zeros);
+  for (int t=0; t<T; t++) T_m(aux_xi(0,t))++;
   
   // aux_sigma, Y, X
   
@@ -366,7 +369,7 @@ Rcpp::List sample_B_mssa_s4 (
     mat X_m(K, T_m(m));
     
     for (int t=0; t<T; t++){
-      if (aux_xi(m,t)==1) {
+      if (aux_xi(0,t)==m) {
         aux_sigma_m.col(ii) = aux_sigma.col(t);
         Y_m.col(ii)         = Y.col(t);
         X_m.col(ii)         = X.col(t);
@@ -451,7 +454,7 @@ arma::mat sample_A_heterosk1 (
 arma::mat sample_A_heterosk1_mss (
     arma::mat         aux_A,          // NxK
     const arma::cube& aux_B,          // NxNxM
-    const arma::mat&  aux_xi,         // MxT
+    const arma::mat&  aux_xi,         // 1xT
     arma::field<arma::mat>  prior_precision, // (N)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  Y,              // NxT dependent variables
@@ -462,8 +465,9 @@ arma::mat sample_A_heterosk1_mss (
   const int N         = aux_A.n_rows;
   const int K         = aux_A.n_cols;
   const int T         = Y.n_cols;
-  const int M         = aux_xi.n_rows;
-  const vec Tm       = sum(aux_xi, 1);
+  const int M         = aux_B.n_slices;
+  vec Tm(M, fill::zeros);
+  for (int t=0; t<T; t++) Tm(aux_xi(0,t))++;
   
   mat prior_A_mean    = as<mat>(prior["A"]);
   rowvec    zerosA(K);
@@ -483,11 +487,11 @@ arma::mat sample_A_heterosk1_mss (
   vec m_iter(M);
   
   for (uword t=0; t<T; t++) {
-    int mm            = aux_xi.col(t).index_max();
+    int mm            = aux_xi(0,t);
     YM(mm).col(m_iter(mm))    = Y.col(t);
     XM(mm).col(m_iter(mm))    = X.col(t);
     SM(mm).col(m_iter(mm))    = aux_sigma.col(t);
-    m_iter += aux_xi.col(t);
+    m_iter(mm)++;
   }
   
   for (int n=0; n<N; n++) {
@@ -535,7 +539,7 @@ arma::mat sample_A_heterosk1_mss (
 arma::cube sample_A_heterosk1_mssa (
     arma::cube        aux_A,          // NxKxM
     const arma::cube& aux_B,          // NxNxM
-    const arma::mat&  aux_xi,         // MxT
+    const arma::mat&  aux_xi,         // 1xT
     arma::field<arma::mat>  prior_precision, // (N,M)(N,N)
     const arma::mat&  aux_sigma,      // NxT conditional STANDARD DEVIATIONS
     const arma::mat&  Y,              // NxT dependent variables
@@ -546,8 +550,9 @@ arma::cube sample_A_heterosk1_mssa (
   const int N         = aux_A.n_rows;
   const int K         = aux_A.n_cols;
   const int T         = Y.n_cols;
-  const int M         = aux_xi.n_rows;
-  const vec Tm        = sum(aux_xi, 1);
+  const int M         = aux_B.n_slices;
+  vec Tm(M, fill::zeros);
+  for (int t=0; t<T; t++) Tm(aux_xi(0,t))++;
   
   mat prior_A_mean    = as<mat>(prior["A"]);
   
@@ -568,11 +573,11 @@ arma::cube sample_A_heterosk1_mssa (
   vec m_iter(M);
   
   for (uword t=0; t<T; t++) {
-    int mm            = aux_xi.col(t).index_max();
+    int mm            = aux_xi(0,t);
     YM(mm).col(m_iter(mm))    = Y.col(t);
     XM(mm).col(m_iter(mm))    = X.col(t);
     SM(mm).col(m_iter(mm))    = aux_sigma.col(t);
-    m_iter += aux_xi.col(t);
+    m_iter(mm)++;
   }
   
   for (int m=0; m<M; m++) {

@@ -241,7 +241,7 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
     #' @field pi_0 an \code{M}-vector of starting values for initial regime probabilities.
     pi_0          = numeric(),
     
-    #' @field xi a \code{MxT} matrix of starting values for regime allocations.
+    #' @field xi a \code{1xT} matrix of starting values for regime allocations coded as integers from 0 to \code{M-1}.
     xi            = matrix(),
     
     #' @field lambda a \code{NxT} matrix of starting values for latent variables.
@@ -292,9 +292,9 @@ specify_starting_values_bsvarTVPms = R6::R6Class(
       }
       
       if (M > 1) {
-        xi    = diag(M)[,sample(1:M, T, replace = TRUE)]
+        xi    = matrix(sample(0:(M-1), T, replace = TRUE), 1, T)
       } else {
-        xi    = matrix(1, M, T)
+        xi    = matrix(0, 1, T)
       }
       
       K                   = N * p + 1 + d

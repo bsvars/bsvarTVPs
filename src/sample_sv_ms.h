@@ -77,7 +77,7 @@ Rcpp::List svar_nc1_mss (
     double&               aux_sigma2_omega_n, // omega prior hyper-parameter 
     double&               aux_s_n,            // scale of IG2 prior for aux_sigma2_omega_n
     arma::urowvec&        aux_S_n,            // 1xT
-    const arma::mat&      aux_xi,             // MxT
+    const arma::mat&      aux_xi,             // 1xT
     const arma::rowvec&   u,                  // 1xT
     const Rcpp::List&     prior
 );
@@ -104,14 +104,15 @@ Rcpp::List svar_ce1_mss (
     double&             aux_sigma2_omega_n, // omega prior hyper-parameter 
     double&             aux_s_n,             // scale of IG2 prior for aux_sigma2_omega_n
     arma::urowvec&      aux_S_n,            // 1xT
-    const arma::mat&    aux_xi,             // MxT
+    const arma::mat&    aux_xi,             // 1xT
     const arma::rowvec& u,                  // 1xT
     const Rcpp::List&   prior
 );
 
 
 arma::mat count_regime_transitions (
-    const arma::mat& xi
+    const arma::mat& xi,
+    const int M
 );
 
 
@@ -136,14 +137,14 @@ arma::mat filtering_studentt (
 
 
 arma::mat smoothing (
-    const arma::mat&  filtered,           // MxT
+    const arma::mat&  filtered,           // 1xT
     const arma::mat&  aux_PR_TR           // MxM
 );
 
 
 arma::mat sample_Markov_process (
     const arma::cube& Z,                  // NxTxM
-    arma::mat         aux_xi,             // MxT
+    arma::mat         aux_xi,             // 1xT
     const arma::mat&  aux_PR_TR,          // MxM
     const arma::vec&  aux_pi_0,           // Mx1
     const bool        finiteM = true
@@ -152,7 +153,7 @@ arma::mat sample_Markov_process (
 
 arma::mat sample_Markov_process_studentt (
     const arma::cube& Z,                  // NxTxM
-    arma::mat         aux_xi,             // MxT
+    arma::mat         aux_xi,             // 1xT
     const arma::mat&  aux_PR_TR,          // MxM
     const arma::vec&  aux_pi_0,           // Mx1
     const arma::mat&  aux_df,             // NxM
@@ -163,7 +164,7 @@ arma::mat sample_Markov_process_studentt (
 Rcpp::List sample_transition_probabilities (
     arma::mat           aux_PR_TR,    // MxM 
     arma::vec           aux_pi_0,     // Mx1
-    const arma::mat&    aux_xi,       // MxT
+    const arma::mat&    aux_xi,       // 1xT
     const Rcpp::List&   prior,         // a list of priors - original dimensions
     const bool          MSnotMIX = true
 );
