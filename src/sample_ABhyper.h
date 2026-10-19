@@ -152,51 +152,6 @@ Rcpp::List sample_hyperparameters_mssa_s4_boost (
 );
 
 
-double rig_inv1 (
-    double alpha,
-    double beta
-);
-
-
-Rcpp::List sample_hyperparameter_horseshoe (
-    Rcpp::List&             aux_hyper_list,
-    const arma::mat&        aux_B,                // (N, N)
-    const arma::mat&        aux_A,                // (N, K)     
-    const arma::field<arma::mat>& VB,             // (N)
-    const arma::ivec&       aux_SL,               // Nx1 row-specific S4 indicators
-    const Rcpp::List&       prior
-);
-
-
-Rcpp::List sample_hyperparameter_mss_horseshoe (
-    Rcpp::List&             aux_hyper_list,
-    const arma::cube&       aux_B,                // (N, N, M)
-    const arma::mat&        aux_A,                // (N, K)     
-    const arma::field<arma::mat>& VB,             // (N)
-    const Rcpp::List&       prior
-);
-
-
-Rcpp::List sample_hyperparameter_mss_s4_horseshoe (
-    Rcpp::List&             aux_hyper_list,
-    const arma::cube&       aux_B,                // (N, N, M)
-    const arma::mat&        aux_A,                // (N, K)     
-    const arma::field<arma::mat>& VB,             // (R + 1)
-    const arma::imat&       aux_SL,               // Nx1 row-specific S4 indicators
-    const Rcpp::List&       prior
-);
-
-
-Rcpp::List sample_hyperparameter_mssa_s4_horseshoe (
-    Rcpp::List&             aux_hyper_list,
-    const arma::cube&       aux_B,                // (N, N, M)
-    const arma::cube&       aux_A,                // (N, K, M)     
-    const arma::field<arma::mat>& VB,             // (R + 1)
-    const arma::imat&       aux_SL,               // Nx1 row-specific S4 indicators
-    const Rcpp::List&       prior
-);
-
-
 arma::field<arma::mat> hyper2precisionB_boost (
     Rcpp::List              aux_hyper_list,      // (2 * N + 1) x 2
     const Rcpp::List&       prior
@@ -218,26 +173,6 @@ arma::field<arma::mat> hyper2precisionB_mss_boost (
 arma::field<arma::mat> hyper2precisionA_msa_boost (
     Rcpp::List              aux_hyper_list,      // (2 * N + 1) x 2
     const Rcpp::List&       prior
-);
-
-
-arma::field<arma::mat> hyper2precisionB_horseshoe (
-    Rcpp::List              aux_hyper_list
-);
-
-
-arma::field<arma::mat> hyper2precisionA_horseshoe (
-    Rcpp::List              aux_hyper_list
-);
-
-
-arma::field<arma::mat> hyper2precisionB_mss_horseshoe (
-    Rcpp::List              aux_hyper_list
-);
-
-
-arma::field<arma::mat> hyper2precisionA_msa_horseshoe (
-    Rcpp::List              aux_hyper_list
 );
 
 

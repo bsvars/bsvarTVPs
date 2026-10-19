@@ -1372,196 +1372,6 @@ RcppExport SEXP _bsvarTVPs_sample_hyperparameters_mssa_s4_boost(SEXP aux_hyper_l
     UNPROTECT(1);
     return rcpp_result_gen;
 }
-// rig_inv1
-double rig_inv1(double alpha, double beta);
-static SEXP _bsvarTVPs_rig_inv1_try(SEXP alphaSEXP, SEXP betaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< double >::type beta(betaSEXP);
-    rcpp_result_gen = Rcpp::wrap(rig_inv1(alpha, beta));
-    return rcpp_result_gen;
-END_RCPP_RETURN_ERROR
-}
-RcppExport SEXP _bsvarTVPs_rig_inv1(SEXP alphaSEXP, SEXP betaSEXP) {
-    SEXP rcpp_result_gen;
-    {
-        Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_rig_inv1_try(alphaSEXP, betaSEXP));
-    }
-    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
-    if (rcpp_isInterrupt_gen) {
-        UNPROTECT(1);
-        Rf_onintr();
-    }
-    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
-    if (rcpp_isLongjump_gen) {
-        Rcpp::internal::resumeJump(rcpp_result_gen);
-    }
-    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
-    if (rcpp_isError_gen) {
-        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
-        UNPROTECT(1);
-        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
-    }
-    UNPROTECT(1);
-    return rcpp_result_gen;
-}
-// sample_hyperparameter_horseshoe
-Rcpp::List sample_hyperparameter_horseshoe(Rcpp::List& aux_hyper_list, const arma::mat& aux_B, const arma::mat& aux_A, const arma::field<arma::mat>& VB, const arma::ivec& aux_SL, const Rcpp::List& prior);
-static SEXP _bsvarTVPs_sample_hyperparameter_horseshoe_try(SEXP aux_hyper_listSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP aux_SLSEXP, SEXP priorSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< Rcpp::List& >::type aux_hyper_list(aux_hyper_listSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type aux_B(aux_BSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type aux_A(aux_ASEXP);
-    Rcpp::traits::input_parameter< const arma::field<arma::mat>& >::type VB(VBSEXP);
-    Rcpp::traits::input_parameter< const arma::ivec& >::type aux_SL(aux_SLSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::List& >::type prior(priorSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_hyperparameter_horseshoe(aux_hyper_list, aux_B, aux_A, VB, aux_SL, prior));
-    return rcpp_result_gen;
-END_RCPP_RETURN_ERROR
-}
-RcppExport SEXP _bsvarTVPs_sample_hyperparameter_horseshoe(SEXP aux_hyper_listSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP aux_SLSEXP, SEXP priorSEXP) {
-    SEXP rcpp_result_gen;
-    {
-        Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_sample_hyperparameter_horseshoe_try(aux_hyper_listSEXP, aux_BSEXP, aux_ASEXP, VBSEXP, aux_SLSEXP, priorSEXP));
-    }
-    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
-    if (rcpp_isInterrupt_gen) {
-        UNPROTECT(1);
-        Rf_onintr();
-    }
-    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
-    if (rcpp_isLongjump_gen) {
-        Rcpp::internal::resumeJump(rcpp_result_gen);
-    }
-    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
-    if (rcpp_isError_gen) {
-        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
-        UNPROTECT(1);
-        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
-    }
-    UNPROTECT(1);
-    return rcpp_result_gen;
-}
-// sample_hyperparameter_mss_horseshoe
-Rcpp::List sample_hyperparameter_mss_horseshoe(Rcpp::List& aux_hyper_list, const arma::cube& aux_B, const arma::mat& aux_A, const arma::field<arma::mat>& VB, const Rcpp::List& prior);
-static SEXP _bsvarTVPs_sample_hyperparameter_mss_horseshoe_try(SEXP aux_hyper_listSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP priorSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< Rcpp::List& >::type aux_hyper_list(aux_hyper_listSEXP);
-    Rcpp::traits::input_parameter< const arma::cube& >::type aux_B(aux_BSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type aux_A(aux_ASEXP);
-    Rcpp::traits::input_parameter< const arma::field<arma::mat>& >::type VB(VBSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::List& >::type prior(priorSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_hyperparameter_mss_horseshoe(aux_hyper_list, aux_B, aux_A, VB, prior));
-    return rcpp_result_gen;
-END_RCPP_RETURN_ERROR
-}
-RcppExport SEXP _bsvarTVPs_sample_hyperparameter_mss_horseshoe(SEXP aux_hyper_listSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP priorSEXP) {
-    SEXP rcpp_result_gen;
-    {
-        Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_sample_hyperparameter_mss_horseshoe_try(aux_hyper_listSEXP, aux_BSEXP, aux_ASEXP, VBSEXP, priorSEXP));
-    }
-    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
-    if (rcpp_isInterrupt_gen) {
-        UNPROTECT(1);
-        Rf_onintr();
-    }
-    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
-    if (rcpp_isLongjump_gen) {
-        Rcpp::internal::resumeJump(rcpp_result_gen);
-    }
-    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
-    if (rcpp_isError_gen) {
-        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
-        UNPROTECT(1);
-        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
-    }
-    UNPROTECT(1);
-    return rcpp_result_gen;
-}
-// sample_hyperparameter_mss_s4_horseshoe
-Rcpp::List sample_hyperparameter_mss_s4_horseshoe(Rcpp::List& aux_hyper_list, const arma::cube& aux_B, const arma::mat& aux_A, const arma::field<arma::mat>& VB, const arma::imat& aux_SL, const Rcpp::List& prior);
-static SEXP _bsvarTVPs_sample_hyperparameter_mss_s4_horseshoe_try(SEXP aux_hyper_listSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP aux_SLSEXP, SEXP priorSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< Rcpp::List& >::type aux_hyper_list(aux_hyper_listSEXP);
-    Rcpp::traits::input_parameter< const arma::cube& >::type aux_B(aux_BSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type aux_A(aux_ASEXP);
-    Rcpp::traits::input_parameter< const arma::field<arma::mat>& >::type VB(VBSEXP);
-    Rcpp::traits::input_parameter< const arma::imat& >::type aux_SL(aux_SLSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::List& >::type prior(priorSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_hyperparameter_mss_s4_horseshoe(aux_hyper_list, aux_B, aux_A, VB, aux_SL, prior));
-    return rcpp_result_gen;
-END_RCPP_RETURN_ERROR
-}
-RcppExport SEXP _bsvarTVPs_sample_hyperparameter_mss_s4_horseshoe(SEXP aux_hyper_listSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP aux_SLSEXP, SEXP priorSEXP) {
-    SEXP rcpp_result_gen;
-    {
-        Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_sample_hyperparameter_mss_s4_horseshoe_try(aux_hyper_listSEXP, aux_BSEXP, aux_ASEXP, VBSEXP, aux_SLSEXP, priorSEXP));
-    }
-    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
-    if (rcpp_isInterrupt_gen) {
-        UNPROTECT(1);
-        Rf_onintr();
-    }
-    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
-    if (rcpp_isLongjump_gen) {
-        Rcpp::internal::resumeJump(rcpp_result_gen);
-    }
-    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
-    if (rcpp_isError_gen) {
-        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
-        UNPROTECT(1);
-        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
-    }
-    UNPROTECT(1);
-    return rcpp_result_gen;
-}
-// sample_hyperparameter_mssa_s4_horseshoe
-Rcpp::List sample_hyperparameter_mssa_s4_horseshoe(Rcpp::List& aux_hyper_list, const arma::cube& aux_B, const arma::cube& aux_A, const arma::field<arma::mat>& VB, const arma::imat& aux_SL, const Rcpp::List& prior);
-static SEXP _bsvarTVPs_sample_hyperparameter_mssa_s4_horseshoe_try(SEXP aux_hyper_listSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP aux_SLSEXP, SEXP priorSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< Rcpp::List& >::type aux_hyper_list(aux_hyper_listSEXP);
-    Rcpp::traits::input_parameter< const arma::cube& >::type aux_B(aux_BSEXP);
-    Rcpp::traits::input_parameter< const arma::cube& >::type aux_A(aux_ASEXP);
-    Rcpp::traits::input_parameter< const arma::field<arma::mat>& >::type VB(VBSEXP);
-    Rcpp::traits::input_parameter< const arma::imat& >::type aux_SL(aux_SLSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::List& >::type prior(priorSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_hyperparameter_mssa_s4_horseshoe(aux_hyper_list, aux_B, aux_A, VB, aux_SL, prior));
-    return rcpp_result_gen;
-END_RCPP_RETURN_ERROR
-}
-RcppExport SEXP _bsvarTVPs_sample_hyperparameter_mssa_s4_horseshoe(SEXP aux_hyper_listSEXP, SEXP aux_BSEXP, SEXP aux_ASEXP, SEXP VBSEXP, SEXP aux_SLSEXP, SEXP priorSEXP) {
-    SEXP rcpp_result_gen;
-    {
-        Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_sample_hyperparameter_mssa_s4_horseshoe_try(aux_hyper_listSEXP, aux_BSEXP, aux_ASEXP, VBSEXP, aux_SLSEXP, priorSEXP));
-    }
-    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
-    if (rcpp_isInterrupt_gen) {
-        UNPROTECT(1);
-        Rf_onintr();
-    }
-    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
-    if (rcpp_isLongjump_gen) {
-        Rcpp::internal::resumeJump(rcpp_result_gen);
-    }
-    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
-    if (rcpp_isError_gen) {
-        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
-        UNPROTECT(1);
-        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
-    }
-    UNPROTECT(1);
-    return rcpp_result_gen;
-}
 // sample_lambda_ms
 arma::mat sample_lambda_ms(const arma::mat& aux_df, const arma::mat& aux_xi, const arma::mat& U);
 static SEXP _bsvarTVPs_sample_lambda_ms_try(SEXP aux_dfSEXP, SEXP aux_xiSEXP, SEXP USEXP) {
@@ -2535,11 +2345,6 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
         signatures.insert("Rcpp::List(*sample_hyperparameters_mss_boost)(Rcpp::List&,const arma::cube&,const arma::mat&,const arma::field<arma::mat>&,const Rcpp::List&,const bool)");
         signatures.insert("Rcpp::List(*sample_hyperparameters_mss_s4_boost)(Rcpp::List&,const arma::cube&,const arma::mat&,const arma::field<arma::mat>&,const arma::imat&,const Rcpp::List&,const bool)");
         signatures.insert("Rcpp::List(*sample_hyperparameters_mssa_s4_boost)(Rcpp::List&,const arma::cube&,const arma::cube&,const arma::field<arma::mat>&,const arma::imat&,const Rcpp::List&,const bool)");
-        signatures.insert("double(*rig_inv1)(double,double)");
-        signatures.insert("Rcpp::List(*sample_hyperparameter_horseshoe)(Rcpp::List&,const arma::mat&,const arma::mat&,const arma::field<arma::mat>&,const arma::ivec&,const Rcpp::List&)");
-        signatures.insert("Rcpp::List(*sample_hyperparameter_mss_horseshoe)(Rcpp::List&,const arma::cube&,const arma::mat&,const arma::field<arma::mat>&,const Rcpp::List&)");
-        signatures.insert("Rcpp::List(*sample_hyperparameter_mss_s4_horseshoe)(Rcpp::List&,const arma::cube&,const arma::mat&,const arma::field<arma::mat>&,const arma::imat&,const Rcpp::List&)");
-        signatures.insert("Rcpp::List(*sample_hyperparameter_mssa_s4_horseshoe)(Rcpp::List&,const arma::cube&,const arma::cube&,const arma::field<arma::mat>&,const arma::imat&,const Rcpp::List&)");
         signatures.insert("arma::mat(*sample_lambda_ms)(const arma::mat&,const arma::mat&,const arma::mat&)");
         signatures.insert("double(*log_kernel_df_ms_nm)(const double&,const arma::rowvec&,const double&)");
         signatures.insert("Rcpp::List(*sample_df_ms)(arma::mat&,const arma::mat&,const arma::mat&,const arma::mat&,const Rcpp::List&,const int&,arma::mat&,const arma::vec&)");
@@ -2606,11 +2411,6 @@ RcppExport SEXP _bsvarTVPs_RcppExport_registerCCallable() {
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_sample_hyperparameters_mss_boost", (DL_FUNC)_bsvarTVPs_sample_hyperparameters_mss_boost_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_sample_hyperparameters_mss_s4_boost", (DL_FUNC)_bsvarTVPs_sample_hyperparameters_mss_s4_boost_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_sample_hyperparameters_mssa_s4_boost", (DL_FUNC)_bsvarTVPs_sample_hyperparameters_mssa_s4_boost_try);
-    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_rig_inv1", (DL_FUNC)_bsvarTVPs_rig_inv1_try);
-    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_sample_hyperparameter_horseshoe", (DL_FUNC)_bsvarTVPs_sample_hyperparameter_horseshoe_try);
-    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_sample_hyperparameter_mss_horseshoe", (DL_FUNC)_bsvarTVPs_sample_hyperparameter_mss_horseshoe_try);
-    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_sample_hyperparameter_mss_s4_horseshoe", (DL_FUNC)_bsvarTVPs_sample_hyperparameter_mss_s4_horseshoe_try);
-    R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_sample_hyperparameter_mssa_s4_horseshoe", (DL_FUNC)_bsvarTVPs_sample_hyperparameter_mssa_s4_horseshoe_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_sample_lambda_ms", (DL_FUNC)_bsvarTVPs_sample_lambda_ms_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_log_kernel_df_ms_nm", (DL_FUNC)_bsvarTVPs_log_kernel_df_ms_nm_try);
     R_RegisterCCallable("bsvarTVPs", "_bsvarTVPs_sample_df_ms", (DL_FUNC)_bsvarTVPs_sample_df_ms_try);
@@ -2676,11 +2476,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bsvarTVPs_sample_hyperparameters_mss_boost", (DL_FUNC) &_bsvarTVPs_sample_hyperparameters_mss_boost, 6},
     {"_bsvarTVPs_sample_hyperparameters_mss_s4_boost", (DL_FUNC) &_bsvarTVPs_sample_hyperparameters_mss_s4_boost, 7},
     {"_bsvarTVPs_sample_hyperparameters_mssa_s4_boost", (DL_FUNC) &_bsvarTVPs_sample_hyperparameters_mssa_s4_boost, 7},
-    {"_bsvarTVPs_rig_inv1", (DL_FUNC) &_bsvarTVPs_rig_inv1, 2},
-    {"_bsvarTVPs_sample_hyperparameter_horseshoe", (DL_FUNC) &_bsvarTVPs_sample_hyperparameter_horseshoe, 6},
-    {"_bsvarTVPs_sample_hyperparameter_mss_horseshoe", (DL_FUNC) &_bsvarTVPs_sample_hyperparameter_mss_horseshoe, 5},
-    {"_bsvarTVPs_sample_hyperparameter_mss_s4_horseshoe", (DL_FUNC) &_bsvarTVPs_sample_hyperparameter_mss_s4_horseshoe, 6},
-    {"_bsvarTVPs_sample_hyperparameter_mssa_s4_horseshoe", (DL_FUNC) &_bsvarTVPs_sample_hyperparameter_mssa_s4_horseshoe, 6},
     {"_bsvarTVPs_sample_lambda_ms", (DL_FUNC) &_bsvarTVPs_sample_lambda_ms, 3},
     {"_bsvarTVPs_log_kernel_df_ms_nm", (DL_FUNC) &_bsvarTVPs_log_kernel_df_ms_nm, 3},
     {"_bsvarTVPs_sample_df_ms", (DL_FUNC) &_bsvarTVPs_sample_df_ms, 8},

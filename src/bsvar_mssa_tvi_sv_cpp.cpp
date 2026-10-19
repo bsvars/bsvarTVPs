@@ -22,7 +22,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     const Rcpp::List&             starting_values,
     const int                     thin = 100,           // introduce thinning
     const int                     sv_select = 1,        // {1 - non-centred, 2 - centred, 3 - homoskedastic};
-    const int                     hyper_select = 1,     // {1 - horseshoe, 2 - boost, 3 - fixed}
+    const int                     hyper_select = 2,     // {2 - boost, 3 - fixed}
     const bool                    finiteM = true,       // {true - stationary MS, false - overfitted};
     const bool                    studentt = false,     // {true - normal, false - Student-t};
     const bool                    show_progress = true
@@ -195,15 +195,7 @@ Rcpp::List bsvar_mssa_tvi_sv_cpp (
     
     // sample aux_hyper
     if ( debug ) Rcout << " sample aux_hyper" << endl;
-    if ( hyper_select == 1 ) {
-      
-      try {
-        aux_hyper           = sample_hyperparameter_mssa_s4_horseshoe(aux_hyper, aux_B, aux_A, VB, aux_SL, prior);
-        precisionB          = hyper2precisionB_mss_horseshoe(aux_hyper);
-        precisionA          = hyper2precisionA_msa_horseshoe(aux_hyper);
-      } catch (std::runtime_error &e) {}
-      
-    } else if ( hyper_select == 2 ) {
+    if ( hyper_select == 2 ) {
       
       aux_hyper           = sample_hyperparameters_mssa_s4_boost( aux_hyper, aux_B, aux_A, VB, aux_SL, prior, true);
       precisionB          = hyper2precisionB_mss_boost(aux_hyper, prior);

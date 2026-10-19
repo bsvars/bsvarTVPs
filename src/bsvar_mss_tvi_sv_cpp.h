@@ -13,7 +13,7 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     const Rcpp::List&             starting_values,
     const int                     thin = 100,           // introduce thinning
     const int                     sv_select = 1,        // {1 - non-centred, 2 - centred, 3 - homoskedastic};
-    const int                     hyper_select = 1,     // {1 - horseshoe, 2 - boost, 3 - fixed}
+    const int                     hyper_select = 2,     // {2 - boost, 3 - fixed}
     const bool                    finiteM = true,       // {true - stationary MS, false - overfitted};
     const bool                    studentt = false,     // {true - normal, false - Student-t};
     const bool                    show_progress = true
