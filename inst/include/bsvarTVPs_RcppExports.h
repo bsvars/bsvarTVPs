@@ -529,6 +529,27 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::mat >(rcpp_result_gen);
     }
 
+    inline double log_normalising_constant_gn(const double& e, const arma::mat& S, const arma::vec& c) {
+        typedef SEXP(*Ptr_log_normalising_constant_gn)(SEXP,SEXP,SEXP);
+        static Ptr_log_normalising_constant_gn p_log_normalising_constant_gn = NULL;
+        if (p_log_normalising_constant_gn == NULL) {
+            validateSignature("double(*log_normalising_constant_gn)(const double&,const arma::mat&,const arma::vec&)");
+            p_log_normalising_constant_gn = (Ptr_log_normalising_constant_gn)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_log_normalising_constant_gn");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_log_normalising_constant_gn(Shield<SEXP>(Rcpp::wrap(e)), Shield<SEXP>(Rcpp::wrap(S)), Shield<SEXP>(Rcpp::wrap(c)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<double >(rcpp_result_gen);
+    }
+
     inline Rcpp::List sample_B_heterosk1_s4(arma::mat aux_B, arma::ivec aux_SL, const arma::mat& aux_A, arma::field<arma::mat> prior_precision, const arma::mat& aux_sigma, const arma::mat& Y, const arma::mat& X, const Rcpp::List& prior, const arma::field<arma::mat>& VBL) {
         typedef SEXP(*Ptr_sample_B_heterosk1_s4)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_sample_B_heterosk1_s4 p_sample_B_heterosk1_s4 = NULL;

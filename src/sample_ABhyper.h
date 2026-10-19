@@ -21,6 +21,13 @@ arma::mat sample_B_heterosk1 (
 );
 
 
+double log_normalising_constant_gn (
+    const double&       e,              // exponent of |b c|
+    const arma::mat&    S,              // rxr scale matrix
+    const arma::vec&    c               // rx1
+);
+
+
 Rcpp::List sample_B_heterosk1_s4 (
     arma::mat                     aux_B,          // NxN
     arma::ivec                    aux_SL,         // Nx1 row-specific S4 indicators

@@ -44,6 +44,7 @@ arma::mat sample_B_heterosk1 (
   const int T               = Y.n_cols;
   
   const int posterior_nu    = T + as<int>(prior["B_nu"]);
+  const int radial_degrees  = posterior_nu - N + 1;
   mat shocks                = Y - aux_A * X;
   
   for (int n=0; n<N; n++) {
@@ -93,7 +94,7 @@ arma::mat sample_B_heterosk1 (
     }
     
     vec   alpha(rn);
-    vec   u(posterior_nu+1, fill::randn);
+    vec   u(radial_degrees, fill::randn);
     u                      *= pow(posterior_nu, -0.5);
     alpha(0)                = pow(as_scalar(sum(pow(u,2))), 0.5);
     if (R::runif(0,1)<0.5) {
@@ -104,13 +105,31 @@ arma::mat sample_B_heterosk1 (
       nn                   *= pow(posterior_nu, -0.5);
       alpha.rows(1,rn-1)    = nn;
     }
-    rowvec b0n              = alpha.t() * Wn * Un;
+    rowvec b0n              = alpha.t() * Wn.t() * Un;
     aux_B.row(n)           = b0n * VB(n);
   } // END n loop
   
   return aux_B;
 } // END sample_B_heterosk1
 
+
+
+
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+double log_normalising_constant_gn (
+    const double&       e,              // exponent of |b c|
+    const arma::mat&    S,              // rxr scale matrix
+    const arma::vec&    c               // rx1
+) {
+  // log of the integral over the r-vector b of the generalised-normal kernel |b c|^e exp(-0.5 b S^{-1} b')
+  const int r     = S.n_rows;
+  double log_det_S, sign_;
+  log_det(log_det_S, sign_, S);
+  double out      = 0.5 * log_det_S + 0.5 * e * log(as_scalar(c.t() * S * c));
+  out            += 0.5 * (e + 1) * log(2.0) + lgamma(0.5 * (e + 1)) + 0.5 * (r - 1) * log(2 * M_PI);
+  return out;
+} // END log_normalising_constant_gn
 
 
 
@@ -136,14 +155,14 @@ Rcpp::List sample_B_heterosk1_s4 (
   double      L         = accu(Lm);
   field<mat>  VB        = VBL.rows(0, L-1);
   
-  const int posterior_nu    = T + N;
+  const int posterior_nu    = T + as<int>(prior["B_nu"]);
+  const int radial_degrees  = posterior_nu - N + 1;
   mat shocks                = Y - aux_A * X;
   
   for (int n=0; n<N; n++) {
   
     mat aux_B_nL(Lm(n), N);
     vec log_posterior_kernel_nL(Lm(n));
-    mat aux_B_tmp           = aux_B;
     
     for (int l=0; l<Lm(n); l++) {
       int ll = 0;
@@ -182,7 +201,7 @@ Rcpp::List sample_B_heterosk1_s4 (
       }
       
       vec   alpha(rn);
-      vec   u                 = rnorm(posterior_nu+1, 0, pow(posterior_nu, -0.5));
+      vec   u                 = rnorm(radial_degrees, 0, pow(posterior_nu, -0.5));
       alpha(0)                = pow(as_scalar(sum(pow(u,2))), 0.5);
       if (R::runif(0,1)<0.5) {
         alpha(0)             *= -1;
@@ -191,19 +210,17 @@ Rcpp::List sample_B_heterosk1_s4 (
         vec nn                = Rcpp::rnorm(rn-1, 0, pow(posterior_nu, -0.5));
         alpha.rows(1,rn-1)    = nn;
       }
-      rowvec b0n              = alpha.t() * Wn * Un;
+      rowvec b0n              = alpha.t() * Wn.t() * Un;
       aux_B_nL.row(l)         = b0n * VB(ll);
       
-      // posterior kernel
-      aux_B_tmp.row(n)            = aux_B_nL.row(l);
-      mat std_shocks              = (aux_B_tmp * shocks) / aux_sigma;
-      log_posterior_kernel_nL(l) -= 0.5 * accu(square(std_shocks));                   // likelihood kernel exp part
-      double abs_log_det_B;
-      double sign_;
-      log_det(abs_log_det_B, sign_, aux_B_tmp); 
-      log_posterior_kernel_nL(l) += T * abs_log_det_B;                                // likelihood kernel det part
-      log_posterior_kernel_nL(l) -= 0.5 * as_scalar(b0n * posterior_S_inv * b0n.t()); // prior B kernel
-      log_posterior_kernel_nL(l) += log(1/Lm(n));                                     // prior multinomial - it's flat, so this does not matter
+      // log posterior probability of component l with b integrated out:
+      // log p(l) + log Z(posterior) - log Z(prior), where |det(B)| = |b c_l| * const and c_l = VB(ll) w'
+      mat prior_S_inv             = VB(ll) * prior_precision(n) * VB(ll).t();
+      prior_S_inv                 = 0.5*( prior_S_inv + prior_S_inv.t() );
+      vec c_l                     = VB(ll) * w.t();
+      log_posterior_kernel_nL(l)  = log(1/Lm(n));                                       // prior multinomial
+      log_posterior_kernel_nL(l) += log_normalising_constant_gn(posterior_nu - N, inv_sympd(posterior_S_inv), c_l);
+      log_posterior_kernel_nL(l) -= log_normalising_constant_gn(posterior_nu - T - N, inv_sympd(prior_S_inv), c_l);
     } // END loop l
     
     // Sample S4 indicator
@@ -413,8 +430,6 @@ arma::mat sample_A_heterosk1 (
   rowvec    zerosA(K);
   vec sigma_vectorised= vectorise(aux_sigma);
   
-  mat       ww(K, K);
-  rowvec    zw(K);
   vec   zn;
   mat   zn_sigma;
   mat   Wn;
@@ -423,6 +438,8 @@ arma::mat sample_A_heterosk1 (
   for (int n=0; n<N; n++) {
     mat   A0          = aux_A;
     A0.row(n)         = zerosA;
+    mat       ww(K, K);
+    rowvec    zw(K);
     
     if ( T != 0 ) {
       zn          = vectorise( aux_B * (Y - A0 * X) );
@@ -978,7 +995,7 @@ Rcpp::List sample_hyperparameters_mssa_s4_boost (
       for (int m=0; m<M; m++) {
         AA_scale_tmp      += as_scalar((aux_A.slice(m).row(n) - prior_A.row(n)) * prior_A_V_inv * trans(aux_A.slice(m).row(n) - prior_A.row(n)));
       }
-      AA_shape_tmp         = prior_hyper_nu_A + N * K;
+      AA_shape_tmp         = prior_hyper_nu_A + M * K;
       aux_hyper(n, 1)   = AA_scale_tmp / R::rchisq(AA_shape_tmp);
     }
   }
