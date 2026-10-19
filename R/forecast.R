@@ -18,14 +18,14 @@ generics::forecast
 #' @param exogenous_forecast forecasted values of the exogenous variables.
 #' @param ... Not used.
 #' 
-#' @return A list of class \code{Forecasts} containing the
+#' @return An object of class \code{Forecasts} containing the
 #' draws from the predictive density and for heteroskedastic models the draws 
 #' from the predictive density of structural shocks conditional standard 
 #' deviations and data. The output elements include:
 #' \describe{
 #'  \item{forecasts}{an \code{N x horizon x S} array with the draws from predictive density}
 #'  \item{forecast_mean}{an \code{N x horizon x S} array with the mean of the predictive density}
-#'  \item{forecast_cov}{an \code{N x N x horizon x S} array with the covariance of the predictive density}
+#'  \item{forecast_covariance}{an \code{N x N x horizon x S} array with the covariance of the predictive density}
 #'  \item{Y}{an \eqn{NxT} matrix with the data on dependent variables}
 #' }
 #'
@@ -63,7 +63,14 @@ forecast.PosteriorBSVARTVP <- function(
   T               = dim(object$posterior$h)[2]
   N               = dim(object$posterior$h)[1]
   S               = dim(object$posterior$h)[3]
-  X_T             = object$last_draw$data_matrices$X[,T]
+  X               = object$last_draw$data_matrices$X
+  Y               = object$last_draw$data_matrices$Y
+  lag_entries     = N * object$last_draw$get_p()
+  X_T             = c(
+    Y[,T],
+    X[seq_len(lag_entries - N),T],
+    tail(X[,T], nrow(X) - lag_entries)
+  )
   K               = length(X_T)
   d               = K - N * object$last_draw$get_p() - 1
   posterior_B     = object$posterior$B_cpp
@@ -103,13 +110,6 @@ forecast.PosteriorBSVARTVP <- function(
                           X_T, exogenous_forecast, horizon, sv_select, studentt)
   }  
   
-  SS              = dim(output$forecast)[3]
-  forecast_covariance         = array(NA, c(N, N, horizon, SS))
-  for (s in 1:SS) forecast_covariance[,,,s] = output$forecast_cov[s,][[1]]
-  output$forecast_covariance  = forecast_covariance
-  
-  output$Y        = object$last_draw$data_matrices$Y
-  
-  class(output)   = "Forecasts"
+  output          = specify_forecasts$new(output, Y)
   return(output)
 }

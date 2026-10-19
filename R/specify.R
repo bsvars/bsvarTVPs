@@ -745,7 +745,9 @@ specify_bsvarTVP = R6::R6Class(
       d             = 0
       if (!is.null(exogenous)) {
         d           = ncol(exogenous)
-        exogenous   = exogenous[-(1:train_data),]
+        if (train_data > 0) {
+          exogenous = exogenous[-(1:train_data), , drop = FALSE]
+        }
       }
       K             = N * p + 1 + d
       

@@ -71,7 +71,7 @@ Rcpp::List forecast_mssa_sv (
       
       // predict SV
       if (sv_select != 3) {
-        HT          = posterior_omega.slice(s).col(ST) % HT + randn(N);
+        HT          = posterior_rho.col(s) % HT + randn(N);
         sigma2_tmp  = exp(posterior_omega.slice(s).col(ST) % HT); 
       }
       
@@ -100,9 +100,9 @@ Rcpp::List forecast_mssa_sv (
       // create Xs
       if ( h != horizon - 1 ) {
         if ( do_exog ) {
-          Xt          = join_cols( out_forecast.slice(s).col(h), Xt.subvec(N, K - 1 - d), trans(exogenous_forecast.row(h + 1)) );
+          Xt          = join_cols( out_forecast.slice(s).col(h), Xt.head(K - 1 - d - N), Xt.subvec(K - 1 - d, K - 1 - d), trans(exogenous_forecast.row(h + 1)) );
         } else {
-          Xt          = join_cols( out_forecast.slice(s).col(h), Xt.subvec(N, K - 1) );
+          Xt          = join_cols( out_forecast.slice(s).col(h), Xt.head(K - 1 - N), Xt.tail(1) );
         }
       } // END if h
       
@@ -113,7 +113,7 @@ Rcpp::List forecast_mssa_sv (
   } // END s loop
   
   return List::create(
-    _["forecast"]       = out_forecast,
+    _["forecasts"]      = out_forecast,
     _["forecast_mean"]  = out_forecast_mean,
     _["forecast_cov"]   = out_forecast_cov
   );
@@ -186,7 +186,7 @@ Rcpp::List forecast_mss_sv (
       
       // predict SV
       if (sv_select != 3) {
-        HT          = posterior_omega.slice(s).col(ST) % HT + randn(N);
+        HT          = posterior_rho.col(s) % HT + randn(N);
         sigma2_tmp  = exp(posterior_omega.slice(s).col(ST) % HT); 
       }
       
@@ -216,9 +216,9 @@ Rcpp::List forecast_mss_sv (
       // create Xs
       if ( h != horizon - 1 ) {
         if ( do_exog ) {
-          Xt          = join_cols( out_forecast.slice(s).col(h), Xt.subvec(N, K - 1 - d), trans(exogenous_forecast.row(h + 1)) );
+          Xt          = join_cols( out_forecast.slice(s).col(h), Xt.head(K - 1 - d - N), Xt.subvec(K - 1 - d, K - 1 - d), trans(exogenous_forecast.row(h + 1)) );
         } else {
-          Xt          = join_cols( out_forecast.slice(s).col(h), Xt.subvec(N, K - 1) );
+          Xt          = join_cols( out_forecast.slice(s).col(h), Xt.head(K - 1 - N), Xt.tail(1) );
         }
       } // END if h
       
@@ -228,7 +228,7 @@ Rcpp::List forecast_mss_sv (
   } // END s loop
   
   return List::create(
-    _["forecast"]       = out_forecast,
+    _["forecasts"]      = out_forecast,
     _["forecast_mean"]  = out_forecast_mean,
     _["forecast_cov"]   = out_forecast_cov
   );

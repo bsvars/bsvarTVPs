@@ -18,14 +18,14 @@ obtained by running the \code{estimate} function.}
 \item{...}{Not used.}
 }
 \value{
-A list of class \code{Forecasts} containing the
+An object of class \code{Forecasts} containing the
 draws from the predictive density and for heteroskedastic models the draws 
 from the predictive density of structural shocks conditional standard 
 deviations and data. The output elements include:
 \describe{
  \item{forecasts}{an \code{N x horizon x S} array with the draws from predictive density}
  \item{forecast_mean}{an \code{N x horizon x S} array with the mean of the predictive density}
- \item{forecast_cov}{an \code{N x N x horizon x S} array with the covariance of the predictive density}
+ \item{forecast_covariance}{an \code{N x N x horizon x S} array with the covariance of the predictive density}
  \item{Y}{an \eqn{NxT} matrix with the data on dependent variables}
 }
 }
