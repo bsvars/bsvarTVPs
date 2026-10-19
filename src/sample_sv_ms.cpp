@@ -755,10 +755,13 @@ arma::mat filtering_studentt (
   // This loop evaluates Student-t pdf at Z being 
   for (int m=0; m<M; m++) {
     
-    mat lk_tmp  = -0.5 * log( 1 + square(Z.slice(m)) ); // NxT
+    mat lk_tmp  = square(Z.slice(m));                    // NxT
+    lk_tmp.each_col() /= (aux_df.col(m) - 2);
+    lk_tmp      = -0.5 * log( 1 + lk_tmp );
     lk_tmp.each_col() %= (1 + aux_df.col(m));
     log_d          = sum(lk_tmp, 0);
     log_d         += -0.5 * N * log(M_PI);
+    log_d         -= 0.5 * accu(log( aux_df.col(m) - 2 ));
     log_d         -= accu(lgamma( 0.5 * aux_df.col(m) ));
     log_d         += accu(lgamma( 0.5 * (aux_df.col(m) + 1) ));
     
