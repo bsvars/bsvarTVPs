@@ -167,22 +167,27 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     // sample aux_xi
     if ( debug ) Rcout<<" sample aux_xi"<<endl;
     cube Z(N, T, M);
+    mat  log_Jacobian(M, T);
     for (int m=0; m<M; m++) {
       Z.slice(m)        = aux_B.slice(m) * (Y - aux_A * X);
+      double abs_log_det_B, sign_;
+      log_det(abs_log_det_B, sign_, aux_B.slice(m));
+      log_Jacobian.row(m).fill( abs_log_det_B );
       if ( sv_select != 3 ) {
         aux_sigma_tmp_m = exp(0.5 * diagmat(aux_omega.col(m)) * aux_h);
         Z.slice(m)     /= aux_sigma_tmp_m;
+        log_Jacobian.row(m) -= sum(log(aux_sigma_tmp_m), 0);
       }
     }
     if ( studentt ) {
       try {
-        aux_xi        = sample_Markov_process_studentt(Z, aux_xi, aux_PR_TR, aux_pi_0, aux_df, finiteM);
+        aux_xi        = sample_Markov_process_studentt(Z, log_Jacobian, aux_xi, aux_PR_TR, aux_pi_0, aux_df, finiteM);
       } catch (std::runtime_error &e) {
         Rcout << "   sample_Markov_process_studentt failure " << endl;
       }
     } else {
       try {
-        aux_xi        = sample_Markov_process(Z, aux_xi, aux_PR_TR, aux_pi_0, finiteM);
+        aux_xi        = sample_Markov_process(Z, log_Jacobian, aux_xi, aux_PR_TR, aux_pi_0, finiteM);
       } catch (std::runtime_error &e) {
         Rcout << "   sample_Markov_process failure " << endl;
       }

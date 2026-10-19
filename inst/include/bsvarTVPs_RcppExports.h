@@ -1096,6 +1096,48 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::vec >(rcpp_result_gen);
     }
 
+    inline Rcpp::List cholesky_tridiagonal_offdiag(const arma::vec& omega_diag, const arma::vec& omega_offdiag) {
+        typedef SEXP(*Ptr_cholesky_tridiagonal_offdiag)(SEXP,SEXP);
+        static Ptr_cholesky_tridiagonal_offdiag p_cholesky_tridiagonal_offdiag = NULL;
+        if (p_cholesky_tridiagonal_offdiag == NULL) {
+            validateSignature("Rcpp::List(*cholesky_tridiagonal_offdiag)(const arma::vec&,const arma::vec&)");
+            p_cholesky_tridiagonal_offdiag = (Ptr_cholesky_tridiagonal_offdiag)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_cholesky_tridiagonal_offdiag");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_cholesky_tridiagonal_offdiag(Shield<SEXP>(Rcpp::wrap(omega_diag)), Shield<SEXP>(Rcpp::wrap(omega_offdiag)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<Rcpp::List >(rcpp_result_gen);
+    }
+
+    inline arma::vec precision_sampler_ar1_offdiag(const arma::vec& precision_diag, const arma::vec& precision_offdiag, const arma::vec& location) {
+        typedef SEXP(*Ptr_precision_sampler_ar1_offdiag)(SEXP,SEXP,SEXP);
+        static Ptr_precision_sampler_ar1_offdiag p_precision_sampler_ar1_offdiag = NULL;
+        if (p_precision_sampler_ar1_offdiag == NULL) {
+            validateSignature("arma::vec(*precision_sampler_ar1_offdiag)(const arma::vec&,const arma::vec&,const arma::vec&)");
+            p_precision_sampler_ar1_offdiag = (Ptr_precision_sampler_ar1_offdiag)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_precision_sampler_ar1_offdiag");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_precision_sampler_ar1_offdiag(Shield<SEXP>(Rcpp::wrap(precision_diag)), Shield<SEXP>(Rcpp::wrap(precision_offdiag)), Shield<SEXP>(Rcpp::wrap(location)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<arma::vec >(rcpp_result_gen);
+    }
+
     inline Rcpp::List svar_nc1(arma::rowvec aux_h_n, double aux_rho_n, double aux_omega_n, double aux_sigma2v_n, double aux_sigma2_omega_n, double aux_s_n, arma::urowvec aux_S_n, const arma::rowvec& u, const Rcpp::List& prior) {
         typedef SEXP(*Ptr_svar_nc1)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_svar_nc1 p_svar_nc1 = NULL;
@@ -1222,17 +1264,17 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::rowvec >(rcpp_result_gen);
     }
 
-    inline arma::mat filtering(const arma::cube& Z, const arma::mat& aux_PR_TR, const arma::vec& pi_0) {
-        typedef SEXP(*Ptr_filtering)(SEXP,SEXP,SEXP);
+    inline arma::mat filtering(const arma::cube& Z, const arma::mat& log_Jacobian, const arma::mat& aux_PR_TR, const arma::vec& pi_0) {
+        typedef SEXP(*Ptr_filtering)(SEXP,SEXP,SEXP,SEXP);
         static Ptr_filtering p_filtering = NULL;
         if (p_filtering == NULL) {
-            validateSignature("arma::mat(*filtering)(const arma::cube&,const arma::mat&,const arma::vec&)");
+            validateSignature("arma::mat(*filtering)(const arma::cube&,const arma::mat&,const arma::mat&,const arma::vec&)");
             p_filtering = (Ptr_filtering)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_filtering");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_filtering(Shield<SEXP>(Rcpp::wrap(Z)), Shield<SEXP>(Rcpp::wrap(aux_PR_TR)), Shield<SEXP>(Rcpp::wrap(pi_0)));
+            rcpp_result_gen = p_filtering(Shield<SEXP>(Rcpp::wrap(Z)), Shield<SEXP>(Rcpp::wrap(log_Jacobian)), Shield<SEXP>(Rcpp::wrap(aux_PR_TR)), Shield<SEXP>(Rcpp::wrap(pi_0)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -1243,17 +1285,17 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::mat >(rcpp_result_gen);
     }
 
-    inline arma::mat filtering_studentt(const arma::cube& Z, const arma::mat& aux_PR_TR, const arma::vec& pi_0, const arma::mat& aux_df) {
-        typedef SEXP(*Ptr_filtering_studentt)(SEXP,SEXP,SEXP,SEXP);
+    inline arma::mat filtering_studentt(const arma::cube& Z, const arma::mat& log_Jacobian, const arma::mat& aux_PR_TR, const arma::vec& pi_0, const arma::mat& aux_df) {
+        typedef SEXP(*Ptr_filtering_studentt)(SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_filtering_studentt p_filtering_studentt = NULL;
         if (p_filtering_studentt == NULL) {
-            validateSignature("arma::mat(*filtering_studentt)(const arma::cube&,const arma::mat&,const arma::vec&,const arma::mat&)");
+            validateSignature("arma::mat(*filtering_studentt)(const arma::cube&,const arma::mat&,const arma::mat&,const arma::vec&,const arma::mat&)");
             p_filtering_studentt = (Ptr_filtering_studentt)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_filtering_studentt");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_filtering_studentt(Shield<SEXP>(Rcpp::wrap(Z)), Shield<SEXP>(Rcpp::wrap(aux_PR_TR)), Shield<SEXP>(Rcpp::wrap(pi_0)), Shield<SEXP>(Rcpp::wrap(aux_df)));
+            rcpp_result_gen = p_filtering_studentt(Shield<SEXP>(Rcpp::wrap(Z)), Shield<SEXP>(Rcpp::wrap(log_Jacobian)), Shield<SEXP>(Rcpp::wrap(aux_PR_TR)), Shield<SEXP>(Rcpp::wrap(pi_0)), Shield<SEXP>(Rcpp::wrap(aux_df)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -1285,17 +1327,17 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::mat >(rcpp_result_gen);
     }
 
-    inline arma::mat sample_Markov_process(const arma::cube& Z, arma::mat aux_xi, const arma::mat& aux_PR_TR, const arma::vec& aux_pi_0, const bool finiteM = true) {
-        typedef SEXP(*Ptr_sample_Markov_process)(SEXP,SEXP,SEXP,SEXP,SEXP);
+    inline arma::mat sample_Markov_process(const arma::cube& Z, const arma::mat& log_Jacobian, arma::mat aux_xi, const arma::mat& aux_PR_TR, const arma::vec& aux_pi_0, const bool finiteM = true) {
+        typedef SEXP(*Ptr_sample_Markov_process)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_sample_Markov_process p_sample_Markov_process = NULL;
         if (p_sample_Markov_process == NULL) {
-            validateSignature("arma::mat(*sample_Markov_process)(const arma::cube&,arma::mat,const arma::mat&,const arma::vec&,const bool)");
+            validateSignature("arma::mat(*sample_Markov_process)(const arma::cube&,const arma::mat&,arma::mat,const arma::mat&,const arma::vec&,const bool)");
             p_sample_Markov_process = (Ptr_sample_Markov_process)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_Markov_process");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_sample_Markov_process(Shield<SEXP>(Rcpp::wrap(Z)), Shield<SEXP>(Rcpp::wrap(aux_xi)), Shield<SEXP>(Rcpp::wrap(aux_PR_TR)), Shield<SEXP>(Rcpp::wrap(aux_pi_0)), Shield<SEXP>(Rcpp::wrap(finiteM)));
+            rcpp_result_gen = p_sample_Markov_process(Shield<SEXP>(Rcpp::wrap(Z)), Shield<SEXP>(Rcpp::wrap(log_Jacobian)), Shield<SEXP>(Rcpp::wrap(aux_xi)), Shield<SEXP>(Rcpp::wrap(aux_PR_TR)), Shield<SEXP>(Rcpp::wrap(aux_pi_0)), Shield<SEXP>(Rcpp::wrap(finiteM)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -1306,17 +1348,17 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::mat >(rcpp_result_gen);
     }
 
-    inline arma::mat sample_Markov_process_studentt(const arma::cube& Z, arma::mat aux_xi, const arma::mat& aux_PR_TR, const arma::vec& aux_pi_0, const arma::mat& aux_df, const bool finiteM = true) {
-        typedef SEXP(*Ptr_sample_Markov_process_studentt)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+    inline arma::mat sample_Markov_process_studentt(const arma::cube& Z, const arma::mat& log_Jacobian, arma::mat aux_xi, const arma::mat& aux_PR_TR, const arma::vec& aux_pi_0, const arma::mat& aux_df, const bool finiteM = true) {
+        typedef SEXP(*Ptr_sample_Markov_process_studentt)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_sample_Markov_process_studentt p_sample_Markov_process_studentt = NULL;
         if (p_sample_Markov_process_studentt == NULL) {
-            validateSignature("arma::mat(*sample_Markov_process_studentt)(const arma::cube&,arma::mat,const arma::mat&,const arma::vec&,const arma::mat&,const bool)");
+            validateSignature("arma::mat(*sample_Markov_process_studentt)(const arma::cube&,const arma::mat&,arma::mat,const arma::mat&,const arma::vec&,const arma::mat&,const bool)");
             p_sample_Markov_process_studentt = (Ptr_sample_Markov_process_studentt)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_sample_Markov_process_studentt");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_sample_Markov_process_studentt(Shield<SEXP>(Rcpp::wrap(Z)), Shield<SEXP>(Rcpp::wrap(aux_xi)), Shield<SEXP>(Rcpp::wrap(aux_PR_TR)), Shield<SEXP>(Rcpp::wrap(aux_pi_0)), Shield<SEXP>(Rcpp::wrap(aux_df)), Shield<SEXP>(Rcpp::wrap(finiteM)));
+            rcpp_result_gen = p_sample_Markov_process_studentt(Shield<SEXP>(Rcpp::wrap(Z)), Shield<SEXP>(Rcpp::wrap(log_Jacobian)), Shield<SEXP>(Rcpp::wrap(aux_xi)), Shield<SEXP>(Rcpp::wrap(aux_PR_TR)), Shield<SEXP>(Rcpp::wrap(aux_pi_0)), Shield<SEXP>(Rcpp::wrap(aux_df)), Shield<SEXP>(Rcpp::wrap(finiteM)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();

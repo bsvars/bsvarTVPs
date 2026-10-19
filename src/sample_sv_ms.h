@@ -56,6 +56,19 @@ arma::vec precision_sampler_ar1(
 );
 
 
+Rcpp::List cholesky_tridiagonal_offdiag(
+    const arma::vec&    omega_diag,         // Tx1
+    const arma::vec&    omega_offdiag       // (T-1)x1
+);
+
+
+arma::vec precision_sampler_ar1_offdiag(
+    const arma::vec&     precision_diag,      // Tx1
+    const arma::vec&     precision_offdiag,   // (T-1)x1
+    const arma::vec&     location             // Tx1
+);
+
+
 Rcpp::List svar_nc1 (
     arma::rowvec    aux_h_n,                  // 1xT
     double          aux_rho_n,
@@ -123,6 +136,7 @@ arma::rowvec rDirichlet1 (
 
 arma::mat filtering (
     const arma::cube& Z,                  // NxTxM state-specific standardised residuals
+    const arma::mat&  log_Jacobian,       // MxT state-specific log|det(B_m)| - sum(log(sigma_m))
     const arma::mat&  aux_PR_TR,          // MxM
     const arma::vec&  pi_0                // Mx1
 );
@@ -130,6 +144,7 @@ arma::mat filtering (
 
 arma::mat filtering_studentt (
     const arma::cube& Z,                  // NxTxM state-specific standardised residuals
+    const arma::mat&  log_Jacobian,       // MxT state-specific log|det(B_m)| - sum(log(sigma_m))
     const arma::mat&  aux_PR_TR,          // MxM
     const arma::vec&  pi_0,               // Mx1
     const arma::mat&  aux_df              // NxM
@@ -137,13 +152,14 @@ arma::mat filtering_studentt (
 
 
 arma::mat smoothing (
-    const arma::mat&  filtered,           // 1xT
+    const arma::mat&  filtered,           // MxT
     const arma::mat&  aux_PR_TR           // MxM
 );
 
 
 arma::mat sample_Markov_process (
     const arma::cube& Z,                  // NxTxM
+    const arma::mat&  log_Jacobian,       // MxT
     arma::mat         aux_xi,             // 1xT
     const arma::mat&  aux_PR_TR,          // MxM
     const arma::vec&  aux_pi_0,           // Mx1
@@ -153,6 +169,7 @@ arma::mat sample_Markov_process (
 
 arma::mat sample_Markov_process_studentt (
     const arma::cube& Z,                  // NxTxM
+    const arma::mat&  log_Jacobian,       // MxT
     arma::mat         aux_xi,             // 1xT
     const arma::mat&  aux_PR_TR,          // MxM
     const arma::vec&  aux_pi_0,           // Mx1

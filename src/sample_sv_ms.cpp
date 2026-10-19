@@ -43,12 +43,16 @@ arma::vec find_mixture_indicator_cdf (
   
   const int T = datanorm.n_elem;
   vec mixprob(10 * T);
-  for (int j = 0; j < T; j++) {  // TODO slow (10*T calls to exp)!
+  for (int j = 0; j < T; j++) {
     const int first_index = 10*j;
-    mixprob(first_index) = std::exp(pr_s(0) - (datanorm(j) - alpha_s(0)) * (datanorm(j) - alpha_s(0)) / sigma_s(0) );
-    for (int r = 1; r < 10; r++) {
-      mixprob(first_index+r) = mixprob(first_index+r-1) + std::exp(pr_s(r) - (datanorm(j) - alpha_s(r)) * (datanorm(j) - alpha_s(r)) / sigma_s(r) );
+    vec log_weights(10);
+    for (int r = 0; r < 10; r++) {
+      log_weights(r) = std::log(pr_s(r)) - 0.5 * std::log(sigma_s(r))
+        - 0.5 * std::pow(datanorm(j) - alpha_s(r), 2) / sigma_s(r);
     }
+    vec weights = exp(log_weights - max(log_weights));
+    weights /= sum(weights);
+    mixprob.subvec(first_index, first_index + 9) = cumsum(weights);
   }
   return mixprob;
 } // END find_mixture_indicator_cdf
@@ -200,6 +204,50 @@ arma::vec precision_sampler_ar1(
                                                          aa + epsilon);     // this has to be done in the loop as function backward_algorithm requires covector to be a vector (not a matrix)
   return draw_ssar1;
 } // END precision_sampler_ar1
+
+
+
+/*______________________function cholesky_tridiagonal_offdiag______________________*/
+// variant of cholesky_tridiagonal for a tridiagonal matrix with a non-constant off-diagonal
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+Rcpp::List cholesky_tridiagonal_offdiag(
+    const arma::vec&    omega_diag,         // Tx1
+    const arma::vec&    omega_offdiag       // (T-1)x1
+) {
+  const int T = omega_diag.n_elem - 1;
+  vec chol_diag(T+1);
+  vec chol_offdiag(T+1);
+  chol_diag[0] = sqrt(omega_diag[0]);
+  for (int j = 1; j < T+1; j++) {
+    chol_offdiag[j-1] = omega_offdiag[j-1]/chol_diag[j-1];
+    chol_diag[j] = std::sqrt(omega_diag[j]-chol_offdiag[j-1]*chol_offdiag[j-1]);
+  }
+  return List::create(_["chol_diag"]=chol_diag, _["chol_offdiag"]=chol_offdiag);
+} // END cholesky_tridiagonal_offdiag
+
+
+
+/*______________________function precision_sampler_ar1_offdiag______________________*/
+// variant of precision_sampler_ar1 for a precision matrix with a non-constant off-diagonal
+// [[Rcpp::interfaces(cpp)]]
+// [[Rcpp::export]]
+arma::vec precision_sampler_ar1_offdiag(
+    const arma::vec&     precision_diag,      // Tx1
+    const arma::vec&     precision_offdiag,   // (T-1)x1
+    const arma::vec&     location             // Tx1
+) {
+  int T               = location.n_rows;
+  vec  epsilon(T, fill::randn);
+  List precision_chol = cholesky_tridiagonal_offdiag(precision_diag, precision_offdiag);
+  vec  aa             = forward_algorithm(precision_chol["chol_diag"],
+                                          precision_chol["chol_offdiag"],
+                                                        location);
+  vec draw_ssar1      = backward_algorithm(precision_chol["chol_diag"],
+                                           precision_chol["chol_offdiag"],
+                                                         aa + epsilon);
+  return draw_ssar1;
+} // END precision_sampler_ar1_offdiag
 
 
 
@@ -413,28 +461,10 @@ Rcpp::List svar_nc1_mss (
   vec       h_bar       = diagmat(omega_T) * diagmat(sigma_S_inv) * (U - alpha_S).t();
   rowvec    h_aux       = trans(precision_sampler_ar1( V_h.diag(), V_h(1, 0), h_bar));
   
-  // ASIS
-  rowvec    aux_h_tilde = h_aux % omega_T;
-  rowvec    aux_h_tilde_ar = trans(H_rho * aux_h_tilde.t());
-  
-  for (int m=0; m<M; m++) {
-    double  hHHh = 0;
-    for (int t=0; t<T; t++) {
-      if (aux_xi(0,t)==m) {
-        hHHh           += pow(aux_h_tilde(t), 2);
-      }
-    }
-    double  sigma2_aux  = do_rgig1( -0.5*(Tm(m)-1), hHHh, 1/aux_sigma2_omega_n );
-    int     ss = 1;
-    if (R::runif(0,1)<0.5) ss *= -1;
-    aux_omega_n(m)      = ss * sqrt(sigma2_aux);
-    aux_sigma2v_n(m)    = sigma2_aux;
-  } // END m loop
-  
-  for (int t=0; t<T; t++) {
-    omega_T(t)          = aux_omega_n(aux_xi(0,t));
-  }
-  aux_h_n               = aux_h_tilde % pow(omega_T, -1);
+  // no ASIS: with regime-dependent omegas the centred conditional of omega is not GIG
+  aux_omega_n           = omega_aux;
+  aux_sigma2v_n         = square(omega_aux);
+  aux_h_n               = h_aux;
   
   // resample aux_rho
   hm1                   = aux_h_n.cols(0,T-2);
@@ -505,10 +535,10 @@ Rcpp::List svar_ce1 (
   }
   
   // sample aux_s_n
-  aux_s_n               = (1 + 2 * aux_sigma2_omega_n) / chi2rnd(3 + 2 * prior_sv_a_);
-  
+  aux_s_n               = (prior_sv_s_ + 2 * aux_sigma2_omega_n) / chi2rnd(3 + 2 * prior_sv_a_);
+
   // sample aux_sigma2_omega
-  aux_sigma2_omega_n    = randg( distr_param(1 + 0.5 * prior_sv_a_, pow(pow(prior_sv_s_,-1) + pow(2 * aux_sigma2v_n,-1), -1)  ) );
+  aux_sigma2_omega_n    = randg( distr_param(1 + 0.5 * prior_sv_a_, pow(pow(aux_s_n,-1) + pow(2 * aux_sigma2v_n,-1), -1)  ) );
   
   // sample aux_rho
   rowvec    hm1         = aux_h_n.cols(0,T-2);
@@ -584,7 +614,7 @@ Rcpp::List svar_ce1_mss (
   for (int t=0; t<T; t++) {
     sigma2v_T_inv(t)          = pow( aux_sigma2v_n(aux_xi(0,t)), -1);
   }
-  rowvec  aux_h_n = aux_h_tilde % sqrt(sigma2v_T_inv);
+  rowvec  aux_h_n = aux_h_tilde / sqrt(sigma2v_T_inv);
   
   // sample auxiliary mixture states aux_S
   const vec   mixprob   = find_mixture_indicator_cdf(trans(U - aux_h_n));
@@ -601,11 +631,11 @@ Rcpp::List svar_ce1_mss (
   aux_s_n               = (prior_sv_s_ + 2 * aux_sigma2_omega_n)/R::rchisq(3 + 2 * prior_sv_a_);
   
   // sample aux_sigma2_omega
-  aux_sigma2_omega_n    = randg( distr_param(1 + 0.5 * prior_sv_a_, pow(pow(prior_sv_s_,-1) + accu(pow(2 * aux_sigma2v_n,-1)), -1)  ) );
+  aux_sigma2_omega_n    = randg( distr_param(1 + 0.5 * prior_sv_a_, pow(pow(aux_s_n,-1) + accu(pow(2 * aux_sigma2v_n,-1)), -1)  ) );
   
   // sample aux_rho
   rowvec    hm1         = aux_h_n.cols(0,T-2);
-  mat       sigma_v2_inv_diag = diagmat(sigma2v_T_inv.cols(0,T-2));
+  mat       sigma_v2_inv_diag = diagmat(sigma2v_T_inv.cols(1,T-1));
   double    aux_rho_var = as_scalar(pow( hm1 * sigma_v2_inv_diag * hm1.t(), -1));
   double    aux_rho_mean = as_scalar(aux_rho_var * (hm1 * sigma_v2_inv_diag * aux_h_n.cols(1,T-1).t() ) );
   aux_rho_n             = RcppTN::rtn1(aux_rho_mean, sqrt(aux_rho_var),-1,1);
@@ -616,19 +646,13 @@ Rcpp::List svar_ce1_mss (
   HH_rho                = H_rho_new.t() * H_rho_new;
   
   // sample aux_sigma2v
+  rowvec    v_n         = aux_h_n * H_rho_new.t();      // log-volatility innovations
   for (int m=0; m<M; m++) {
-    rowvec  aux_h_n_m(Tm(m));
-    
-    int ii = 0;
+    double ss = aux_sigma2_omega_n;
     for (int t=0; t<T; t++) {
       if (aux_xi(0,t)==m) {
-        aux_h_n_m(ii)   = aux_h_n(t);
-        ii++;
+        ss             += pow(v_n(t), 2);
       }
-    }
-    double ss = aux_sigma2_omega_n;
-    if ( Tm(m) != 0 ) {
-      ss += as_scalar(aux_h_n_m * HH_rho.submat(0,0,Tm(m)-1,Tm(m)-1) * aux_h_n_m.t());
     }
     aux_sigma2v_n(m)      = ss / chi2rnd( 3 + Tm(m) );
   } // END m loop
@@ -641,15 +665,23 @@ Rcpp::List svar_ce1_mss (
   // sample aux_h
   mat       V_h         = diagmat(sigma_S_inv) + (H_rho_new.t() * diagmat(sigma2v_T_inv) * H_rho_new);
   vec       h_bar       = diagmat(sigma_S_inv) * (U - alpha_S).t();
-  vec aux_h_n_tmp       = precision_sampler_ar1( V_h.diag(), V_h(1, 0), h_bar);
+  vec aux_h_n_tmp;
+  vec V_h_offdiag       = V_h.diag(-1);
+  if ( all(V_h_offdiag == V_h(1, 0)) ) {
+    // V_h is tridiagonal with a constant off-diagonal: precision_sampler_ar1 applies
+    aux_h_n_tmp         = precision_sampler_ar1( V_h.diag(), V_h(1, 0), h_bar);
+  } else {
+    // off-diagonal -rho/sigma2v(s_t) varies with the regime: precision_sampler_ar1 does not apply
+    aux_h_n_tmp         = precision_sampler_ar1_offdiag( V_h.diag(), V_h_offdiag, h_bar);
+  }
   
   if (aux_h_n_tmp.has_nan()) throw std::runtime_error("Error: aux_h_n_tmp contains missing observations, nan.");
   aux_h_n               = aux_h_n_tmp.t();
   
-  aux_h_tilde           = aux_h_n / sqrt(sigma2v_T_inv);
+  aux_h_tilde           = aux_h_n % sqrt(sigma2v_T_inv);
   
   return List::create(
-    _["aux_h_n"]              = aux_h_n,
+    _["aux_h_n"]              = aux_h_tilde,
     _["aux_rho_n"]            = aux_rho_n,
     _["aux_omega_n"]          = aux_omega_n,
     _["aux_sigma2v_n"]        = aux_sigma2v_n,
@@ -698,6 +730,7 @@ arma::rowvec rDirichlet1 (
 // [[Rcpp::export]]
 arma::mat filtering (
     const arma::cube& Z,                  // NxTxM state-specific standardised residuals
+    const arma::mat&  log_Jacobian,       // MxT state-specific log|det(B_m)| - sum(log(sigma_m))
     const arma::mat&  aux_PR_TR,          // MxM
     const arma::vec&  pi_0                // Mx1
 ) {
@@ -708,24 +741,23 @@ arma::mat filtering (
   const int   N = Z.n_rows;
   const int   M = aux_PR_TR.n_rows;
   
-  mat         eta_t(M, T);
+  mat         log_eta_t(M, T);
   mat         xi_t_t(M, T);
   
   // This loop evaluates mvnormal pdf at Z being multivariate standard normal distribution
   for (int m=0; m<M; m++) {
     rowvec log_d    = -0.5 * sum(square(Z.slice(m)), 0);
-    log_d          += -0.5 * N * log(2*M_PI);
-    NumericVector   exp_log_d   = wrap(exp(log_d));
-    exp_log_d[exp_log_d==0]     = 1e-300;
-    eta_t.row(m)    = as<rowvec>(exp_log_d);
+    log_d          += -0.5 * N * log(2*M_PI) + log_Jacobian.row(m);
+    log_eta_t.row(m) = log_d;
   } // END m loop
   
   vec xi_tm1_tm1    = pi_0;
   
   for (int t=0; t<T; t++) {
-    vec     num     = eta_t.col(t) % (aux_PR_TR.t() * xi_tm1_tm1);
-    double  den     = sum(num);
-    xi_t_t.col(t)   = num/den;
+    vec log_weight  = log_eta_t.col(t) + log(aux_PR_TR.t() * xi_tm1_tm1);
+    log_weight     -= max(log_weight);
+    vec weight      = exp(log_weight);
+    xi_t_t.col(t)   = weight / sum(weight);
     xi_tm1_tm1      = xi_t_t.col(t);
   } // END t loop
   
@@ -738,6 +770,7 @@ arma::mat filtering (
 // [[Rcpp::export]]
 arma::mat filtering_studentt (
     const arma::cube& Z,                  // NxTxM state-specific standardised residuals
+    const arma::mat&  log_Jacobian,       // MxT state-specific log|det(B_m)| - sum(log(sigma_m))
     const arma::mat&  aux_PR_TR,          // MxM
     const arma::vec&  pi_0,               // Mx1
     const arma::mat&  aux_df              // NxM
@@ -749,7 +782,7 @@ arma::mat filtering_studentt (
   const int   N = Z.n_rows;
   const int   M = aux_PR_TR.n_rows;
   
-  mat         eta_t(M, T);
+  mat         log_eta_t(M, T);
   mat         xi_t_t(M, T);
   rowvec      log_d(T);
   
@@ -765,19 +798,18 @@ arma::mat filtering_studentt (
     log_d         -= 0.5 * accu(log( aux_df.col(m) - 2 ));
     log_d         -= accu(lgamma( 0.5 * aux_df.col(m) ));
     log_d         += accu(lgamma( 0.5 * (aux_df.col(m) + 1) ));
-    
-    NumericVector   exp_log_d   = wrap(exp(log_d));
-    exp_log_d[exp_log_d==0]     = 1e-300;
-    eta_t.row(m)    = as<rowvec>(exp_log_d);
+    log_d         += log_Jacobian.row(m);
+    log_eta_t.row(m) = log_d;
     
   } // END m loop
   
   vec xi_tm1_tm1    = pi_0;
   
   for (int t=0; t<T; t++) {
-    vec     num     = eta_t.col(t) % (aux_PR_TR.t() * xi_tm1_tm1);
-    double  den     = sum(num);
-    xi_t_t.col(t)   = num/den;
+    vec log_weight  = log_eta_t.col(t) + log(aux_PR_TR.t() * xi_tm1_tm1);
+    log_weight     -= max(log_weight);
+    vec weight      = exp(log_weight);
+    xi_t_t.col(t)   = weight / sum(weight);
     xi_tm1_tm1      = xi_t_t.col(t);
   } // END t loop
   
@@ -821,56 +853,43 @@ arma::mat smoothing (
 // [[Rcpp::export]]
 arma::mat sample_Markov_process (
     const arma::cube& Z,                  // NxTxM
+    const arma::mat&  log_Jacobian,       // MxT
     arma::mat         aux_xi,             // 1xT
     const arma::mat&  aux_PR_TR,          // MxM
     const arma::vec&  aux_pi_0,           // Mx1
     const bool        finiteM = true
 ) {
+  // the function changes the value of aux_xi by reference (filling it with a new draw)
   
-  int minimum_regime_occurrences = 0;
-  int max_iterations = 1;
-  if ( finiteM ) {
-    minimum_regime_occurrences = 2;
-    max_iterations = 10;
-  }
+  const int minimum_regime_occurrences = finiteM ? 3 : 0;
+  const int max_iterations = finiteM ? 10 : 1;
   
   const int   T   = Z.n_cols;
   const int   M   = aux_PR_TR.n_rows;
-  mat aux_xi_tmp = aux_xi;
-  mat aux_xi_out = aux_xi;
-  
-  mat filtered    = filtering(Z, aux_PR_TR, aux_pi_0);
+  mat filtered    = filtering(Z, log_Jacobian, aux_PR_TR, aux_pi_0);
   mat smoothed    = smoothing(filtered, aux_PR_TR);
   
-  int draw        = csample_num1(wrap(seq_len(M)), wrap(smoothed.col(T-1)));
-  aux_xi_tmp(0,T-1)       = draw-1;
-  
-  if ( minimum_regime_occurrences==0 ) {
+  for (int iteration=0; iteration<max_iterations; iteration++) {
+    mat aux_xi_tmp(1, T);
+    int draw = csample_num1(wrap(seq_len(M)), wrap(smoothed.col(T-1)));
+    aux_xi_tmp(0,T-1) = draw-1;
+
     for (int t=T-2; t>=0; --t) {
-      vec xi_Tmj    = aux_PR_TR.col(aux_xi_tmp(0,t+1)) % filtered.col(t);
-      xi_Tmj       /= sum(xi_Tmj);
-      draw          = csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
-      aux_xi_tmp(0,t)     = draw-1;
+      vec xi_Tmj = aux_PR_TR.col(aux_xi_tmp(0,t+1)) % filtered.col(t);
+      xi_Tmj /= sum(xi_Tmj);
+      draw = csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
+      aux_xi_tmp(0,t) = draw-1;
     }
-    aux_xi_out = aux_xi_tmp;
-  } else {
-    int regime_occurrences  = 1;
-    int iterations  = 1;
-    while ( (regime_occurrences<minimum_regime_occurrences) & (iterations<max_iterations) ) {
-      for (int t=T-2; t>=0; --t) {
-        vec xi_Tmj    = aux_PR_TR.col(aux_xi_tmp(0,t+1)) % filtered.col(t);
-        xi_Tmj       /= sum(xi_Tmj);
-        draw          = csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
-        aux_xi_tmp(0,t)     = draw-1;
-      }
-      mat transitions       = count_regime_transitions(aux_xi_tmp, M);
-      regime_occurrences    = min(transitions.diag());
-      iterations++;
-    } // END while
-    if ( iterations<max_iterations ) aux_xi_out = aux_xi_tmp;
+
+    rowvec occurrences(M, fill::zeros);
+    for (int t=0; t<T; t++) occurrences(aux_xi_tmp(0,t))++;
+    if (!finiteM || min(occurrences) >= minimum_regime_occurrences) {
+      aux_xi = aux_xi_tmp;
+      break;
+    }
   }
   
-  return aux_xi_out;
+  return aux_xi;
 } // END sample_Markov_process
 
 
@@ -882,57 +901,44 @@ arma::mat sample_Markov_process (
 // [[Rcpp::export]]
 arma::mat sample_Markov_process_studentt (
     const arma::cube& Z,                  // NxTxM
+    const arma::mat&  log_Jacobian,       // MxT
     arma::mat         aux_xi,             // 1xT
     const arma::mat&  aux_PR_TR,          // MxM
     const arma::vec&  aux_pi_0,           // Mx1
     const arma::mat&  aux_df,             // NxM
     const bool        finiteM = true
 ) {
+  // the function changes the value of aux_xi by reference (filling it with a new draw)
   
-  int minimum_regime_occurrences = 0;
-  int max_iterations = 1;
-  if ( finiteM ) {
-    minimum_regime_occurrences = 2;
-    max_iterations = 10;
-  }
+  const int minimum_regime_occurrences = finiteM ? 3 : 0;
+  const int max_iterations = finiteM ? 10 : 1;
   
   const int   T   = Z.n_cols;
   const int   M   = aux_PR_TR.n_rows;
-  mat aux_xi_tmp = aux_xi;
-  mat aux_xi_out = aux_xi;
-  
-  mat filtered    = filtering_studentt(Z, aux_PR_TR, aux_pi_0, aux_df);
+  mat filtered    = filtering_studentt(Z, log_Jacobian, aux_PR_TR, aux_pi_0, aux_df);
   mat smoothed    = smoothing(filtered, aux_PR_TR);
   
-  int draw        = csample_num1(wrap(seq_len(M)), wrap(smoothed.col(T-1)));
-  aux_xi_tmp(0,T-1)       = draw-1;
-  
-  if ( minimum_regime_occurrences==0 ) {
+  for (int iteration=0; iteration<max_iterations; iteration++) {
+    mat aux_xi_tmp(1, T);
+    int draw = csample_num1(wrap(seq_len(M)), wrap(smoothed.col(T-1)));
+    aux_xi_tmp(0,T-1) = draw-1;
+
     for (int t=T-2; t>=0; --t) {
-      vec xi_Tmj    = aux_PR_TR.col(aux_xi_tmp(0,t+1)) % filtered.col(t);
-      xi_Tmj       /= sum(xi_Tmj);
-      draw          = csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
-      aux_xi_tmp(0,t)     = draw-1;
+      vec xi_Tmj = aux_PR_TR.col(aux_xi_tmp(0,t+1)) % filtered.col(t);
+      xi_Tmj /= sum(xi_Tmj);
+      draw = csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
+      aux_xi_tmp(0,t) = draw-1;
     }
-    aux_xi_out = aux_xi_tmp;
-  } else {
-    int regime_occurrences  = 1;
-    int iterations  = 1;
-    while ( (regime_occurrences<minimum_regime_occurrences) & (iterations<max_iterations) ) {
-      for (int t=T-2; t>=0; --t) {
-        vec xi_Tmj    = aux_PR_TR.col(aux_xi_tmp(0,t+1)) % filtered.col(t);
-        xi_Tmj       /= sum(xi_Tmj);
-        draw          = csample_num1(wrap(seq_len(M)), wrap(xi_Tmj));
-        aux_xi_tmp(0,t)     = draw-1;
-      }
-      mat transitions       = count_regime_transitions(aux_xi_tmp, M);
-      regime_occurrences    = min(transitions.diag());
-      iterations++;
-    } // END while
-    if ( iterations<max_iterations ) aux_xi_out = aux_xi_tmp;
+
+    rowvec occurrences(M, fill::zeros);
+    for (int t=0; t<T; t++) occurrences(aux_xi_tmp(0,t))++;
+    if (!finiteM || min(occurrences) >= minimum_regime_occurrences) {
+      aux_xi = aux_xi_tmp;
+      break;
+    }
   }
   
-  return aux_xi_out;
+  return aux_xi;
 } // END sample_Markov_process_studentt
 
 

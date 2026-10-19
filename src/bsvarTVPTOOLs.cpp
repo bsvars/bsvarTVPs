@@ -148,14 +148,19 @@ arma::cube bsvarTVPs_filter_forecast_smooth (
   cube  filtered_probabilities(M, T, S);
   cube  for_smo_probabilities(M, T, S);
   cube  shocks(N, T, M);
+  mat   log_Jacobian(M, T);
   
   for (int s=0; s<S; s++) {
     for (int m=0; m<M; m++) {
       shocks.slice(m)     = pow(posterior_sigma.slice(s), -1) % (posterior_B(s).slice(m) * ( Y - posterior_A.slice(s) * X ));
+      double abs_log_det_B, sign_;
+      log_det(abs_log_det_B, sign_, posterior_B(s).slice(m));
+      log_Jacobian.row(m) = abs_log_det_B - sum(log(posterior_sigma.slice(s)), 0);
     }
     
     filtered_probabilities.slice(s)   = filtering(
       shocks, 
+      log_Jacobian,
       posterior_PR_TR.slice(s), 
       posterior_pi_0.col(s)
     );
