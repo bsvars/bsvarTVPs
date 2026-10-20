@@ -68,6 +68,7 @@
 #' @importFrom R6 R6Class
 #' @importFrom RcppTN rtn
 #' @importFrom Rcpp sourceCpp
+#' @importFrom utils tail
 #' @import RcppArmadillo
 #' @import RcppProgress
 #' 
