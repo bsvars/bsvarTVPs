@@ -304,8 +304,7 @@ Rcpp::List svar_nc1 (
   rowvec    hm1         = aux_h_n.cols(0,T-2);
   double    aux_rho_var = as_scalar(pow(hm1*hm1.t(), -1));
   double    aux_rho_mean = as_scalar(aux_rho_var * hm1*aux_h_n.cols(1,T-1).t());
-  double    upper_bound = pow(1-aux_sigma2_omega_n, 0.5);
-  aux_rho_n             = RcppTN::rtn1(aux_rho_mean, pow(aux_rho_var, 0.5),-upper_bound,upper_bound);
+  aux_rho_n             = RcppTN::rtn1(aux_rho_mean, pow(aux_rho_var, 0.5),0, 1);
   
   mat       H_rho_new(T, T, fill::eye);
   H_rho_new.diag(-1)   -= aux_rho_n;
@@ -335,8 +334,7 @@ Rcpp::List svar_nc1 (
   hm1                   = aux_h_n.cols(0,T-2);
   aux_rho_var           = as_scalar(pow(hm1*hm1.t(), -1));
   aux_rho_mean          = as_scalar(aux_rho_var * hm1*aux_h_n.cols(1,T-1).t());
-  upper_bound           = pow(1-aux_sigma2_omega_n, 0.5);
-  aux_rho_n             = RcppTN::rtn1(aux_rho_mean, pow(aux_rho_var, 0.5),-upper_bound,upper_bound);
+  aux_rho_n             = RcppTN::rtn1(aux_rho_mean, pow(aux_rho_var, 0.5),0, 1);
   
   return List::create(
     _["aux_h_n"]              = aux_h_n,
@@ -414,8 +412,7 @@ Rcpp::List svar_nc1_mss (
   rowvec    hm1         = aux_h_n.cols(0,T-2);
   double    aux_rho_var = as_scalar(pow(hm1*hm1.t(), -1));
   double    aux_rho_mean = as_scalar(aux_rho_var * hm1*aux_h_n.cols(1,T-1).t());
-  double    upper_bound = sqrt(1-aux_sigma2_omega_n);
-  aux_rho_n             = RcppTN::rtn1(aux_rho_mean, pow(aux_rho_var, 0.5), -upper_bound, upper_bound);
+  aux_rho_n             = RcppTN::rtn1(aux_rho_mean, pow(aux_rho_var, 0.5), 0, 1);
   
   mat       H_rho_new(T, T, fill::eye);
   H_rho_new.diag(-1)   -= aux_rho_n;
@@ -470,8 +467,7 @@ Rcpp::List svar_nc1_mss (
   hm1                   = aux_h_n.cols(0,T-2);
   aux_rho_var           = as_scalar(pow(hm1*hm1.t(), -1));
   aux_rho_mean          = as_scalar(aux_rho_var * hm1*aux_h_n.cols(1,T-1).t());
-  upper_bound           = sqrt(1-aux_sigma2_omega_n);
-  aux_rho_n             = RcppTN::rtn1(aux_rho_mean, pow(aux_rho_var, 0.5), -upper_bound, upper_bound);
+  aux_rho_n             = RcppTN::rtn1(aux_rho_mean, pow(aux_rho_var, 0.5), 0, 1);
   
   
   return List::create(
@@ -544,7 +540,7 @@ Rcpp::List svar_ce1 (
   rowvec    hm1         = aux_h_n.cols(0,T-2);
   double    aux_rho_var = as_scalar(pow( hm1 * hm1.t() / aux_sigma2v_n, -1));
   double    aux_rho_mean = as_scalar(aux_rho_var * (hm1 * aux_h_n.cols(1,T-1).t() / aux_sigma2v_n) );
-  aux_rho_n             = RcppTN::rtn1(aux_rho_mean, pow(aux_rho_var, 0.5),-1,1);
+  aux_rho_n             = RcppTN::rtn1(aux_rho_mean, pow(aux_rho_var, 0.5),0, 1);
   
   mat       H_rho_new(T, T, fill::eye);
   H_rho_new.diag(-1)   -= aux_rho_n;
@@ -638,7 +634,7 @@ Rcpp::List svar_ce1_mss (
   mat       sigma_v2_inv_diag = diagmat(sigma2v_T_inv.cols(1,T-1));
   double    aux_rho_var = as_scalar(pow( hm1 * sigma_v2_inv_diag * hm1.t(), -1));
   double    aux_rho_mean = as_scalar(aux_rho_var * (hm1 * sigma_v2_inv_diag * aux_h_n.cols(1,T-1).t() ) );
-  aux_rho_n             = RcppTN::rtn1(aux_rho_mean, sqrt(aux_rho_var),-1,1);
+  aux_rho_n             = RcppTN::rtn1(aux_rho_mean, sqrt(aux_rho_var),0, 1);
   
   mat       H_rho_new(T, T, fill::eye);
   H_rho_new.diag(-1)   -= aux_rho_n;
