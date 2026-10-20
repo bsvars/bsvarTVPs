@@ -21,8 +21,8 @@ Otherwise, the parameter estimates determine this magnitude.}
 }
 \value{
 An object of class \code{PosteriorIR}, that is, an 
-\code{NxNx(horizon+1)xS} array with attribute PosteriorIR 
-containing \code{S} draws of the impulse responses.
+\code{NxNx(horizon+1)xMxS} array with attribute PosteriorIR 
+containing \code{S} draws of the impulse responses for each of the \code{M} regimes.
 }
 \description{
 Each of the draws from the posterior estimation of models from 
