@@ -139,30 +139,6 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     // Check for user interrupts
     if (ss % 200 == 0) checkUserInterrupt();
     
-    // sample aux_lambda and aux_df
-    if ( debug ) Rcout<<" sample aux_lambda and aux_df"<<endl;
-    mat E             = (Y - aux_A * X);
-    if ( studentt ) {
-      
-      mat U           = E;
-      for (int t=0; t<T; t++) {
-        int   m       = aux_xi(0,t);
-        U.col(t)      = aux_B.slice(m) * (Y.col(t) - aux_A * X.col(t));
-      }
-      U              /= aux_sigma;
-      
-      try {
-        aux_lambda      = sample_lambda_ms(aux_df, aux_xi, U);
-        aux_lambda_sqrt = sqrt(aux_lambda);
-        aux_hetero      = aux_sigma % aux_lambda_sqrt;
-      } catch (std::runtime_error &e) {}
-      
-      try {
-        aux_df_tmp      = sample_df_ms (aux_df, aux_lambda, aux_xi, U, prior, ss, adaptive_scale, adptive_alpha_gamma);
-        aux_df          = as<mat>(aux_df_tmp["aux_df"]);
-        adaptive_scale  = as<mat>(aux_df_tmp["adaptive_scale"]);
-      } catch (std::runtime_error &e) {}
-    } // END studentt
     
     // sample aux_xi
     if ( debug ) Rcout<<" sample aux_xi"<<endl;
@@ -180,26 +156,59 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
       }
     }
     if ( studentt ) {
-      try {
+      // try {
         aux_xi        = sample_Markov_process_studentt(Z, log_Jacobian, aux_xi, aux_PR_TR, aux_pi_0, aux_df, finiteM);
-      } catch (std::runtime_error &e) {
-        Rcout << "   sample_Markov_process_studentt failure " << endl;
-      }
+      // } catch (std::runtime_error &e) {
+      //   Rcout << "   sample_Markov_process_studentt failure " << endl;
+      // }
     } else {
-      try {
+      // try {
         aux_xi        = sample_Markov_process(Z, log_Jacobian, aux_xi, aux_PR_TR, aux_pi_0, finiteM);
-      } catch (std::runtime_error &e) {
-        Rcout << "   sample_Markov_process failure " << endl;
-      }
+      // } catch (std::runtime_error &e) {
+      //   Rcout << "   sample_Markov_process failure " << endl;
+      // }
     }    
     
     // sample aux_PR_TR and aux_pi_0
     if ( debug ) Rcout<<" sample aux_PR_TR and aux_pi_0"<<endl;
-    try {
+    // try {
       PR_TR_tmp       = sample_transition_probabilities(aux_PR_TR, aux_pi_0, aux_xi, prior);
       aux_PR_TR       = as<mat>(PR_TR_tmp["aux_PR_TR"]);
       aux_pi_0        = as<vec>(PR_TR_tmp["aux_pi_0"]);
-    } catch (std::runtime_error &e) {}
+    // } catch (std::runtime_error &e) {}
+    
+    // update the conditional sds to the new regime allocations
+    if ( sv_select != 3 ) {
+      for (int t=0; t<T; t++) {
+        aux_sigma.col(t)  = exp(0.5 * aux_omega.col(aux_xi(0,t)) % aux_h.col(t));
+      }
+      aux_hetero          = aux_sigma % aux_lambda_sqrt;
+    }
+    
+    // sample aux_lambda and aux_df
+    if ( debug ) Rcout<<" sample aux_lambda and aux_df"<<endl;
+    mat E             = (Y - aux_A * X);
+    if ( studentt ) {
+      
+      mat U           = E;
+      for (int t=0; t<T; t++) {
+        int   m       = aux_xi(0,t);
+        U.col(t)      = aux_B.slice(m) * (Y.col(t) - aux_A * X.col(t));
+      }
+      U              /= aux_sigma;
+      
+      // try {
+        aux_lambda      = sample_lambda_ms(aux_df, aux_xi, U);
+        aux_lambda_sqrt = sqrt(aux_lambda);
+        aux_hetero      = aux_sigma % aux_lambda_sqrt;
+      // } catch (std::runtime_error &e) {}
+      
+      // try {
+        aux_df_tmp      = sample_df_ms (aux_df, aux_lambda, aux_xi, U, prior, ss, adaptive_scale, adptive_alpha_gamma);
+        aux_df          = as<mat>(aux_df_tmp["aux_df"]);
+        adaptive_scale  = as<mat>(aux_df_tmp["adaptive_scale"]);
+      // } catch (std::runtime_error &e) {}
+    } // END studentt
     
     // sample aux_hyper
     if ( debug ) Rcout<<" sample aux_hyper"<<endl;
@@ -219,17 +228,17 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
     
     // sample aux_B
     if ( debug ) Rcout<<" sample aux_B"<<endl;
-    try {
+    // try {
       BSL             = sample_B_mss_s4(aux_B, aux_SL, aux_A, precisionB, aux_hetero, aux_xi, Y, X, prior, VB);
       aux_B           = as<cube>(BSL["aux_B"]);
       aux_SL          = as<imat>(BSL["aux_SL"]);
-    } catch (std::runtime_error &e) {}
+    // } catch (std::runtime_error &e) {}
     
     // sample aux_A
     if ( debug ) Rcout<<" sample aux_A"<<endl;
-    try {
+    // try {
       aux_A           = sample_A_heterosk1_mss(aux_A, aux_B, aux_xi, precisionA, aux_hetero, Y, X, prior);
-    } catch (std::runtime_error &e) {}
+    // } catch (std::runtime_error &e) {}
     
     // sample aux_h, aux_omega and aux_S, aux_sigma2_omega
     if ( debug ) Rcout<<" sample aux_h, aux_omega and aux_S, aux_sigma2_omega"<<endl;
@@ -255,27 +264,30 @@ Rcpp::List bsvar_mss_tvi_sv_cpp (
         double  s2o_tmp     = aux_sigma2_omega(n);
         double  s_n         = aux_s_(n);
         
+        // bool    sv_ok       = true;
         if ( sv_select == 2 ) {
-          try {
+          // try {
             sv_n            = svar_ce1_mss( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior);
-          } 
-          catch (std::runtime_error &e) {}
-          catch (std::logic_error &e) {}
+          // } 
+          // catch (std::runtime_error &e) {sv_ok = false;}
+          // catch (std::logic_error &e) {sv_ok = false;}
         } else if ( sv_select == 1 ) {
-          try {
+          // try {
             sv_n            = svar_nc1_mss( h_tmp, rho_tmp, omega_tmp, sigma2v_tmp, s2o_tmp, s_n, S_tmp, aux_xi, U_tmp, prior);
-          } 
-          catch (std::runtime_error &e) {}
-          catch (std::logic_error &e) {}
+          // } 
+          // catch (std::runtime_error &e) {sv_ok = false;}
+          // catch (std::logic_error &e) {sv_ok = false;}
         }
         
-        aux_h.row(n)        = as<rowvec>(sv_n["aux_h_n"]);
-        aux_rho(n)          = as<double>(sv_n["aux_rho_n"]);
-        aux_omega.row(n)    = as<rowvec>(sv_n["aux_omega_n"]);
-        aux_sigma2v.row(n)  = as<rowvec>(sv_n["aux_sigma2v_n"]);
-        aux_S.row(n)        = as<urowvec>(sv_n["aux_S_n"]);
-        aux_sigma2_omega(n) = as<double>(sv_n["aux_sigma2_omega_n"]);
-        aux_s_(n)           = as<double>(sv_n["aux_s_n"]);
+        // if ( sv_ok ) {
+          aux_h.row(n)        = as<rowvec>(sv_n["aux_h_n"]);
+          aux_rho(n)          = as<double>(sv_n["aux_rho_n"]);
+          aux_omega.row(n)    = as<rowvec>(sv_n["aux_omega_n"]);
+          aux_sigma2v.row(n)  = as<rowvec>(sv_n["aux_sigma2v_n"]);
+          aux_S.row(n)        = as<urowvec>(sv_n["aux_S_n"]);
+          aux_sigma2_omega(n) = as<double>(sv_n["aux_sigma2_omega_n"]);
+          aux_s_(n)           = as<double>(sv_n["aux_s_n"]);
+        // }
         
         for (int t=0; t<T; t++){
           omega_T_n(t)      = aux_omega(n, aux_xi(0,t));
