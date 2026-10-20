@@ -107,6 +107,7 @@ specify_prior_bsvarTVP = R6::R6Class(
       stopifnot("Argument stationary must be a logical vector of length N." = length(stationary) == N & is.logical(stationary))
       
       A1                = diag(as.numeric(!stationary))
+      B_nu              = N
       
       if (is.null(train_data)) {
         T_train         = 0
@@ -118,13 +119,14 @@ specify_prior_bsvarTVP = R6::R6Class(
         T_train         = nrow(train_data)
         resid           = train_data[2:T_train,] - train_data[1:(T_train - 1),] %*% t(A1)
         S_inv           = crossprod(resid)
+        B_nu            = T_train + N
       }
       
       K                 = N * p + 1 + d
       self$A            = cbind(A1, matrix(0, N, K - N))
-      self$A_V_inv      = diag(c(kronecker((1:p)^2, rep(1, N) ), rep(1, d + 1)))
+      self$A_V_inv      = diag(c(kronecker((1:p)^2, rep(1, N) ), rep(1/100, d + 1)))
       self$B_V_inv      = S_inv
-      self$B_nu         = T_train + N + 1
+      self$B_nu         = B_nu
       self$hyper_nu_B   = 10
       self$hyper_a_B    = 10
       self$hyper_s_BB   = 100
