@@ -28,4 +28,4 @@ Imports:
     RcppTN
 BugReports: https://github.com/bsvars/bsvarTVPs/issues
 Encoding: UTF-8
-RoxygenNote: 7.3.3
+Config/roxygen2/version: 8.0.0
