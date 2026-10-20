@@ -167,8 +167,8 @@ RcppExport SEXP _bsvarTVPs_bsvarTVPs_ir(SEXP posterior_BSEXP, SEXP posterior_ASE
     return rcpp_result_gen;
 }
 // bsvarTVPs_filter_forecast_smooth
-arma::cube bsvarTVPs_filter_forecast_smooth(Rcpp::List& posterior, const arma::mat& Y, const arma::mat& X, const bool forecasted, const bool smoothed);
-static SEXP _bsvarTVPs_bsvarTVPs_filter_forecast_smooth_try(SEXP posteriorSEXP, SEXP YSEXP, SEXP XSEXP, SEXP forecastedSEXP, SEXP smoothedSEXP) {
+arma::cube bsvarTVPs_filter_forecast_smooth(Rcpp::List& posterior, const arma::mat& Y, const arma::mat& X, const bool forecasted, const bool smoothed, const bool msa, const bool studentt);
+static SEXP _bsvarTVPs_bsvarTVPs_filter_forecast_smooth_try(SEXP posteriorSEXP, SEXP YSEXP, SEXP XSEXP, SEXP forecastedSEXP, SEXP smoothedSEXP, SEXP msaSEXP, SEXP studenttSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< Rcpp::List& >::type posterior(posteriorSEXP);
@@ -176,15 +176,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::mat& >::type X(XSEXP);
     Rcpp::traits::input_parameter< const bool >::type forecasted(forecastedSEXP);
     Rcpp::traits::input_parameter< const bool >::type smoothed(smoothedSEXP);
-    rcpp_result_gen = Rcpp::wrap(bsvarTVPs_filter_forecast_smooth(posterior, Y, X, forecasted, smoothed));
+    Rcpp::traits::input_parameter< const bool >::type msa(msaSEXP);
+    Rcpp::traits::input_parameter< const bool >::type studentt(studenttSEXP);
+    rcpp_result_gen = Rcpp::wrap(bsvarTVPs_filter_forecast_smooth(posterior, Y, X, forecasted, smoothed, msa, studentt));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _bsvarTVPs_bsvarTVPs_filter_forecast_smooth(SEXP posteriorSEXP, SEXP YSEXP, SEXP XSEXP, SEXP forecastedSEXP, SEXP smoothedSEXP) {
+RcppExport SEXP _bsvarTVPs_bsvarTVPs_filter_forecast_smooth(SEXP posteriorSEXP, SEXP YSEXP, SEXP XSEXP, SEXP forecastedSEXP, SEXP smoothedSEXP, SEXP msaSEXP, SEXP studenttSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvarTVPs_filter_forecast_smooth_try(posteriorSEXP, YSEXP, XSEXP, forecastedSEXP, smoothedSEXP));
+        rcpp_result_gen = PROTECT(_bsvarTVPs_bsvarTVPs_filter_forecast_smooth_try(posteriorSEXP, YSEXP, XSEXP, forecastedSEXP, smoothedSEXP, msaSEXP, studenttSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -2350,7 +2352,7 @@ static int _bsvarTVPs_RcppExport_validate(const char* sig) {
         signatures.insert("arma::field<arma::cube>(*bsvarTVPs_ir_ms)(arma::field<arma::cube>&,arma::cube&,const int,const int,const bool)");
         signatures.insert("arma::field<arma::cube>(*bsvarTVPs_ir_mssa)(arma::field<arma::cube>&,arma::field<arma::cube>&,const int,const int,const bool)");
         signatures.insert("arma::field<arma::cube>(*bsvarTVPs_ir)(arma::cube&,arma::cube&,const int,const int,const bool)");
-        signatures.insert("arma::cube(*bsvarTVPs_filter_forecast_smooth)(Rcpp::List&,const arma::mat&,const arma::mat&,const bool,const bool)");
+        signatures.insert("arma::cube(*bsvarTVPs_filter_forecast_smooth)(Rcpp::List&,const arma::mat&,const arma::mat&,const bool,const bool,const bool,const bool)");
         signatures.insert("arma::cube(*bsvarTVPs_fitted_values)(arma::cube&,arma::mat&)");
         signatures.insert("arma::cube(*bsvarTVPs_structural_shocks)(const arma::field<arma::cube>&,const arma::cube&,const arma::cube&,const arma::mat&,const arma::mat&)");
         signatures.insert("arma::field<arma::cube>(*bsvarTVPs_covariances_rf_mssv)(const arma::field<arma::cube>&,const arma::cube&,const arma::cube&)");
@@ -2483,7 +2485,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bsvarTVPs_bsvarTVPs_ir_ms", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_ir_ms, 5},
     {"_bsvarTVPs_bsvarTVPs_ir_mssa", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_ir_mssa, 5},
     {"_bsvarTVPs_bsvarTVPs_ir", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_ir, 5},
-    {"_bsvarTVPs_bsvarTVPs_filter_forecast_smooth", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_filter_forecast_smooth, 5},
+    {"_bsvarTVPs_bsvarTVPs_filter_forecast_smooth", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_filter_forecast_smooth, 7},
     {"_bsvarTVPs_bsvarTVPs_fitted_values", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_fitted_values, 2},
     {"_bsvarTVPs_bsvarTVPs_structural_shocks", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_structural_shocks, 5},
     {"_bsvarTVPs_bsvarTVPs_covariances_rf_mssv", (DL_FUNC) &_bsvarTVPs_bsvarTVPs_covariances_rf_mssv, 3},

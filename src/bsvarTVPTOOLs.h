@@ -37,7 +37,9 @@ arma::cube bsvarTVPs_filter_forecast_smooth (
     const arma::mat&  Y,
     const arma::mat&  X,
     const bool        forecasted,
-    const bool        smoothed
+    const bool        smoothed,
+    const bool        msa = false,          // regime-specific autoregressive matrices
+    const bool        studentt = false      // Student-t structural shocks
 );
 
 

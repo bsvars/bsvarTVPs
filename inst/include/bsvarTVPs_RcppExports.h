@@ -109,17 +109,17 @@ namespace bsvarTVPs {
         return Rcpp::as<arma::field<arma::cube> >(rcpp_result_gen);
     }
 
-    inline arma::cube bsvarTVPs_filter_forecast_smooth(Rcpp::List& posterior, const arma::mat& Y, const arma::mat& X, const bool forecasted, const bool smoothed) {
-        typedef SEXP(*Ptr_bsvarTVPs_filter_forecast_smooth)(SEXP,SEXP,SEXP,SEXP,SEXP);
+    inline arma::cube bsvarTVPs_filter_forecast_smooth(Rcpp::List& posterior, const arma::mat& Y, const arma::mat& X, const bool forecasted, const bool smoothed, const bool msa = false, const bool studentt = false) {
+        typedef SEXP(*Ptr_bsvarTVPs_filter_forecast_smooth)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_bsvarTVPs_filter_forecast_smooth p_bsvarTVPs_filter_forecast_smooth = NULL;
         if (p_bsvarTVPs_filter_forecast_smooth == NULL) {
-            validateSignature("arma::cube(*bsvarTVPs_filter_forecast_smooth)(Rcpp::List&,const arma::mat&,const arma::mat&,const bool,const bool)");
+            validateSignature("arma::cube(*bsvarTVPs_filter_forecast_smooth)(Rcpp::List&,const arma::mat&,const arma::mat&,const bool,const bool,const bool,const bool)");
             p_bsvarTVPs_filter_forecast_smooth = (Ptr_bsvarTVPs_filter_forecast_smooth)R_GetCCallable("bsvarTVPs", "_bsvarTVPs_bsvarTVPs_filter_forecast_smooth");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_bsvarTVPs_filter_forecast_smooth(Shield<SEXP>(Rcpp::wrap(posterior)), Shield<SEXP>(Rcpp::wrap(Y)), Shield<SEXP>(Rcpp::wrap(X)), Shield<SEXP>(Rcpp::wrap(forecasted)), Shield<SEXP>(Rcpp::wrap(smoothed)));
+            rcpp_result_gen = p_bsvarTVPs_filter_forecast_smooth(Shield<SEXP>(Rcpp::wrap(posterior)), Shield<SEXP>(Rcpp::wrap(Y)), Shield<SEXP>(Rcpp::wrap(X)), Shield<SEXP>(Rcpp::wrap(forecasted)), Shield<SEXP>(Rcpp::wrap(smoothed)), Shield<SEXP>(Rcpp::wrap(msa)), Shield<SEXP>(Rcpp::wrap(studentt)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();

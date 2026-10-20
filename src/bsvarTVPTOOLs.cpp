@@ -131,19 +131,32 @@ arma::cube bsvarTVPs_filter_forecast_smooth (
     const arma::mat&  Y,
     const arma::mat&  X,
     const bool        forecasted,
-    const bool        smoothed
+    const bool        smoothed,
+    const bool        msa = false,          // regime-specific autoregressive matrices
+    const bool        studentt = false      // Student-t structural shocks
 ) {
   
   field<cube> posterior_B = as<field<cube>>(posterior["B"]);
-  cube  posterior_A       = as<cube>(posterior["A"]);
-  cube  posterior_sigma   = as<cube>(posterior["sigma"]);
+  cube        posterior_A;
+  field<cube> posterior_A_ms;
+  if ( msa ) {
+    posterior_A_ms        = as<field<cube>>(posterior["A_cpp"]);   // (S)(N, K, M)
+  } else {
+    posterior_A           = as<cube>(posterior["A_cpp"]);          // (N, K, S)
+  }
+  cube  posterior_df;
+  if ( studentt ) {
+    posterior_df          = as<cube>(posterior["df"]);             // (N, M, S)
+  }
+  cube  posterior_h       = as<cube>(posterior["h"]);
+  cube  posterior_omega   = as<cube>(posterior["omega"]);
   cube  posterior_PR_TR   = as<cube>(posterior["PR_TR"]);
   mat   posterior_pi_0    = as<mat>(posterior["pi_0"]);
   
   const int   N           = Y.n_rows;
   const int   M           = posterior_PR_TR.n_rows;
   const int   T           = Y.n_cols;
-  const int   S           = posterior_A.n_slices;
+  const int   S           = posterior_PR_TR.n_slices;
   
   cube  filtered_probabilities(M, T, S);
   cube  for_smo_probabilities(M, T, S);
@@ -152,21 +165,33 @@ arma::cube bsvarTVPs_filter_forecast_smooth (
   
   for (int s=0; s<S; s++) {
     for (int m=0; m<M; m++) {
-      shocks.slice(m)     = pow(posterior_sigma.slice(s), -1) % (posterior_B(s).slice(m) * ( Y - posterior_A.slice(s) * X ));
+      mat sigma_m         = exp(0.5 * diagmat(posterior_omega.slice(s).col(m)) * posterior_h.slice(s));   // regime-specific sds
+      mat A_m             = msa ? posterior_A_ms(s).slice(m) : posterior_A.slice(s);
+      shocks.slice(m)     = pow(sigma_m, -1) % (posterior_B(s).slice(m) * ( Y - A_m * X ));
       double abs_log_det_B, sign_;
       log_det(abs_log_det_B, sign_, posterior_B(s).slice(m));
-      log_Jacobian.row(m) = abs_log_det_B - sum(log(posterior_sigma.slice(s)), 0);
+      log_Jacobian.row(m) = abs_log_det_B - sum(log(sigma_m), 0);
     }
     
-    filtered_probabilities.slice(s)   = filtering(
-      shocks, 
-      log_Jacobian,
-      posterior_PR_TR.slice(s), 
-      posterior_pi_0.col(s)
-    );
+    if ( studentt ) {
+      filtered_probabilities.slice(s) = filtering_studentt(
+        shocks, 
+        log_Jacobian,
+        posterior_PR_TR.slice(s), 
+        posterior_pi_0.col(s),
+        posterior_df.slice(s)
+      );
+    } else {
+      filtered_probabilities.slice(s) = filtering(
+        shocks, 
+        log_Jacobian,
+        posterior_PR_TR.slice(s), 
+        posterior_pi_0.col(s)
+      );
+    }
     
     if (forecasted) {
-      for_smo_probabilities.slice(s)  = posterior_PR_TR.slice(s) * filtered_probabilities.slice(s);
+      for_smo_probabilities.slice(s)  = trans(posterior_PR_TR.slice(s)) * filtered_probabilities.slice(s);
     } else if (smoothed) {
       for_smo_probabilities.slice(s)  = smoothing(filtered_probabilities.slice(s), posterior_PR_TR.slice(s));
     }
