@@ -91,7 +91,7 @@ specify_prior_bsvarTVP = R6::R6Class(
     #' the model.
     #' @param stationary an \code{N} logical vector - its element set to \code{FALSE} 
     #' sets the prior mean for the autoregressive parameters of the \code{N}th 
-    #' equation to the white noise process, otherwise to random walk.
+    #' equation to the random walk process, otherwise to white noise.
     #' @return A new prior specification PriorBSVARTVP
     #' @examples 
     #' # a prior for 3-variable example with one lag
@@ -589,6 +589,7 @@ specify_identification_bsvarsTVI = R6::R6Class(
         self$VB[[n]]   <- matrix(diag(N)[B[n,],], ncol = N)
         self$VA[[n]]   <- matrix(diag(K)[A[n,],], ncol = K)
       }
+      self$VB[[n + 1]] <- as.matrix(rep(1, N))
     }, # END set_identification
     
     
@@ -693,8 +694,8 @@ specify_bsvarTVP = R6::R6Class(
     #' are estimated, otherwise they are fixed.
     #' @param exogenous a \code{(T+p)xd} matrix of exogenous variables. 
     #' @param stationary an \code{N} logical vector - its element set to \code{FALSE} sets 
-    #' the prior mean for the autoregressive parameters of the \code{N}th equation to the white noise process, 
-    #' otherwise to random walk.
+    #' the prior mean for the autoregressive parameters of the \code{N}th equation to the random walk process, 
+    #' otherwise to white noise.
     #' @param finiteM a logical value - if true a stationary Markov switching 
     #' model is estimated. Otherwise, a sparse Markov switching model is estimated 
     #' in which \code{M=20} and the number of visited states is estimated.
@@ -758,6 +759,7 @@ specify_bsvarTVP = R6::R6Class(
         }
       }
       private$finiteM  = finiteM
+      private$M        = M
       
       if (missing(B)) {
         message("The identification is set to the default option of lower-triangular structural matrix.")
