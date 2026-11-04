@@ -656,7 +656,7 @@ Rcpp::List sample_hyperparameter_boost_s4 (
   
   mat   prior_A               = as<mat>(prior["A"]);
   mat   prior_A_V_inv         = as<mat>(prior["A_V_inv"]);
-  mat   prior_B_V_inv         = as<mat>(prior["B_V_inv"]);
+  cube  prior_B_V_inv         = as<cube>(prior["B_V_inv"]);   // NxNxN
   
   int         Ltmp = VB.n_elem - 1;
   vec         Lm  = VB(Ltmp);
@@ -695,7 +695,7 @@ Rcpp::List sample_hyperparameter_boost_s4 (
       aux_hyper(N + n, 0) = R::rgamma(BB_shape_tmp, BB_scale_tmp);
       
       BB_scale_tmp         = aux_hyper(N + n, 0) + 
-        as_scalar(aux_B.row(n) * prior_B_V_inv * trans(aux_B.row(n)));
+        as_scalar(aux_B.row(n) * prior_B_V_inv.slice(n) * trans(aux_B.row(n)));
       BB_shape_tmp         = prior_hyper_nu_B + rn(n);
       aux_hyper(n, 0)   = BB_scale_tmp / R::rchisq(BB_shape_tmp);
     }
@@ -748,7 +748,7 @@ Rcpp::List sample_hyperparameters_mss_boost (
   
   mat   prior_A               = as<mat>(prior["A"]);
   mat   prior_A_V_inv         = as<mat>(prior["A_V_inv"]);
-  mat   prior_B_V_inv         = as<mat>(prior["B_V_inv"]);
+  cube  prior_B_V_inv         = as<cube>(prior["B_V_inv"]);   // NxNxN
   
   // aux_B - related hyper-parameters 
   vec     ss_tmp      = aux_hyper.submat(N, 0, 2 * N - 1, 0);
@@ -780,7 +780,7 @@ Rcpp::List sample_hyperparameters_mss_boost (
       double BVB        = 0;
       for (int m=0; m<M; m++) {
         rowvec  Bnm     = aux_B.subcube(n, 0, m, n, N - 1, m);
-        BVB            += as_scalar(Bnm * prior_B_V_inv * Bnm.t());
+        BVB            += as_scalar(Bnm * prior_B_V_inv.slice(n) * Bnm.t());
       }
       BB_scale_tmp         = aux_hyper(N + n, 0) + BVB;
       BB_shape_tmp         = prior_hyper_nu_B + M * rn;
@@ -836,7 +836,7 @@ Rcpp::List sample_hyperparameters_mss_s4_boost (
   
   mat   prior_A               = as<mat>(prior["A"]);
   mat   prior_A_V_inv         = as<mat>(prior["A_V_inv"]);
-  mat   prior_B_V_inv         = as<mat>(prior["B_V_inv"]);
+  cube  prior_B_V_inv         = as<cube>(prior["B_V_inv"]);   // NxNxN
   
   int   Ltmp                  = VB.n_elem - 1;
   vec   Lm                    = VB(Ltmp);
@@ -879,7 +879,7 @@ Rcpp::List sample_hyperparameters_mss_s4_boost (
       double BVB        = 0;
       for (int m=0; m<M; m++) {
         rowvec  Bnm     = aux_B.subcube(n, 0, m, n, N - 1, m);
-        BVB            += as_scalar(Bnm * prior_B_V_inv * Bnm.t());
+        BVB            += as_scalar(Bnm * prior_B_V_inv.slice(n) * Bnm.t());
       }
       BB_scale_tmp         = aux_hyper(N + n, 0) + BVB;
       BB_shape_tmp         = prior_hyper_nu_B + rn;
@@ -936,7 +936,7 @@ Rcpp::List sample_hyperparameters_mssa_s4_boost (
   
   mat   prior_A               = as<mat>(prior["A"]);
   mat   prior_A_V_inv         = as<mat>(prior["A_V_inv"]);
-  mat   prior_B_V_inv         = as<mat>(prior["B_V_inv"]);
+  cube  prior_B_V_inv         = as<cube>(prior["B_V_inv"]);   // NxNxN
   
   int   Ltmp                  = VB.n_elem - 1;
   vec   Lm                    = VB(Ltmp);
@@ -978,7 +978,7 @@ Rcpp::List sample_hyperparameters_mssa_s4_boost (
       double BVB        = 0;
       for (int m=0; m<M; m++) {
         rowvec  Bnm     = aux_B.subcube(n, 0, m, n, N - 1, m);
-        BVB            += as_scalar(Bnm * prior_B_V_inv * Bnm.t());
+        BVB            += as_scalar(Bnm * prior_B_V_inv.slice(n) * Bnm.t());
       }
       BB_scale_tmp         = aux_hyper(N + n, 0) + BVB;
       BB_shape_tmp         = prior_hyper_nu_B + rn;
@@ -1016,12 +1016,12 @@ arma::field<arma::mat> hyper2precisionB_boost (
 ) {
   
   mat         aux_hyper     = as<mat>(aux_hyper_list["aux_hyper"]); 
-  mat         prior_SS_inv  = as<mat>(prior["B_V_inv"]);
+  cube        prior_SS_inv  = as<cube>(prior["B_V_inv"]);   // NxNxN
   int         N             = prior_SS_inv.n_rows; 
   field<mat>  precisionB(N);
   
   for (int n=0; n<N; n++) {
-    precisionB(n)           = pow(aux_hyper(n, 0), -1) * prior_SS_inv;
+    precisionB(n)           = pow(aux_hyper(n, 0), -1) * prior_SS_inv.slice(n);
   }
   
   return precisionB;
@@ -1053,7 +1053,7 @@ arma::field<arma::mat> hyper2precisionB_mss_boost (
 ) {
   
   mat         aux_hyper     = as<mat>(aux_hyper_list["aux_hyper"]); 
-  mat         prior_SS_inv  = as<mat>(prior["B_V_inv"]);
+  cube        prior_SS_inv  = as<cube>(prior["B_V_inv"]);   // NxNxN
   mat         prior_PR_TR   = as<mat>(prior["PR_TR"]);
   
   int         N             = prior_SS_inv.n_rows; 
@@ -1062,7 +1062,7 @@ arma::field<arma::mat> hyper2precisionB_mss_boost (
   
   for (int n=0; n<N; n++) {
     for (int m=0; m<M; m++) {
-      precisionB(n, m)      = pow(aux_hyper(n, 0), -1) * prior_SS_inv;
+      precisionB(n, m)      = pow(aux_hyper(n, 0), -1) * prior_SS_inv.slice(n);
     }
   }
   

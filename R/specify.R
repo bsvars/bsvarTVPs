@@ -22,9 +22,10 @@ specify_prior_bsvarTVP = R6::R6Class(
     #' the row of the parameter matrix \eqn{A}. This precision matrix is equation invariant.
     A_V_inv    = matrix(),
     
-    #' @field B_V_inv an \code{NxN} precision matrix of the generalised-normal prior distribution 
-    #' for the structural matrix \eqn{B}. This precision matrix is equation invariant.
-    B_V_inv    = matrix(),
+    #' @field B_V_inv an \code{NxNxN} array of the equation-specific \code{NxN} precision
+    #' matrices of the generalised-normal prior distribution for the rows of the structural
+    #' matrix \eqn{B}; \code{B_V_inv[,,n]} is the precision matrix for the \code{n}th row.
+    B_V_inv    = array(),
     
     #' @field B_nu a positive integer greater of equal than \code{N}, a shape parameter of 
     #' the generalised-normal prior distribution for the structural matrix \eqn{B}.
@@ -125,7 +126,7 @@ specify_prior_bsvarTVP = R6::R6Class(
       K                 = N * p + 1 + d
       self$A            = cbind(A1, matrix(0, N, K - N))
       self$A_V_inv      = diag(c(kronecker((1:p)^2, rep(1, N) ), rep(1/100, d + 1)))
-      self$B_V_inv      = S_inv
+      self$B_V_inv      = array(S_inv, c(N, N, N))
       self$B_nu         = B_nu
       self$hyper_nu_B   = 10
       self$hyper_a_B    = 10
