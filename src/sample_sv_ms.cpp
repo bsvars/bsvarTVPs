@@ -71,7 +71,7 @@ arma::uvec inverse_transform_sampling (
   uvec r(T);
   for (int j = 0; j < T; j++) {
     int index = (10-1)/2;  // start searching in the middle
-    const double unnorm_cdf_value = R::unif_rand()*mixprob[9 + 10*j];  // current (non-normalized) value
+    const double unnorm_cdf_value = randu()*mixprob[9 + 10*j];  // current (non-normalized) value
     bool larger = false;  // indicates that we already went up
     bool smaller = false; // indicates that we already went down
     while(true) {
@@ -392,7 +392,7 @@ Rcpp::List svar_nc1_mss (
   }
   
   // sample aux_s_n
-  aux_s_n               = (prior_sv_s_ + 2 * aux_sigma2_omega_n)/R::rchisq(3 + 2 * prior_sv_a_);
+  aux_s_n               = (prior_sv_s_ + 2 * aux_sigma2_omega_n)/chi2rnd(3 + 2 * prior_sv_a_);
   
   // sample aux_sigma2_omega
   aux_sigma2_omega_n    = do_rgig1( prior_sv_a_ - 0.5 * M, accu(square(aux_omega_n)), 2/aux_s_n );
@@ -435,7 +435,7 @@ Rcpp::List svar_nc1_mss (
     }
     double    V_omega_inv = 1/vo;
     double    omega_bar   = mo;
-    omega_aux(m)          = R::rnorm(V_omega_inv*omega_bar, sqrt(V_omega_inv) );
+    omega_aux(m)          = randn( distr_param(V_omega_inv*omega_bar, sqrt(V_omega_inv) ));
   } // END m loop
   
   for (int t=0; t<T; t++) {
@@ -605,7 +605,7 @@ Rcpp::List svar_ce1_mss (
   }
   
   // sample aux_s_n
-  aux_s_n               = (prior_sv_s_ + 2 * aux_sigma2_omega_n)/R::rchisq(3 + 2 * prior_sv_a_);
+  aux_s_n               = (prior_sv_s_ + 2 * aux_sigma2_omega_n)/chi2rnd(3 + 2 * prior_sv_a_);
   
   // sample aux_sigma2_omega
   aux_sigma2_omega_n    = randg( distr_param(1 + 0.5 * prior_sv_a_, pow(pow(aux_s_n,-1) + accu(pow(2 * aux_sigma2v_n,-1)), -1)  ) );

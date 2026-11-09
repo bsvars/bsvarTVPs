@@ -93,7 +93,7 @@ Rcpp::List sample_df_ms (
       kernel_ratio            *= RcppTN::dtn1(aux_df(n, m), aux_df_star(n, m), adaptive_scale(n, m), 2, R_PosInf) / RcppTN::dtn1(aux_df_star(n, m), aux_df(n, m), adaptive_scale(n, m), 2, R_PosInf);
       
       if ( kernel_ratio < 1 ) alpha(n, m) = kernel_ratio;
-      if ( R::runif(0, 1) < alpha(n, m) ) {
+      if ( randu() < alpha(n, m) ) {
         aux_df(n, m) = aux_df_star(n, m);
       }
       if (s > 1) {
