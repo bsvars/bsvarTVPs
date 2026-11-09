@@ -272,7 +272,7 @@ Rcpp::List svar_nc1 (
   const NumericVector pr_s    = NumericVector::create(0.00609,0.04775,0.13057,0.20674,0.22715,0.18842,0.12047,0.05591,0.01575,0.00115);
   const double        ccc     = 0.000000001;      // a constant to make log((u+ccc)^2) feasible
   
-  // sample h and omega of the non-centered SV including ASIS step
+  // sample h and omega of the non-centered SV
   const int     T = u.n_cols;
   const rowvec  U = log(pow(u + ccc, 2));
   
@@ -315,27 +315,16 @@ Rcpp::List svar_nc1 (
   double    V_omega_inv = 1/( as_scalar(aux_h_n * diagmat(sigma_S_inv) * aux_h_n.t()) + pow(aux_sigma2_omega_n, -1) );
   double    omega_bar   = as_scalar(aux_h_n * diagmat(sigma_S_inv) * (U - alpha_S).t());
   double    omega_aux   = randn( distr_param(V_omega_inv*omega_bar, sqrt(V_omega_inv) ));
-  
+
   // sample aux_h
   mat       V_h         = pow(omega_aux, 2) * diagmat(sigma_S_inv) + HH_rho;
   vec       h_bar       = omega_aux * diagmat(sigma_S_inv) * (U - alpha_S).t();
   rowvec    h_aux       = trans(precision_sampler_ar1( V_h.diag(), V_h(1, 0), h_bar));
-  
-  // ASIS
-  rowvec    aux_h_tilde = omega_aux * h_aux;
-  double    hHHh        = as_scalar( aux_h_tilde * HH_rho * aux_h_tilde.t() );
-  aux_sigma2v_n         = do_rgig1( -0.5*(T-1), hHHh, 1/aux_sigma2_omega_n );
-  int       ss=1;
-  if (R::runif(0,1)<0.5) ss *= -1;
-  aux_omega_n           = ss * sqrt(aux_sigma2v_n);
-  aux_h_n               = aux_h_tilde / aux_omega_n;
-  
-  // ASIS: resample aux_rho
-  hm1                   = aux_h_n.cols(0,T-2);
-  aux_rho_var           = as_scalar(pow(hm1*hm1.t(), -1));
-  aux_rho_mean          = as_scalar(aux_rho_var * hm1*aux_h_n.cols(1,T-1).t());
-  aux_rho_n             = RcppTN::rtn1(aux_rho_mean, pow(aux_rho_var, 0.5),0, 1);
-  
+
+  aux_omega_n           = omega_aux;
+  aux_sigma2v_n         = pow(omega_aux, 2);
+  aux_h_n               = h_aux;
+
   return List::create(
     _["aux_h_n"]              = aux_h_n,
     _["aux_rho_n"]            = aux_rho_n,
@@ -370,7 +359,7 @@ Rcpp::List svar_nc1_mss (
   const NumericVector pr_s    = NumericVector::create(0.00609,0.04775,0.13057,0.20674,0.22715,0.18842,0.12047,0.05591,0.01575,0.00115);
   const double        ccc     = 0.000000001;      // a constant to make log((u+ccc)^2) feasible
   
-  // sample h and omega of the non-centered SV including ASIS step
+  // sample h and omega of the non-centered SV
   const int     T = u.n_cols;
   const int     M = aux_omega_n.n_cols;
   const rowvec  U = log(square(u + ccc));
@@ -458,18 +447,10 @@ Rcpp::List svar_nc1_mss (
   vec       h_bar       = diagmat(omega_T) * diagmat(sigma_S_inv) * (U - alpha_S).t();
   rowvec    h_aux       = trans(precision_sampler_ar1( V_h.diag(), V_h(1, 0), h_bar));
   
-  // no ASIS: with regime-dependent omegas the centred conditional of omega is not GIG
   aux_omega_n           = omega_aux;
   aux_sigma2v_n         = square(omega_aux);
   aux_h_n               = h_aux;
-  
-  // resample aux_rho
-  hm1                   = aux_h_n.cols(0,T-2);
-  aux_rho_var           = as_scalar(pow(hm1*hm1.t(), -1));
-  aux_rho_mean          = as_scalar(aux_rho_var * hm1*aux_h_n.cols(1,T-1).t());
-  aux_rho_n             = RcppTN::rtn1(aux_rho_mean, pow(aux_rho_var, 0.5), 0, 1);
-  
-  
+
   return List::create(
     _["aux_h_n"]              = aux_h_n,
     _["aux_rho_n"]            = aux_rho_n,
